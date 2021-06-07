@@ -1,0 +1,518 @@
+<?php
+namespace App\Http\Api\School;
+use App\Http\Controllers\Controller;
+use App\Models\School\SchoolHardware;
+use App\Models\School\SchoolPath;
+use App\Models\School\SchoolCarriageJson;
+use App\Models\School\SchoolCarriageInventory;
+use App\Models\School\SchoolCarriage;
+
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\PushController as Push;
+use App\Http\Controllers\RedisController as RedisServer;
+use App\Http\Api\School\SchoolController as SchoolServer;
+use App\Http\Api\School\TempDataController as TempData;
+use App\Facades\Map;
+class MacController extends Controller{
+    private $prefixCar='car_';
+    private $prefixGroup='group:';
+
+    /**
+     * 获取经纬度
+     * pathUrl =>                           /mac/get_loglat
+     * @param Request $request
+     * @param RedisServer $redisServer
+     * @param SchoolController $schoolServer
+     * @return mixed
+     */
+    public function get_loglat(Request $request,RedisServer $redisServer,SchoolServer $schoolServer,TempData $tempData,Push $push){
+        $carriage_id=null;
+        /** 接收数据*/
+        $mac_address		=$request->input('mac_address');
+        $longitude			=$request->input('longitude');
+        $latitude			=$request->input('latitude');
+        $now_time           =date('Y-m-d H:i:s',time());
+        $input				=$request->all();
+
+		//$kongzhi='1234';
+		//dump($mac_address);
+//Log::info($mac_address);
+        /** 虚拟数据+"longitude": "121.38206"
+      +"dimensionality": "31.11325"1*/
+
+        $input['mac_address']       =$mac_address   ='22120010341';
+        $input['longitude']         =$longitude     ='121.312337';
+        $input['latitude']          =$latitude      ='31.194791';
+        $now_time                   ='2020-09-17 11:10:00';
+
+        $rules = [
+            'mac_address' => 'required',
+            'longitude' => 'required',
+            'latitude' => 'required',
+        ];
+        $message = [
+            'mac_address.required' => '设备id不能为空',
+            'longitude.required' => '经度不能为空',
+            'latitude.required' => '纬度不能为空',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()){
+            $datass         =date_time();
+            /** 从redis中拉取数据，如果有，则判断是不是2，如果是2，则还是他，如果没有则拉取第一条数据进行发车 **/
+			$carriage_id		=$redisServer->get($mac_address,'mac_path');
+			/** 如果是空的，则去做发车的准备工作，准备工作为**/
+			if(empty($carriage_id)){
+                //如果是空的，则说明是初始化的状态，则需要根据UP，DOWM去拿第一条线路
+                //第一步，我们需要把 设备号查询出来关联的那个车辆			school_hardware
+                $where=[
+                    ['mac_address','=',$mac_address],
+                    ['delete_flag','=','Y']
+                ];
+                $mac_info=SchoolHardware::where($where)->select('mac_address','car_id','use_group_code as group_code')->first();
+
+                //第二步，去拿取这个公司的配置文件
+                if($mac_info){
+                    $fache_flag='Y';
+                    $keys=$this->prefixGroup.$mac_info->group_code;
+                    $basicsAuth		=$redisServer->get($keys,'group');
+                    $basics=json_decode($basicsAuth);
+                    if($basics){
+                        $fache_flag		=$basics->auto_depart_flag??$fache_flag;
+                    }
+//                    $where_basics=[
+//                        ['group_code','=',$mac_info->group_code],
+//                        ['delete_flag','=','Y']
+//                    ];
+//                    $basics=SchoolBasics::where($where_basics)->select('skip_flag','auto_depart_flag','group_code')->first();
+//
+//                    if($basics){
+//                        $fache_flag		=$basics->fache_flag??$fache_flag;
+//                    }
+
+                    //第三步，去拿取这个时间段的车辆
+                    if($fache_flag == 'Y' && $datass['status'] != 'OUT'){
+                        //去查询第一个线路数据
+                        $where_path=[
+                            ['site_type','=',$datass['status']],
+                            ['default_car_id','=',$mac_info->car_id],
+                            ['delete_flag','=','Y'],
+                            ['use_flag','=','Y']
+                        ];
+                        $schoolPathTime=SchoolPath::where($where_path)
+                            ->select('self_id')
+//                            ->select('default_car_id','default_car_brand','site_type','self_id','path_name','group_code')
+                            ->orderBy('come_time','asc')
+                            ->first();
+                        if($schoolPathTime){
+                            /**  如果你的第一个车有的话，还要去数据库看看，如果有，则别让他操作任何东西了！！！！！！！**/
+                            $carriage_id2   =$this->prefixCar.$schoolPathTime->self_id.$datass['dateStatus'];
+                            /***   这里要做修改，修改成从缓存中拿数据，如果拿到的数据，是2或者3，则不发车了，没必要从数据库中拿数据，
+                             * 注意：！！！！！！！！   缓存在发车过程中不可以清0
+                             **
+                             */
+                            //$aiui=SchoolCarriage::where('self_id','=',$carriage_id2)->value('carriage_status');
+//                            if($aiui== 2 || $aiui== 3){
+//                                $msg['code'] = 305;
+//                                $msg['msg'] = "不发车，运输结束了";
+//                                return $msg;
+//                            }
+
+//                            $carriage		=$redisServer->get($carriage_id2,'carriage');
+//                            $carriage_status=json_decode($carriage);
+//                            if(!isset($carriage_status)){
+//                                $msg['code'] = 306;
+//                                $msg['msg'] = "不发车，运输结束了";
+//                                return $msg;
+//                            }else{
+//                                if($carriage_status->carriage_status == 2 && $carriage_status->carriage_status == 3){
+//                                    $msg['code'] = 305;
+//                                    $msg['msg'] = "不发车，运输结束了";
+//                                    return $msg;
+//                                }
+//                            }
+
+                            //如果有这个车，则执行发车逻辑即可
+                            $path_info=$schoolServer->getPathInfo($schoolPathTime->self_id);
+                            //如果有数据则执行
+                            if($path_info->count()>0 &&  $path_info->schoolPathway->count()>0){
+                                $dispatchCarStatus=1;         //初始化为1未发车
+                                //获取未发车的数据
+                                $carriageInfo=$schoolServer->carriageInfo($path_info,$carriage_id2,$dispatchCarStatus,$datass,$mac_address);
+                                $redisServer->setex($carriage_id2,json_encode($carriageInfo,JSON_UNESCAPED_UNICODE),'carriage',25920);      ///1
+                                /*** 因为这里是mac是空的，所以可以直接执行发车逻辑**/
+                                //如果再里面就发车
+                                $schoolServer->saveInfo($carriageInfo,$redisServer,$mac_address);
+                                $carriage_id        =$carriage_id2;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /** 如果有运输ID， 则可以开始发起计算了，这个时候需要判断  状态是不是2，如果是2，才可以计算***/
+            if($carriage_id){
+                    $jsonInfo=$redisServer->get($carriage_id,'carriage');
+                    $carriage_info=json_decode($jsonInfo);
+                    if($carriage_info){
+						switch($carriage_info->carriage_status){
+                            case '2':
+                                /*** 则需要发起计算经纬度**/
+                                $enterLongitude         =$carriage_info->school_pathway[$carriage_info->next]->longitude;
+                                $enterLatitude          =$carriage_info->school_pathway[$carriage_info->next]->dimensionality;
+                                $distanceInfo           =Map::getDistance($longitude,$latitude,$enterLongitude,$enterLatitude);
+
+                                /*** 下面是发起计算的地方，如果计算得到结果，则需要存储进去redis中，**/
+                                if($distanceInfo['info'] == 'OK'){
+                                    $distance=$distanceInfo['route']['paths'][0]['distance'];           //得到的距离
+                                    $duration=$distanceInfo['route']['paths'][0]['duration'];           //得到的时间
+
+                                    //处理数据方法并返回数据进入缓存  并且发送推送消息的地方
+                                    $carriage_info=$this->dataHandling($carriage_info,$redisServer,$schoolServer,$tempData,$push,$distance,$duration,$longitude,$latitude,$now_time,$datass);
+
+                                    dd($carriage_info);
+
+
+
+
+
+
+                                         $redisServer->setex($carriage_id,json_encode($carriage_info,JSON_UNESCAPED_UNICODE),'carriage',25920);
+                                        /***开始把新的数据写入到redis中去了哦***/
+
+                                        /** 以下这个地方是将实时数据储存进入SchoolCarriageJson 的地方**/
+                                        //$schoolServer->setCarriageJson($redisServer,$longitude,$latitude,$distance,$duration,$carriage_info->carriage_id,$carriage_info->status,$now_time);
+                                        /** 以下这个地方是将实时数据储存进入SchoolCarriageJson 的地方结束**/
+                                        //dd($carriage_info);
+                                        $msg['code'] = 200;
+                                        $msg['msg'] = "存储成功";
+                                        return $msg;
+                                    }
+                                break;
+                            case '1':
+                                /*** 则需要判断是不是发车,如果这个车在这个距离盒子中，则可以进行发车处理，这里主要是处理N的问题**/
+                                //如果再里面就发车
+                                dd(121211);
+                                $schoolServer->saveInfo($carriage_info,$redisServer,$mac_address);
+                                //$carriage_id        =$carriage_info->carriage_id;
+
+                                break;
+                        }
+                    }
+                }
+
+            //以下代码不用了
+        }else{
+            $msg['code'] = 301;
+            $msg['msg'] = "参数不正确";
+            return $msg;
+        }
+    }
+
+
+
+    /**
+     * 数据处理
+     * @param $carriage_info
+     * @param $redisServer
+     * @param $distance
+     * @param $duration
+     * @param $longitude
+     * @param $latitude
+     * @param $now_time
+     * @return mixed
+     */
+    private function dataHandling($carriage_info,$redisServer,$schoolServer,$tempData,$push,$distance,$duration,$longitude,$latitude,$now_time,$datass){
+        /** 为保证推送只触发一个，我们需要做一个权重关系
+         *  发车提醒，预约到站提醒，到站提醒，结束运行提醒
+         * 1，发车提醒，2预约到站提醒，3，结束提醒，4到站提醒
+         **/
+        $push_flag=null;
+        if($carriage_info->start_flag == 'Y'){
+            //这个地方是发车后，拿到第一次经纬度的地方,做一个围栏，在这个围栏里面再触发推送，距离第一个要到达的站点距离5公里之内
+            $long=$carriage_info->school_pathway[$carriage_info->next]		->longitude;
+            $lat=$carriage_info->school_pathway[$carriage_info->next]		->dimensionality;
+            $boolen=Map::getBoolean($long,$lat,$longitude,$latitude,5);            //电子栅栏设置为多少合适，2为公里
+            dd($boolen);
+            if($boolen){
+                $push_flag='start';
+                $carriage_info->start_flag = 'N';
+            }
+        }
+dd(1551);
+        /**** 处理是不是到站的情况**/
+        $cando='N';     //是不是执行到站操作的控制，Y为执行，N为不执行
+        switch ($carriage_info->isEmergent){
+            case 'Y':
+                //说明这里是紧急状态，那么需要将   $carriage_info->errorcount     进行累加，在新的距离大于老的距离的情况下
+                if($distance > $carriage_info->oldDis ){
+                    $carriage_info->errorcount++;
+                }
+
+                if($carriage_info->errorcount > 3){
+                    //说明已经在紧急的情况下出现了3次连续大，很大的概率应该是过站了，所以请执行 到站的程序
+                    //执行完毕后，解除紧急状态
+                    $cando='Y';
+                }
+                break;
+            default:
+                //在正常情况下，那么什么时候需要进入紧急状态   传递 过来的值已经在1公里之内了
+                if($distance < 500){
+                    $carriage_info->isEmergent='Y';
+                    $carriage_info->oldDis=$distance;
+                }
+                break;
+        }
+
+        dd($carriage_info);
+        if($distance<=200){
+            //执行到站逻辑处理
+            $cando='Y';
+        }
+
+		//dump($distance);
+		//dump($cando);
+        //$cando='Y';
+        //$carriage_info->next = $carriage_info->end =7;
+
+        if($cando =='Y'){
+			/**如果到站了，要把单前这个站的值修改成1 Y**/
+			$carriage_info->log[$carriage_info->next]->status='Y';
+
+            $carriage_info->isEmergent='N';      //异常开启标志，再次初始化
+            $carriage_info->errorcount=0;        //异常计数器，再次初始化
+            //把next这个站点设置为已到站
+            $carriage_info->school_pathway[$carriage_info->next]->pathway_status='Y';
+            $carriage_info->school_pathway[$carriage_info->next]->arrive_time=$now_time;
+
+            //如果是最后一个站点，则设置全部到站
+            if($carriage_info->next == $carriage_info->end){
+                $carriage_info->carriage_status=3;          //全部到站完成，线路结束
+
+                /**将redis中的运输数据存储到数据库中，以便于后台出历史轨迹的地方**/
+                $sss = $carriage_info->carriage_id . 'ss';
+                $tempsss = json_decode($redisServer->get($sss,'default'), true);
+                $da['self_id']          = generate_id('self_');
+                $da['carriage_id']      = $carriage_info->carriage_id;
+                $da['json']             = json_encode($tempsss);
+                $da['create_time']      = $da['update_time'] = $now_time;
+                $da['type']             ='car';
+                //$idd = SchoolCarriageJson::insert($da);
+
+
+                /*** 以下是执行正确结束运行，修改数据库状态的地方**/
+				$strtotime=strtotime($now_time)-strtotime($carriage_info->start_time);
+                $dass['carriage_status'] = 3;
+				$dass['duration'] = $strtotime;						//时间
+				$dass['distance'] = $carriage_info->distance;
+
+                $dass['text_info'] = json_encode($carriage_info,JSON_UNESCAPED_UNICODE);
+                $dass['update_time'] = $now_time;
+
+                $dass_where['self_id']=$carriage_info->carriage_id;
+                SchoolCarriage::where($dass_where)->update($dass);
+
+                /*** 这个时候需要把另外一个车辆准备发车了！！！！！！****/
+                //拿到下一个发车的线路ID出来，做成一个运输ID,做一个条件出来，把MAC对应的线路修改成下一条线路
+
+                //$carriage_info->come_time='16:30:30';
+                $where_path=[
+                    ['site_type','=',$datass['status']],
+                    ['default_car_id','=',$carriage_info->default_car_id],
+                    ['delete_flag','=','Y'],
+                    ['come_time','>',$carriage_info->come_time],
+                    ['use_flag','=','Y']
+                ];
+				Log::info($where_path);
+                $schoolPathTime=SchoolPath::where($where_path)
+                    ->select('default_car_id','default_car_brand','site_type','self_id','path_name','group_code')
+                    ->orderBy('come_time','asc')
+                    ->first();
+
+					$jhsibfie=json_decode(json_encode($schoolPathTime),true);
+					//Log::info($jhsibfie);
+                if( $schoolPathTime){
+                    $carriage_id2   =$this->prefixCar.$schoolPathTime->self_id.$datass['dateStatus'];
+                    $path_info=$schoolServer->getPathInfo($schoolPathTime->self_id);
+
+                    if($path_info->count()>0 &&  $path_info->schoolPathway->count()>0){
+
+                        $dispatchCarStatus=1;         //初始化为1未发车
+                        $carriageInfo=$schoolServer->carriageInfo($path_info,$carriage_id2,$dispatchCarStatus,$datass,$carriage_info->mac_address);
+
+                        $redisServer->setex($carriage_id2,json_encode($carriageInfo,JSON_UNESCAPED_UNICODE),'carriage',25920);      ///1
+                        $redisServer->setex($carriage_info->mac_address,$carriage_id2,'mac_path',25920);
+
+                    }
+
+
+                }else{
+                    //删除MAC redis
+                   $dels= $redisServer->del($carriage_info->mac_address,'mac_path');
+
+                }
+                //$carriage_info->end_flag = 'N';
+                /*** 做最终结束运行推送的地方**/
+                if($carriage_info->end_flag == 'Y'){
+                    $push_flag='end';
+                    //$tempData->sendCartData($push,$carriage_info,'end');
+                    $carriage_info->end_flag = 'N';
+                }
+				//$this->rollCall($tempData,$push,$carriage_info);
+            }else{
+				//$this->rollCall($tempData,$push,$carriage_info);
+                //$carriage_info->go_flag = 'Y';
+                /*** 做到站  推送的地方**/
+                if($carriage_info->arrive_flag == 'Y'){
+                    $push_flag='arrive';
+					//$tempData->sendCartData($push,$carriage_info,'arrive');
+                }
+                //总计10   开始的0，结束9   next 1     【2,4,6】==3
+                do {
+                    $carriage_info->next ++ ;
+                } while (in_array($carriage_info->next,$carriage_info->paichu));
+
+            }
+        }
+
+        /***把计算得到的值丢到每个站点里面去，开始***/
+        $temp_distance = $distance;
+        $temp_duration = $duration;
+
+        /** 以下是做预约到站提醒的地方  ，预约提醒还有2个1！！！！！***/
+        $candodo='N';
+        $huyuyt=[];
+        foreach($carriage_info->school_pathway as $k => $v){
+            switch($v->pathway_status){
+                case 'Q':
+                    $v->real_distance = 0;
+                    $v->real_duration = 0;
+                    break;
+                case 'N':
+                    if($k < $carriage_info->next){
+                        $v->real_distance = 0;
+                        $v->real_duration = 0;
+                    }else if($k == $carriage_info->next){
+                        $v->real_distance = $distance;
+                        $v->real_duration = $duration;
+                    }else{
+                        $temp_distance = $v->distance + $temp_distance;
+                        $temp_duration = $v->duration + $temp_duration;
+                        $v->real_distance = $temp_distance;
+                        $v->real_duration = $temp_duration;
+                    }
+
+                    /** 推送预约到站提醒*/
+                    if($carriage_info->go_flag == 'Y' && $v->go_push_flag == 'N' && $k >= $carriage_info->next){
+                        if($v->real_duration  > $carriage_info->go_time && $v->real_duration  < $carriage_info->go_time+200){
+                            if($v->students){
+                                $huyuyt=array_merge($huyuyt,$v->students);
+                            }
+                            $push_flag='go_time';
+                            //$candodo='Y';
+                            $v->go_push_flag = 'Y';
+                        }
+                    }
+
+                    break;
+                case 'Y':
+                    $v->real_distance = 0;
+                    $v->real_duration = 0;
+                    break;
+
+            }
+
+        }
+        //$push_flag='end';
+		/** 保证一次只推送一条数据出来*/
+        if($push_flag){
+			$tempData->sendCartData($push,$carriage_info,$push_flag,$huyuyt);
+        }
+
+
+
+//        $tempData->sendCartData($push,$carriage_info,'start');
+
+        $carriage_info->timss           =$now_time;               //写入的时间
+        $carriage_info->real_longitude  =$longitude;
+        $carriage_info->real_latitude   =$latitude;
+        return $carriage_info;
+    }
+
+
+	public function rollCall($tempData,$push,$carriage_info){
+        //判断是否为Y
+        if($carriage_info->call_up_flag == 'Y' && $carriage_info->call_down_flag == 'Y'){
+            $where['use_flag']='Y';
+            $where['delete_flag']='Y';
+            $where['carriage_id']=$carriage_info->carriage_id;
+            $where['pathway_count_id']=$carriage_info->school_pathway[$carriage_info->next]->pathway_id;
+            $exists=SchoolCarriageInventory::where($where)->exists();
+            if(!$exists){
+                //判断是否是最后一战
+                switch ($carriage_info->site_type){
+                    case 'UP':
+                        if($carriage_info->next == $carriage_info->end){
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }else{
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }
+                        break;
+                    case 'DOWN':
+                        if($carriage_info->next == $carriage_info->start){
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }else{
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }
+                        break;
+                }
+            }
+        }else if($carriage_info->call_up_flag == 'Y' && $carriage_info->call_down_flag == 'N'){
+            //判断是否是最后一战
+            $where['use_flag']='Y';
+            $where['delete_flag']='Y';
+            $where['carriage_id']=$carriage_info->carriage_id;
+            $where['pathway_count_id']=$carriage_info[$carriage_info->next]['pathway_id'];
+            $exists=SchoolCarriageInventory::where($where)->exists();
+            if(!$exists){
+                switch ($carriage_info->site_type){
+                    case 'UP':
+                        if($carriage_info->next != $carriage_info->end){
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }
+                        break;
+                    case 'DOWN':
+                        if($carriage_info->next == $carriage_info->start){
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }
+                        break;
+                }
+            }
+        }else if($carriage_info->call_up_flag == 'N' && $carriage_info->call_down_flag == 'Y'){
+            //判断最后一战
+            $where['use_flag']='Y';
+            $where['delete_flag']='Y';
+            $where['carriage_id']=$carriage_info->carriage_id;
+            $where['pathway_count_id']=$carriage_info[$carriage_info->next]['pathway_id'];
+            $exists=SchoolCarriageInventory::where($where)->exists();
+            if(!$exists){
+                switch ($carriage_info->site_type){
+                    case 'UP':
+                        if($carriage_info->next == $carriage_info->end){
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }
+                        break;
+                    case 'DOWN':
+                        if($carriage_info->next != $carriage_info->start){
+                            $tempData->sendCartData($push,$carriage_info,'rollCall');
+                        }
+                        break;
+                }
+            }
+        }
+    }
+}
+?>

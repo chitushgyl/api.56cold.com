@@ -1,0 +1,228 @@
+<?php
+namespace App\Http\Api\Pay;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use EasyWeChat\Factory;
+use EasyWeChat\Foundation\Application;
+use EasyWeChat\Kernel\Support\Collection;
+use EasyWeChat\Kernel\Support\XML;
+use EasyWeChat\Payment\Order;
+// use Illuminate\Support\Facades\Schema;
+
+class NotifyController extends Controller{
+    /**	平台方的支付回调控制器		/notify/notify  */
+    public function notify(Request $request){
+        $request = Request::createFromGlobals();
+        try {
+            $xml = XML::parse(strval($request->getContent()));
+        } catch (\Throwable $e) {
+            //Log::info($e);  Log::info(44444);
+            throw new Exception('Invalid request XML: ' . $e->getMessage(), 400);
+        }
+        if (!is_array($xml) || empty($xml)) {
+            //Log::info('没有走这里');
+            throw new Exception('Invalid request XML.', 400);
+        }
+
+        $message=new Collection($xml);
+
+        $order_where=[
+            ['self_id','=',$message['out_trade_no']],
+        ];
+
+        $order_info=DB::table('shop_order_pay')
+            ->where($order_where)
+            ->select('pay_status','total_user_id','pay_to_money')
+            ->first();
+
+        if (!$order_info) {
+            $fail('Order not exist.');
+        }
+
+        if ($order_info->pay_status  != '1') {
+            return true;
+        }
+
+        if($message['result_code'] === 'SUCCESS'){
+            //到公用方法中去处理商品数据，在order方法中
+            $now_time=date('Y-m-d H:i:s',time());
+            $order_true=$this->process($message,$order_info,$now_time);
+            return $order_true;
+        }
+
+    }
+
+    //订单处理
+    public function process($parameter,$order_info,$now_time) {
+        //查出所有的商品的数据出来,并且查出这个商品要给与多少的积分比例，优惠券的ID出来
+
+
+        $order_list=[
+            ['pay_order_sn','=',$parameter['out_trade_no']],
+        ];
+
+        //查出所有商品的信息，做积分的 做优惠券的结合的
+        $order_list_info=DB::table('shop_order_list')
+            ->where($order_list)
+            ->select(
+                'price',
+                'number',
+                'discounts_activity',
+                'discounts_single',
+                'discounts_all_total',
+                'coupon_id',
+                'integral_scale'
+            )
+            ->get()->toArray();
+
+
+        $give_integral=0;       //给用户的积分
+        foreach ($order_list_info as $k => $v){
+            $give_integral+= ($v->price*$v->number-$v->discounts_activity-$v->discounts_single-$v->discounts_all_total)*$v->integral_scale;
+        }
+        $give_integral=intval($give_integral);
+
+
+        //dd($give_integral);
+
+
+
+        //将付款的时间处理一下，20200421203911   要变成       2020-03-31 17:08:14
+        $ahiui=[];
+        for ($x=0; $x<=12; $x+=2) {
+            $j=2;
+            $ahiui[]=substr($parameter['time_end'],$x,$j);
+        }
+        $pay_time=$ahiui[0].$ahiui[1].'-'.$ahiui[2].'-'.$ahiui[3].' '.$ahiui[4].':'.$ahiui[5].':'.$ahiui[6];
+        //上面是处理时间的
+
+
+        /** 开始处理业务逻辑   */
+        //第一步，修改支付订单的情况
+        $data["pay_status"]=2;
+        $data["pay_way"]="H5";
+        $data["pay_time"]=$pay_time;
+        $data["pay_mode"]="WeChat";
+        $data["pay_true"]=$parameter['total_fee'];
+        $data["pay_msg_info"]=json_encode($parameter);
+        $data["mch_id"]=$parameter['mch_id'];
+        $data["pay_message"]=$parameter['transaction_id'];
+        $data["update_time"]=$now_time;
+        $data['pay_mode']='WeChat';//支付方式，ALIPAY，WeChat，yuePay
+        $data['pay_way']='H5';//微信H5，PC端PC，安卓ANDROID，ISO
+
+        $where2['self_id']=$parameter['out_trade_no'];
+
+        $order_true=DB::table('shop_order_pay')->where($where2)->update($data);           //这个地方处理支付订单的状态
+
+        $where3['pay_order_sn']=$parameter['out_trade_no'];
+        $shop_order_data["pay_status"]=2;
+        $shop_order_data["update_time"]=$now_time;
+        DB::table('shop_order')->where($where3)->update($shop_order_data);           //这个地方处理支付订单的状态
+
+        if($give_integral>0 && $order_info->pay_to_money != $parameter['total_fee']){
+            //如果要给的积分》0.则给她积分，还要做层级关系的积分给与		$parameter,$order_info
+
+            //先给自己加积分
+            $user_where=[
+                ['a.self_id','=',$order_info->total_user_id],
+                ['b.delete_flag','=','Y'],
+            ];
+
+            $user_infosssss=DB::table('user_reg as a')
+                ->join('user_capital as b',function($join){
+                    $join->on('a.total_user_id','=','b.user_id');
+                }, null,null,'left')
+                ->where($user_where)
+                ->select(
+                    'a.self_id as user_id',
+                    'a.total_user_id',
+                    'a.father_user_id1',
+                    'a.father_user_id2',
+                    'a.father_user_id3',
+                    'a.father_user_id4',
+                    'a.father_user_id5',
+                    'a.father_user_id6',
+                    'a.father_user_id7',
+                    'a.father_user_id8',
+                    'b.integral'
+                )
+                ->first();
+
+            $where_integral1['total_user_id']=$user_infosssss->total_user_id;
+            $where_integral1['delete_flag']='Y';
+            //做一个积分流水的，一个积分总额的
+            //dd($user_info->integral);
+
+            $data1['self_id']=generate_id('wallet_');
+            $data1['total_user_id']=$user_infosssss->total_user_id;
+            $data1['capital_type']='integral';
+            $data1['produce_type']='IN';
+            $data1['money']=$give_integral;
+            $data1['create_time']=$now_time;
+            $data1['produce_cause']='消费赠送';
+            $data1['now_money']=$user_infosssss->integral+$give_integral;
+            $data1['now_money_md']=get_md5($data1['now_integral']);
+            $data1["order_sn"]=$parameter['out_trade_no'];
+
+            $data_capital['integral']=$data1['now_integral'];
+            $data_capital['update_time']=$now_time;
+            DB::table('user_capital')->where($where_integral1)->update($data_capital);           //修改用户总积分
+            DB::table('user_wallet')->insert($data1);           //添加这个用户的积分流水
+            //dump($user_info);
+            //现在做他的下线
+            for($i=1;$i<17;$i++){
+                $hjgur='father_user_id'.$i;
+
+                if($user_infosssss->$hjgur){
+                    $where_integral1_list['total_user_id']=$user_infosssss->$hjgur;
+                    $where_integral1_list['delete_flag']='Y';
+                    $allIn_integral=DB::table('user_capital')->where($where_integral1_list)->value('integral');
+
+                    $data1_list['self_id']=generate_id('wallet_');
+                    $data1_list['total_user_id']=$user_infosssss->$hjgur;
+                    $data1_list['capital_type']='integral';
+                    $data1_list['produce_type']='IN';
+                    $data1_list['money']=intval(ceil($give_integral*0.1));
+                    $data1_list['create_time']=$now_time;
+                    $data1_list['produce_cause']='推广消费赠送';
+                    $data1_list['now_money']=$allIn_integral+$data1_list['integral'];
+                    $data1_list['now_money_md']=get_md5($data1_list['now_integral']);
+                    $data1_list["order_sn"]=$parameter['out_trade_no'];
+
+                    $data_capital_list['integral']=$data1_list['now_integral'];
+                    $data_capital_list['update_time']=$now_time;
+
+                    DB::table('user_capital')->where($where_integral1_list)->update($data_capital_list);            //修改用户总积分
+                    DB::table('user_wallet')->insert($data1_list);           										//添加这个用户的积分流水
+                }
+            }
+        }
+        //去拿取所有这个订单使用到的优惠券，到用户优惠券里去找
+        $where_user_coupon['user_order_sn']=$parameter['out_trade_no'];
+        $where_user_coupon['delete_flag']='Y';
+        $where_user_coupon['coupon_status']='lock';
+        $coupon_ids=DB::table('user_coupon')->where($where_user_coupon)->select('self_id')->get()->toArray();
+        //dump($where_user_coupon);
+
+        if($coupon_ids){
+            //如果优惠券的集合是有的，则需要将优惠券的情况进行处理，在个人优惠券中修改成已使用，注意，这里应该是全场优惠券和单品优惠券的集合
+            foreach($coupon_ids as $k => $v){
+                $wehriu[]=$v->self_id;
+            }
+
+            $user_coupon['coupon_status']='used';
+            $user_coupon['use_time']=$user_coupon['update_time']=$now_time;
+            DB::table('user_coupon')->whereIn('self_id',$wehriu)->update($user_coupon);
+
+            //dd($wehriu);
+        }
+
+        if($order_true){
+            return true;
+        }
+    }
+
+}
+?>
