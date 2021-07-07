@@ -23,7 +23,7 @@ class PayController extends CommonController{
         $input         = $request->all();
         $price         = $request->input('price');
         $group_code     = $request->input('group_code');//接收中间件产生的参数
-        $price = 0.01;
+//        $price = 0.01;
         include_once base_path( '/vendor/alipay/pagepay/service/AlipayTradeService.php');
         include_once base_path('/vendor/alipay/pagepay/buildermodel/AlipayTradePagePayContentBuilder.php');
         $ordernumber = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
@@ -126,7 +126,7 @@ class PayController extends CommonController{
             $msg['msg']  = "接取的订单不能上线";
             return $msg;
         }
-        $price = 0.01;
+//        $price = 0.01;
         include_once base_path( '/vendor/alipay/pagepay/service/AlipayTradeService.php');
         include_once base_path('/vendor/alipay/pagepay/buildermodel/AlipayTradePagePayContentBuilder.php');
 
@@ -229,7 +229,7 @@ class PayController extends CommonController{
         $self_id       = $request->input('self_id');
         $group_code    = $request->input('group_code');
 //        dd($user_info->group_code);
-        $price = 0.01;
+//        $price = 0.01;
 //        $self_id = 'order_202105191510152166706423';
 //        $group_code = 'group_20210517152951011628979';
         include_once base_path( '/vendor/alipay/pagepay/service/AlipayTradeService.php');

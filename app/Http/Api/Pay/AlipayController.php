@@ -207,7 +207,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-        $data['price'] = $price = 0.01;
+//        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -317,7 +317,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-        $data['price'] = $price = 0.01;
+//        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -355,7 +355,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-        $data['price'] = $price = 0.01;
+//        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -493,7 +493,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
-        $price = 0.01;
+//        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -652,7 +652,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
-        $price = 0.01;
+//        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -787,7 +787,7 @@ class AlipayController extends Controller{
         // 支付金额
         $price = $request->input('price');
 //        /**虚拟数据
-        $price   = 0.01;
+//        $price   = 0.01;
 //        $self_id = 'order_202103121712041799645968';
 //         * */
         $now_time = date('Y-m-d H:i:s',time());
@@ -889,7 +889,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
-        $price = 0.01;
+//        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -1034,7 +1034,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
 //        $self_id = 'patch_202105071628455839736801';
-        $data['price'] = $price = 0.01;
+//        $data['price'] = $price = 0.01;
         if ($user_info->type == 'user' || $user_info->type == 'carriage'){
             $user_id = $user_info->total_user_id;
         }else{
