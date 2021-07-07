@@ -15,5 +15,6 @@ yarn-error.log
 /database
 /bootstrap
 /.idea
+/.gitignore
 
 

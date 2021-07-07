@@ -55,11 +55,14 @@ class CityController extends CommonController{
 
         $where=get_list_where($search);
 
-        $select=['self_id','group_code','group_name','min_number','start_price','unit_price','max_price','city','city_id','delete_flag','use_flag'];
+        $select=['self_id','group_code','group_name','min_number','start_price','unit_price','max_price','city','city_id','delete_flag','use_flag','carriage_group_code'];
+        $select1=['self_id','group_name'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsDeliveryCity::where($where)->count(); //总的数据量
-                $data['items']=TmsDeliveryCity::where($where)
+                $data['items']=TmsDeliveryCity::with(['systemGroup' => function($query)use($select1){
+                    $query->select($select1);
+                }])->where($where)
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
@@ -68,7 +71,10 @@ class CityController extends CommonController{
             case 'one':
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=TmsDeliveryCity::where($where)->count(); //总的数据量
-                $data['items']=TmsDeliveryCity::where($where)
+                $data['items']=TmsDeliveryCity::with(['systemGroup' => function($query)use($select1){
+                    $query->select($select1);
+                }])
+                ->where($where)
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='N';
@@ -76,7 +82,9 @@ class CityController extends CommonController{
 
             case 'more':
                 $data['total']=TmsDeliveryCity::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
-                $data['items']=TmsDeliveryCity::where($where)->whereIn('group_code',$group_info['group_code'])
+                $data['items']=TmsDeliveryCity::with(['systemGroup' => function($query)use($select1){
+                    $query->select($select1);
+                }])->where($where)->whereIn('group_code',$group_info['group_code'])
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
@@ -86,9 +94,12 @@ class CityController extends CommonController{
 
         foreach ($data['items'] as $k=>$v) {
             $v->button_info=$button_info;
-            $v->start_price= number_format($v->start_price,2);
-            $v->unit_price=number_format($v->unit_price,2);
-            $v->max_price = number_format($v->max_price,2);
+            $v->start_price= number_format($v->start_price/100,2);
+            $v->unit_price=number_format($v->unit_price/100,2);
+            $v->max_price = number_format($v->max_price/100,2);
+            if ($v->systemGroup){
+                $v->carriage_show = $v->systemGroup->group_name;
+            }
         }
 
 
@@ -115,14 +126,14 @@ class CityController extends CommonController{
             ['delete_flag','=','Y'],
             ['self_id','=',$self_id],
         ];
-        $select=['self_id','group_code','group_name','min_number','start_price','unit_price','max_price','city','city_id','delete_flag','use_flag'];
+        $select=['self_id','group_code','group_name','min_number','start_price','unit_price','max_price','city','city_id','delete_flag','use_flag','carriage_group_code'];
         $select1 = ['self_id','parame_name'];
         $data['info']=TmsDeliveryCity::where($where)->select($select)->first();
 
         if ($data['info']){
-            $data['info']->start_price= number_format($data['info']->start_price,2);
-            $data['info']->unit_price=number_format($data['info']->unit_price,2);
-            $data['info']->max_price = number_format($data['info']->max_price,2);
+            $data['info']->start_price= number_format($data['info']->start_price/100,2);
+            $data['info']->unit_price=number_format($data['info']->unit_price/100,2);
+            $data['info']->max_price = number_format($data['info']->max_price/100,2);
 
         }
 
@@ -156,6 +167,7 @@ class CityController extends CommonController{
         $unit_price         =$request->input('unit_price');
         $max_price          =$request->input('max_price');
         $city               =$request->input('city');
+        $carriage_group_code = $request->input('carriage_group_code');
 
 
         /*** 虚拟数据
@@ -207,12 +219,13 @@ class CityController extends CommonController{
             }
 
             $data['min_number']        =$min_number;
-            $data['start_price']       =$start_price;
-            $data['max_price']         =$max_price;
-            $data['unit_price']        =$unit_price;
+            $data['start_price']       =$start_price*100;
+            $data['max_price']         =$max_price*100;
+            $data['unit_price']        =$unit_price*100;
             $data['city']              =$city;
             $data['group_code']        =$group_code;
             $data['type']              ='send';
+            $data['carriage_group_code'] = $carriage_group_code;
 
             $wheres['self_id'] = $self_id;
             $old_info=TmsDeliveryCity::where($wheres)->first();
@@ -571,15 +584,22 @@ class CityController extends CommonController{
     public function  details(Request $request,Details $details){
         $self_id=$request->input('self_id');
         $table_name='tms_delivery_city';
-        $select=['self_id','group_code','group_name','min_number','start_price','unit_price','max_price','city','city_id','delete_flag','use_flag'];
-        // $self_id='car_202012291341297595587871';
-        $info=$details->details($self_id,$table_name,$select);
-
+        $select=['self_id','group_code','group_name','min_number','start_price','unit_price','max_price','city','city_id','delete_flag','use_flag','carriage_group_code'];
+        $select1=['self_id','group_name'];
+//         $self_id='delivery_1615615612612';
+//        $info=$details->details($self_id,$table_name,$select);
+        $info = TmsDeliveryCity::with(['systemGroup' => function($query)use($select1){
+            $query->select($select1);
+        }])->where('self_id',$self_id)->select($select)->first();
         if($info){
             /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
-            $info->start_price= number_format($info->start_price,2);
-            $info->unit_price=number_format($info->unit_price,2);
-            $info->max_price = number_format($info->max_price,2);
+            $info->start_price= number_format($info->start_price/100,2);
+            $info->unit_price=number_format($info->unit_price/100,2);
+            $info->max_price = number_format($info->max_price/100,2);
+            if ($info->systemGroup){
+                $info->carriage_show = $info->systemGroup->group_name;
+            }
+
             $data['info']=$info;
             $log_flag='Y';
             $data['log_flag']=$log_flag;

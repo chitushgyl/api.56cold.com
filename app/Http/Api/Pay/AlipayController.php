@@ -6,6 +6,8 @@ use App\Models\Tms\TmsOrderDispatch;
 use App\Models\Tms\TmsPayment;
 use App\Models\User\UserCapital;
 use App\Models\User\UserWallet;
+use App\Models\User\UserIdentity;
+use App\Models\Group\SystemGroup;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use EasyWeChat\Foundation\Application;
@@ -26,7 +28,7 @@ class AlipayController extends Controller{
         $total_amount = $price; //付款金额，必填
         $body = '测试支付';//商品描述，可空
         $timeExpress = '10m';
-        $notify_url = 'http://api.56cold.com/alipay/notify';//异步通知地址
+        $notify_url = 'http://ytapi.56cold.com/alipay/notify';//异步通知地址
         $return_url = "http://front.56cold.com/tms/pay/pay_success?order_id=".$out_trade_no."&from=2";//同步跳转
         //构造参数
         $payRequestBuilder = new \AlipayTradeWapPayContentBuilder;
@@ -56,7 +58,6 @@ class AlipayController extends Controller{
     public function notify(){
         require base_path('vendor/Alipay/wappay/service/AlipayTradeService.php');
         $arr=$_POST;
-
         $alipaySevice = new \AlipayTradeService(config('tms.alipay_config'));
         $alipaySevice->writeLog(var_export($_POST,true));
         $result = $alipaySevice->check($arr);
@@ -88,14 +89,11 @@ class AlipayController extends Controller{
         }else{
             echo "fail";
         }
-
-
     }
 /*
  * 选","app_id":"wxdc3dff8cfd3db5cb","secret":"39f8bfcfd099af3ede363af5355d7d6d",
  * "pay_app_id":"wxdc3dff8cfd3db5cb","mch_id":"1519218071","key":"89c383df1bd197f2d398b7a0f07db030"}
  * */
-
     /*** wxe83015a059e35239  1481595522  FdzK0xScm6GRS0zUW4LRYOak5rZA9k3o  */
     /**
      * H5微信支付  /alipay/wechat
@@ -116,7 +114,7 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-        $noturl = 'http://api.56cold.com/alipay/wxpaynotify';
+        $noturl = 'http://ytapi.56cold.com/alipay/wxpaynotify';
         $appid = 'wxdc3dff8cfd3db5cb';
         $mch_id = '1519218071';
         $notify_url = $noturl;
@@ -130,7 +128,6 @@ class AlipayController extends Controller{
         $params['attach'] = $user_id;                        //附加参数（用户ID）
         $result = $wechatAppPay->jsapi($params);
 //        print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
-
         //2.创建公众号端预支付参数
         /** @var TYPE_NAME $result */
         $data = @$wechatAppPay->getPayParams($result);
@@ -157,7 +154,6 @@ class AlipayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
             $order = TmsOrder::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type'])->first();
-
             if ($order->order_status == 2){
                 echo 'success';
                 return false;
@@ -180,20 +176,17 @@ class AlipayController extends Controller{
             $money['delete_flag']                = 'Y';
             $moneys['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
-
             $tmsOrderCost = TmsOrderCost::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
             if ($tmsOrderCost){
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->where('shouk_type','PLATFORM')->update($money);
                 TmsOrderCost::whereIn('self_id',$money_list)->where('fk_type','PLATFORM')->update($moneys);
             }
-
             $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
             if ($tmsOrderDispatch){
                 $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
                 $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
             }
-
             if ($id){
                 echo 'success';
             }else{
@@ -263,7 +256,6 @@ class AlipayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
             $order = TmsOrder::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_state'])->first();
-
             if ($order->pay_state == 'Y'){
                 echo 'success';
                 return false;
@@ -284,7 +276,6 @@ class AlipayController extends Controller{
                 ];
             }
             TmsPayment::insert($pay);
-
             $capital = UserCapital::where($where)->first();
             $wallet['self_id'] = generate_id('wallet_');
             $wallet['produce_type'] = 'out';
@@ -295,10 +286,8 @@ class AlipayController extends Controller{
             $wallet['now_money'] = $capital->money;
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
-
 //            $order_update['order_status'] = 6;
             $order_update['pay_state'] = 'Y';
-
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
             /**修改费用数据为可用**/
@@ -309,8 +298,6 @@ class AlipayController extends Controller{
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
-
-
             if ($id){
                 echo 'success';
             }else{
@@ -360,6 +347,44 @@ class AlipayController extends Controller{
     }
 
     /**
+     * 承运端微信支付  /alipay/driverWechat
+     * */
+    public function driverWechat(Request $request){
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $self_id = $request->input('self_id');//订单ID
+        $price = $request->input('price');//支付金额
+        //$user_id = 1;
+        $data['price'] = $price = 0.01;
+        $data['ordernumber'] = $self_id;
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+        include_once base_path( '/vendor/wxAppPay/weixin.php');
+        $out_trade_no = $data['ordernumber'];
+        $noturl = 'http://api.56cold.com/alipay/appWechat_notify';
+        $appid = 'wx1ed6b733675628df';
+        $mch_id = '1487413072';
+        $notify_url = $noturl;
+        $key = '011eaf63e5f7944c6a979de570d44aaa';
+        $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify_url,$key);
+        $params['body'] = '订单支付';                       //商品描述
+        $params['out_trade_no'] = $out_trade_no;    //自定义的订单号
+        $params['total_fee'] = $price*100;                       //订单金额 只能为整数 单位为分
+        $params['trade_type'] = 'APP';                      //交易类型 JSAPI | NATIVE | APP | WAP
+        $params['attach'] = $user_id;                      //附加参数（用户ID）
+        $result = $wechatAppPay->unifiedOrder($params);
+        // print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
+        // exit();
+        //2.创建APP端预支付参数
+        /** @var TYPE_NAME $result */
+        $data = @$wechatAppPay->getAppPayParams($result['prepay_id']);
+        return json_encode($data);
+    }
+
+    /**
      * APP微信支付回调
      * */
     public function appWechat_notify(){
@@ -378,8 +403,7 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//微信账号
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
-            $order = TmsOrder::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type'])->first();
-
+            $order = TmsOrder::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
             if ($order->order_status == 2){
                 echo 'success';
                 return false;
@@ -400,7 +424,6 @@ class AlipayController extends Controller{
                 ];
             }
             TmsPayment::insert($pay);
-
             $capital = UserCapital::where($where)->first();
             $wallet['self_id'] = generate_id('wallet_');
             $wallet['produce_type'] = 'out';
@@ -427,11 +450,22 @@ class AlipayController extends Controller{
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
-
             $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
             if ($tmsOrderDispatch){
                 $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
                 $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
+            }
+            /**推送**/
+            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+            if($order->group_code){
+               $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
+                if($group->company_type != 'TMS3PL'){
+                    $A = $this->send_push_msg($push_contnect);
+                }
+            }else{
+                $A = $this->send_push_msg($push_contnect);
             }
 
             if ($id){
@@ -470,7 +504,6 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         include_once base_path( '/vendor/alipay/aop/request/AlipayTradeAppPayRequest.php');
         $aop = new \AopClient();
@@ -481,10 +514,8 @@ class AlipayController extends Controller{
         $aop->format = "json";
         $aop->charset = "UTF-8";
         $aop->signType = "RSA2";
-
         //运单支付
         $subject = '订单支付';
-
         $notifyurl = "api.56cold.com/alipay/appAlipay_notify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
@@ -506,11 +537,12 @@ class AlipayController extends Controller{
      * APP支付宝支付回调
      * */
     public function appAlipay_notify(){
+        file_put_contents(base_path('/storage/ali.txt'),$_POST);
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
-
         $aop = new \AopClient();
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $flag = $aop->rsaCheckV1($_POST, NULL, "RSA2");
+        file_put_contents(base_path('/storage/a.txt'),$flag);
         if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
             $now_time = date('Y-m-d H:i:s',time());
             $pay['order_id'] = $_POST['out_trade_no'];
@@ -522,8 +554,8 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
-            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
-            $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type'])->first();
+            file_put_contents(base_path('/storage/al.txt'),'123');
+            $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
             if ($order->order_status == 2){
                 echo 'success';
                 return false;
@@ -534,7 +566,6 @@ class AlipayController extends Controller{
                 $where = [
                     ['total_user_id','=',$_POST['passback_params']]
                 ];
-
             }else{
                 $pay['group_code'] = $_POST['passback_params'];
                 $pay['group_code'] = $_POST['passback_params'];
@@ -543,10 +574,8 @@ class AlipayController extends Controller{
                 $where = [
                     ['group_code','=',$_POST['passback_params']]
                 ];
-
             }
             TmsPayment::insert($pay);
-
             $capital = UserCapital::where($where)->first();
             $wallet['self_id'] = generate_id('wallet_');
             $wallet['produce_type'] = 'out';
@@ -574,7 +603,6 @@ class AlipayController extends Controller{
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
-
             $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$_POST['out_trade_no'])->select('self_id','dispatch_flag')->get();
             if ($tmsOrderDispatch){
 //                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
@@ -585,7 +613,18 @@ class AlipayController extends Controller{
                 }
 
             }
-
+            /**推送**/
+            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+            if($order->group_code){
+                $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
+                if($group->company_type != 'TMS3PL'){
+                    $A = $this->send_push_msg($push_contnect);
+                }
+            }else{
+                $A = $this->send_push_msg($push_contnect);
+            }
             if ($id){
                 echo 'success';
             }else{
@@ -624,7 +663,6 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         include_once base_path( '/vendor/alipay/aop/request/AlipayTradeAppPayRequest.php');
         $aop = new \AopClient();
@@ -635,10 +673,8 @@ class AlipayController extends Controller{
         $aop->format = "json";
         $aop->charset = "UTF-8";
         $aop->signType = "RSA2";
-
         //运单支付
         $subject = '订单支付';
-
         $notifyurl = "api.56cold.com/alipay/paymentAlipayNotify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
@@ -663,7 +699,6 @@ class AlipayController extends Controller{
      * */
     public function paymentAlipayNotify(){
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
-
         $aop = new \AopClient();
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $flag = $aop->rsaCheckV1($_POST, NULL, "RSA2");
@@ -690,7 +725,6 @@ class AlipayController extends Controller{
                 $where = [
                     ['total_user_id','=',$_POST['passback_params']]
                 ];
-
             }else{
                 $pay['group_code'] = $_POST['passback_params'];
                 $pay['group_code'] = $_POST['passback_params'];
@@ -699,10 +733,8 @@ class AlipayController extends Controller{
                 $where = [
                     ['group_code','=',$_POST['passback_params']]
                 ];
-
             }
             TmsPayment::insert($pay);
-
             $capital = UserCapital::where($where)->first();
             $wallet['self_id'] = generate_id('wallet_');
             $wallet['produce_type'] = 'out';
@@ -714,10 +746,8 @@ class AlipayController extends Controller{
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
-
 //            $order_update['order_status'] = 6;
             $order_update['pay_state'] = 'Y';
-
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
             /**修改费用数据为可用**/
@@ -728,7 +758,6 @@ class AlipayController extends Controller{
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
-
             if ($id){
                 echo 'success';
             }else{
@@ -759,7 +788,7 @@ class AlipayController extends Controller{
         $price = $request->input('price');
 //        /**虚拟数据
         $price   = 0.01;
-        $self_id = 'order_202103121712041799645968';
+//        $self_id = 'order_202103121712041799645968';
 //         * */
         $now_time = date('Y-m-d H:i:s',time());
         $pay['order_id'] = $self_id;
@@ -771,7 +800,7 @@ class AlipayController extends Controller{
         $pay['pay_result'] = 'SU';//
         $pay['state'] = 'in';//支付状态
         $pay['self_id'] = generate_id('pay_');
-        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type'])->first();
+        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
         if ($order->order_status == 2){
             $msg['code'] = 301;
             $msg['msg']  = '该订单已支付';
@@ -779,14 +808,12 @@ class AlipayController extends Controller{
         }
         if ($user_info->type){
             $pay['total_user_id'] = $user_info->total_user_id;
-
             $capital_where = [
                 ['total_user_id','=',$user_info->total_user_id],
             ];
         }else{
             $pay['group_code'] = $user_info->group_code;
             $pay['group_name'] = $user_info->group_name;
-
             $capital_where = [
                 ['group_code','=',$user_info->group_code],
             ];
@@ -800,7 +827,6 @@ class AlipayController extends Controller{
         $capital['money'] = $userCapital->money - $price*100;
         $capital['update_time'] = $now_time;
         UserCapital::where($capital_where)->update($capital);
-
         $wallet['self_id'] = generate_id('wallet_');
         $wallet['produce_type'] = 'out';
         $wallet['capital_type'] = 'wallet';
@@ -809,9 +835,7 @@ class AlipayController extends Controller{
         $wallet['now_money'] = $capital['money'];
         $wallet['now_money_md'] = get_md5($capital['money']);
         $wallet['wallet_status'] = 'SU';
-
         UserWallet::insert($wallet);
-
         TmsPayment::insert($pay);
         if ($order->order_type == 'line'){
             $order_update['order_status'] = 3;
@@ -834,6 +858,11 @@ class AlipayController extends Controller{
             $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
             $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
         }
+        /**推送**/
+        $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+        $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+        $A = $this->send_push_msg($push_contnect);
         if ($id){
             $msg['code'] = 200;
             $msg['msg']  = '支付成功！';
@@ -843,8 +872,6 @@ class AlipayController extends Controller{
             $msg['msg']  = '支付失败！';
             return $msg;
         }
-
-
     }
 
     /**
@@ -889,10 +916,8 @@ class AlipayController extends Controller{
         $aop->format = "json";
         $aop->charset = "UTF-8";
         $aop->signType = "RSA2";
-
         //运单支付
         $subject = '订单支付';
-
         $notifyurl = "api.56cold.com/alipay/onlineApipay_notity";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
@@ -912,7 +937,6 @@ class AlipayController extends Controller{
 
     public function onlineApipay_notity(){
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
-
         $aop = new \AopClient();
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $flag = $aop->rsaCheckV1($_POST, NULL, "RSA2");
@@ -928,8 +952,12 @@ class AlipayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
 //            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
-            $order = TmsOrderDispatch::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type'])->first();
-
+            $order = TmsOrderDispatch::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+            $payment_info = TmsPayment::where('dispatch_id',$_POST['out_trade_no'])->select(['pay_result','state','dispatch_id'])->first();
+            if ($payment_info){
+                echo 'fail';
+                return false;
+            }
             if (substr($_POST['passback_params'],3) == 'user'){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
@@ -947,7 +975,6 @@ class AlipayController extends Controller{
 
             }
             TmsPayment::insert($pay);
-
             $capital = UserCapital::where($where)->first();
             $wallet['self_id'] = generate_id('wallet_');
             $wallet['produce_type'] = 'out';
@@ -959,7 +986,6 @@ class AlipayController extends Controller{
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
-
             $order_update['order_status'] = 2;
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $order_update['pay_status']  = 'Y';
@@ -977,13 +1003,17 @@ class AlipayController extends Controller{
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
+            /**推送**/
+            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+//            $A = $this->send_push_msg($push_contnect);
 
 //            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$_POST['out_trade_no'])->select('self_id')->get();
 //            if ($tmsOrderDispatch){
 //                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
 //                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
 //            }
-
             if ($id){
                 echo 'success';
             }else{
@@ -1005,7 +1035,6 @@ class AlipayController extends Controller{
         $price = $request->input('price');//支付金额
 //        $self_id = 'patch_202105071628455839736801';
         $data['price'] = $price = 0.01;
-
         if ($user_info->type == 'user' || $user_info->type == 'carriage'){
             $user_id = $user_info->total_user_id;
         }else{
@@ -1017,7 +1046,6 @@ class AlipayController extends Controller{
             $msg['msg']  = '此订单不能重复上线';
             return $msg;
         }
-//        dd($user_id);
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $notify_url = 'http://api.56cold.com/alipay/onlineWechat_notify';
         $appid = 'wx1ed6b733675628df';
@@ -1054,8 +1082,12 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//微信账号
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
-            $order = TmsOrderDispatch::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type'])->first();
-
+            $order = TmsOrderDispatch::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+            $payment_info = TmsPayment::where('dispatch_id',$_POST['out_trade_no'])->select(['pay_result','state','dispatch_id'])->first();
+            if ($payment_info){
+                echo 'fail';
+                return false;
+            }
             if (substr($_POST['passback_params'],3) == 'user'){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
@@ -1101,7 +1133,11 @@ class AlipayController extends Controller{
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
-
+            /**推送**/
+            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+//            $A = $this->send_push_msg($push_contnect);
 //            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
 //            if ($tmsOrderDispatch){
 //                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
@@ -1117,5 +1153,102 @@ class AlipayController extends Controller{
             echo 'fail';
         }
     }
+
+
+    /**
+     * 群推送（根据clientid推送）
+     * */
+    public function send_push_msg($data){
+        $where = [
+            ['type','=','carriage'],
+        ];
+        $select = ['user_id','clientid','type'];
+        $info = UserIdentity::with(['logLogin'=>function($query)use($select) {
+            $query->where('type', '!=', 'after');
+            $query->select($select);
+        }])
+            ->where($where)->orWhere('type','TMS3PL')->orWhere('type','business')
+            ->select('total_user_id','type')
+            ->get();
+        $clientid_list = [];
+        foreach ($info as $key =>$value){
+            if ($value->logLogin){
+                foreach ($value->logLogin as $k =>$v){
+                    $clientid_list[] = $v->clientid;
+                }
+            }
+        }
+        $cid = array_unique($clientid_list);
+
+        include_once base_path( '/vendor/getui/GeTui.php');
+        $gt = new \getui\GeTui();
+        $a =  $gt->PushMessageToList($data, $cid);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ?>

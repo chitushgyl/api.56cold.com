@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\StatusController as Status;
 use App\Models\Tms\TmsWallet;
 use App\Models\Tms\TmsWalletInfo;
-
+use App\Models\Tms\TmsBankList;
 
 class WalletController extends Controller{
 
@@ -345,6 +345,12 @@ class WalletController extends Controller{
         ];
         $select  = ['self_id','group_name','type','bank_name','card_holder','card_number','group_code','default_flag'];
         $data['info'] = UserBank::where($where)->select($select)->first();
+        $select1  = ['self_id','group_code','group_name','name','code','use_flag','delete_flag'];
+        $where1 = [
+            ['delete_flag','=','Y'],
+            ['use_flag','=','Y'],
+        ];
+        $data['bank_info'] = TmsBankList::where($where1)->select($select1)->get();
         $msg['code']  = 200;
         $msg['msg']   = "数据拉取成功";
         $msg['data']  = $data;

@@ -27,7 +27,8 @@ class OrderController extends CommonController{
         /** 接收中间件参数**/
         $group_info             = $request->get('group_info');
         $user_info              = $request->get('user_info');
-
+        $order_state_type        =config('tms.3pl_order_state');
+        $data['state_info']       =$order_state_type;
         $data['page_info']      =config('page.listrows');
         $data['button_info']    =$request->get('anniu');
         $data['user_info']      = $user_info;
@@ -227,6 +228,45 @@ class OrderController extends CommonController{
                 $cold[$key] =$tms_control_type[$value];
             }
             $v->clod= $cold;
+            if($v->order_type == 'vehicle'){
+                $v->picktime_show = '装车时间 '.$v->send_time;
+            }else{
+                $v->picktime_show = '提货时间 '.$v->send_time;
+            }
+
+            $v->temperture_show ='温度 '.$v->clod[0];
+            $v->order_id_show = '订单编号'.substr($v->self_id,15);
+            if ($v->order_status == 1){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 2){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 3){
+                $v->state_font_color = '#0088F4';
+            }elseif($v->order_status == 4){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 5){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 6){
+                $v->state_font_color = '#FF9400';
+            }else{
+                $v->state_font_color = '#FF807D';
+            }
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->order_type_color = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+                if ($v->TmsCarType){
+                    $v->car_type_show = $v->TmsCarType->parame_name;
+                    $v->good_info_show = '车型 '.$v->car_type_show;
+                }
+            }else{
+                $v->good_info_show = '货物 '.$v->good_number.'件'.$v->good_weight.'kg'.$v->good_volume.'方';
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+            }
             $button1 = [];
             $button2 = [];
             $button3 = [];
@@ -248,7 +288,7 @@ class OrderController extends CommonController{
                     $button4[] = $value;
                 }
 
-                if ($v->order_status == 3){
+                if ($v->order_status == 3 && $v->order_type == 'line'){
                     $v->button  = $button1;
                 }
                 if ($v->order_status == 5){
@@ -256,6 +296,9 @@ class OrderController extends CommonController{
                 }
                 if ($v->order_status == 2){
                     $v->button = $button3;
+                }
+                if ($v->order_status == 2 && $v->order_type == 'vehicle'){
+                    $v->button  = $button1;
                 }
 //                if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
 //                    $v->button  = $button4;
@@ -1499,6 +1542,12 @@ class OrderController extends CommonController{
 
                         $id=TmsOrder::insert($data);
                         TmsOrderDispatch::insert($inserttt);
+                        if ($data['order_type'] == 'offline'){
+                            $center_list = '有从'. $data['send_shi_name'].'发往'.$data['gather_shi_name'].'的整车订单';
+                            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+                            $this->send_push_message($push_contnect,$data['send_shi_name']);
+                        }
+
                        if ($company_id) {
 //                           TmsOrderMoney::insert($money);
                            TmsOrderCost::insert($money_company);
@@ -1817,7 +1866,7 @@ class OrderController extends CommonController{
         $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
         $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
         $self_id=$request->input('self_id');
-//        $self_id = 'order_202104101426434991808260';
+//        $self_id = 'order_202106231710070766328312';
 
         $select = ['self_id','group_code','group_name','company_name','create_user_name','create_time','use_flag','order_type','order_status','gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_time','send_time',
             'gather_address','send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_address','remark','total_money','price','pick_money','send_money','good_name','good_number','good_weight','good_volume','pick_flag','send_flag','info'
@@ -1974,8 +2023,99 @@ class OrderController extends CommonController{
             if ($info->order_type == 'vehicle'){
                 $info->good_weight = ($info->good_weight/1000).'吨';
             }
+            $info->color = '#FF7A1A';
+            $info->order_id_show = '订单编号'.$info->self_id_show;
+            $order_details = [];
+            $receipt_list = [];
+            $car_info = [];
+            $order_details1['name'] = '订单金额';
+            $order_details1['value'] = '¥'.$info->total_money;
+            $order_details1['color'] = '#FF7A1A';
+            $order_details2['name'] = '是否付款';
+            $order_details2['value'] = $info->pay_state;
+            $order_details2['color'] = '#FF7A1A';
+
+            $order_details4['name'] = '收货时间';
+            $order_details4['value'] = $info->gather_time;
+            $order_details4['color'] = '#000000';
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+                $order_details3['name'] = '装车时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+                $order_details5['name'] = '是否装卸';
+                if($info->pick_flag == 'Y'){
+                    $pick_flag_show = '需要装货';
+                }else{
+                    $pick_flag_show = '不需装货';
+                }
+                if ($info->send_flag == 'Y'){
+                    $send_flag_show = '需要卸货';
+                }else{
+                    $send_flag_show = '不需卸货';
+                }
+                $order_details5['value'] = $pick_flag_show.' '.$send_flag_show;
+                $order_details5['color'] = '#000000';
+            }else{
+                $order_details3['name'] = '提货时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+                $order_details5['name'] = '是否提配';
+                if($info->pick_flag == 'Y'){
+                    $pick_flag_show = '需要提货';
+                }else{
+                    $pick_flag_show = '不需提货';
+                }
+                if ($info->send_flag == 'Y'){
+                    $send_flag_show = '需要配送';
+                }else{
+                    $send_flag_show = '不需配送';
+                }
+                $order_details5['value'] = $pick_flag_show.' '.$send_flag_show;
+                $order_details5['color'] = '#000000';
+            }
+            $order_details6['name'] = '订单备注';
+            $order_details6['value'] = $info->remark;
+            $order_details6['color'] = '#000000';
+            $order_details7['name'] = '班次号';
+            $order_details7['value'] = $info->shift_number;
+            $order_details7['color'] = '#000000';
+            $order_details8['name'] = '时效';
+            $order_details8['value'] = $info->trunking;
+            $order_details8['color'] = '#000000';
+
+            $order_details9['name'] = '运输信息';
+            $order_details9['value'] = $info->car_info;
+
+            $order_details10['name'] = '回单信息';
+            $order_details10['value'] = $info->receipt;
+
+            $order_details[] = $order_details1;
+            $order_details[]= $order_details2;
+
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+                $order_details[] = $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }else{
+                $order_details[]= $order_details7;
+                $order_details[]= $order_details8;
+                $order_details[]= $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }
+            if(!empty($info->car_info)){
+                $car_info[] = $order_details9;
+            }
+            if (!empty($info->receipt)){
+                $receipt_list[] = $order_details10;
+            }
 //            dd($info->toArray());
             $data['info']=$info;
+            $data['order_details'] = $order_details;
+            $data['receipt_list'] = $receipt_list;
+            $data['car_info'] = $car_info;
             $log_flag='Y';
             $data['log_flag']=$log_flag;
             $log_num='10';
@@ -2180,7 +2320,6 @@ class OrderController extends CommonController{
      货主公司下单 /tms/order/add_order
      **/
     public function add_order(Request $request,Tms $tms){
-
         $operationing   = $request->get('operationing');//接收中间件产生的参数
         $now_time       =date('Y-m-d H:i:s',time());
         $table_name     ='tms_order';
@@ -2191,7 +2330,6 @@ class OrderController extends CommonController{
         $operationing->now_time         =$now_time;
         $operationing->type             ='add';
         $user_info = $request->get('user_info');//接收中间件产生的参数
-        $group_info = $request->get('group_info');//接收中间件产生的参数
         $project_type = $user_info->type;
 //        dump($user_info);
         $input      =$request->all();
@@ -2329,21 +2467,51 @@ class OrderController extends CommonController{
             'order_type'=>'required',
         ];
         $message = [
-            'order_type.required'=>'必须选择',
+            'order_type.required'=>'请选择订单类型',
         ];
 
 
-
-        $company_id     = null;
-        $company_name   = null;
-        $group_code     = $user_info->group_code;
-        $group_name     =$user_info->group_name;
-        $total_user_id = null;
-        $receiver_id = null;
+        switch ($project_type){
+            case 'company':
+                $company_id     = null;
+                $company_name   = null;
+                $group_code     = $user_info->group_code;
+                $group_name     = $user_info->group_name;
+                $total_user_id  = null;
+                $receiver_id    = null;
+                break;
+            case 'TMS3PL':
+                $company_id     = null;
+                $company_name   = null;
+                $group_code     = $user_info->group_code;
+                $group_name     = $user_info->group_name;
+                $total_user_id  = null;
+                $receiver_id    = null;
+                break;
+            default:
+                $company_id     = null;
+                $company_name   = null;
+                $group_code     = null;
+                $group_name     = null;
+                $total_user_id  = null;
+                $receiver_id    = null;
+                break;
+        }
+//        $company_id     = null;
+//        $company_name   = null;
+//        $group_code     = $user_info->group_code;
+//        $group_name     =$user_info->group_name;
+//        $total_user_id = null;
+//        $receiver_id = null;
 
 
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {
+            $where_group=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$group_code],
+            ];
+            $group_info    =SystemGroup::where($where_group)->select('group_code','group_name')->first();
             /***开始做二次效验**/
             if ($order_type == 'vehicle' || $order_type == 'lcl') {
                 if (count($dispatcher) == 0) {
@@ -2394,7 +2562,7 @@ class OrderController extends CommonController{
             /** 处理一下发货地址  及联系人**/
             foreach ($dispatcher as $k => $v){
                 if ($order_type == 'vehicle' || $order_type == 'lcl' || ($order_type == 'line' && $send_flag == 'Y')) {
-                    $gather_address = $tms->address_contact($v['gather_address_id'],$v['gather_qu'],$v['gather_address'],$v['gather_name'],$v['gather_tel'],'',$user_info,$now_time);
+                    $gather_address = $tms->address_contact($v['gather_address_id'],$v['gather_qu'],$v['gather_address'],$v['gather_name'],$v['gather_tel'],$group_info,$user_info,$now_time);
 
                     if(empty($gather_address)){
                         $msg['code'] = 303;
@@ -2419,7 +2587,7 @@ class OrderController extends CommonController{
                     $gather_address = (Object)$gather_address;
                 }
                 if ($order_type == 'vehicle' || $order_type == 'lcl' || ($order_type == 'line' && $pick_flag == 'Y')) {
-                    $send_address=$tms->address_contact($v['send_address_id'],$v['send_qu'],$v['send_address'],$v['send_name'],$v['send_tel'],'',$user_info,$now_time);
+                    $send_address=$tms->address_contact($v['send_address_id'],$v['send_qu'],$v['send_address'],$v['send_name'],$v['send_tel'],$group_info,$user_info,$now_time);
                     if(empty($send_address)){
                         $msg['code'] = 303;
                         $msg['msg'] = $send_t.'地址不存在';
@@ -2639,7 +2807,7 @@ class OrderController extends CommonController{
                         ['delete_flag','=','Y'],
                         ['self_id','=',$line_id],
                     ];
-                    $select_line = ['self_id','shift_number','type','price','use_flag','group_name','type','group_code',
+                    $select_line = ['self_id','shift_number','type','price','use_flag','group_name','type','group_code','special','min_number','max_number','unit_price','start_price','max_price',
                         'pick_price','send_price','pick_type','more_price','send_type','all_weight','all_volume','trunking','control',
                         'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_sheng_name','send_shi','send_shi_name',
                         'send_qu','send_qu_name','send_address','send_address_longitude','send_address_latitude',
@@ -2671,6 +2839,9 @@ class OrderController extends CommonController{
                             $list['company_id']                 = $company_id;
                             $list['company_name']               = $company_name;
                             $list['receiver_id']                = $line_info->group_code;
+                            if ($line_info->special == 1 && $line_info->carriage_group_code){
+                                $list['receiver_id']                = $line_info->carriage_group_code;
+                            }
                             $list['group_code']                 = $group_code;
                             $list['group_name']                 = $group_name;
                             $list['total_user_id']              = $total_user_id;
@@ -2780,6 +2951,11 @@ class OrderController extends CommonController{
                                         $money['fk_type']                    = 'GROUP_CODE';
                                         $money['ZIJ_group_code']             = $user_info->group_code;
                                         break;
+                                    case 'TMS3PL':
+                                        $money['fk_group_code']              = $user_info->group_code;
+                                        $money['fk_type']                    = 'GROUP_CODE';
+                                        $money['ZIJ_group_code']             = $user_info->group_code;
+                                        break;
                                 }
                             }else{
                                 switch ($project_type){
@@ -2807,6 +2983,21 @@ class OrderController extends CommonController{
                                         $money['delete_flag']                = 'N';
                                         break;
                                     case 'company':
+                                        $money_['shouk_group_code']           = $line_info->group_code;
+                                        $money_['shouk_type']                 = 'GROUP_CODE';
+                                        $money_['fk_group_code']              = '1234';
+                                        $money_['fk_type']                    = 'PLATFORM';
+                                        $money_['ZIJ_group_code']             = '1234';
+                                        $money_['delete_flag']                = 'N';
+
+                                        $money['shouk_group_code']           = '1234';
+                                        $money['shouk_type']                 = 'PLATFORM';
+                                        $money['fk_group_code']              = $user_info->group_code;
+                                        $money['fk_type']                    = 'GROUP_CODE';
+                                        $money['ZIJ_group_code']             = $user_info->group_code;
+                                        $money['delete_flag']                = 'N';
+                                        break;
+                                    case 'TMS3PL':
                                         $money_['shouk_group_code']           = $line_info->group_code;
                                         $money_['shouk_type']                 = 'GROUP_CODE';
                                         $money_['fk_group_code']              = '1234';
@@ -2860,6 +3051,9 @@ class OrderController extends CommonController{
                             $list['company_id']                 = $company_id;
                             $list['company_name']               = $company_name;
                             $list['receiver_id']                = $line_info->group_code;
+                            if ($line_info->special == 1 && $line_info->carriage_group_code){
+                                $list['receiver_id']                = $line_info->carriage_group_code;
+                            }
                             $list['group_code']                 = $group_code;
                             $list['group_name']                 = $group_name;
                             $list['total_user_id']              = $total_user_id;
@@ -2975,6 +3169,11 @@ class OrderController extends CommonController{
                                         $money['fk_type']                    = 'GROUP_CODE';
                                         $money['ZIJ_group_code']             = $user_info->group_code;
                                         break;
+                                    case 'TMS3PL':
+                                        $money['fk_group_code']              = $user_info->group_code;
+                                        $money['fk_type']                    = 'GROUP_CODE';
+                                        $money['ZIJ_group_code']             = $user_info->group_code;
+                                        break;
                                 }
                             }else{
                                 switch ($project_type){
@@ -3002,6 +3201,21 @@ class OrderController extends CommonController{
                                         $money['delete_flag']                = 'N';
                                         break;
                                     case 'company':
+                                        $money_['shouk_group_code']           = $line_info->group_code;
+                                        $money_['shouk_type']                 = 'GROUP_CODE';
+                                        $money_['fk_group_code']              = '1234';
+                                        $money_['fk_type']                    = 'PLATFORM';
+                                        $money_['ZIJ_group_code']             = '1234';
+                                        $money_['delete_flag']                = 'N';
+
+                                        $money['shouk_group_code']           = '1234';
+                                        $money['shouk_type']                 = 'PLATFORM';
+                                        $money['fk_group_code']              = $user_info->group_code;
+                                        $money['fk_type']                    = 'GROUP_CODE';
+                                        $money['ZIJ_group_code']             = $user_info->group_code;
+                                        $money['delete_flag']                = 'N';
+                                        break;
+                                    case 'TMS3PL':
                                         $money_['shouk_group_code']           = $line_info->group_code;
                                         $money_['shouk_type']                 = 'GROUP_CODE';
                                         $money_['fk_group_code']              = '1234';
@@ -3047,6 +3261,9 @@ class OrderController extends CommonController{
                         $list['company_id']                 = $company_id;
                         $list['company_name']               = $company_name;
                         $list['receiver_id']                = $line_info->group_code;
+                        if ($line_info->special == 1 && $line_info->carriage_group_code){
+                            $list['receiver_id']                = $line_info->carriage_group_code;
+                        }
                         $list['group_code']                 = $group_code;
                         $list['group_name']                 = $group_name;
                         $list['total_user_id']              = $total_user_id;
@@ -3161,6 +3378,11 @@ class OrderController extends CommonController{
                                     $money['fk_type']                    = 'GROUP_CODE';
                                     $money['ZIJ_group_code']             = $user_info->group_code;
                                     break;
+                                case 'TMS3PL':
+                                    $money['fk_group_code']              = $user_info->group_code;
+                                    $money['fk_type']                    = 'GROUP_CODE';
+                                    $money['ZIJ_group_code']             = $user_info->group_code;
+                                    break;
                             }
                         }else{
                             switch ($project_type){
@@ -3188,6 +3410,21 @@ class OrderController extends CommonController{
                                     $money['delete_flag']                = 'N';
                                     break;
                                 case 'company':
+                                    $money_['shouk_group_code']           = $line_info->group_code;
+                                    $money_['shouk_type']                 = 'GROUP_CODE';
+                                    $money_['fk_group_code']              = '1234';
+                                    $money_['fk_type']                    = 'PLATFORM';
+                                    $money_['ZIJ_group_code']             = '1234';
+                                    $money_['delete_flag']                = 'N';
+
+                                    $money['shouk_group_code']           = '1234';
+                                    $money['shouk_type']                 = 'PLATFORM';
+                                    $money['fk_group_code']              = $user_info->group_code;
+                                    $money['fk_type']                    = 'GROUP_CODE';
+                                    $money['ZIJ_group_code']             = $user_info->group_code;
+                                    $money['delete_flag']                = 'N';
+                                    break;
+                                case 'TMS3PL':
                                     $money_['shouk_group_code']           = $line_info->group_code;
                                     $money_['shouk_type']                 = 'GROUP_CODE';
                                     $money_['fk_group_code']              = '1234';
@@ -3238,6 +3475,9 @@ class OrderController extends CommonController{
                             $list['company_id']                 = $company_id;
                             $list['company_name']               = $company_name;
                             $list['receiver_id']                = $line_info->group_code;
+                            if ($line_info->special == 1 && $line_info->carriage_id){
+                                $list['receiver_id']                = $line_info->carriage_id;
+                            }
                             $list['group_code']                 = $group_code;
                             $list['group_name']                 = $group_name;
                             $list['total_user_id']              = $total_user_id;
@@ -3314,6 +3554,10 @@ class OrderController extends CommonController{
                             $list['reduce_price']             = 0;
                             $list['total_money']              = $send_money*100;
                             $list['on_line_money']            = $send_money*100;
+                            if ($line_info->special == 1){
+                                $list['total_money'] = line_count_price($line_info,$list['good_number']);
+                                $list['on_line_money'] = line_count_price($line_info,$list['good_number']);
+                            }
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
                             }
@@ -3335,6 +3579,11 @@ class OrderController extends CommonController{
                                         $money['ZIJ_company_id']             = $user_info->company_id;
                                         break;
                                     case 'company':
+                                        $money['fk_group_code']              = $user_info->group_code;
+                                        $money['fk_type']                    = 'GROUP_CODE';
+                                        $money['ZIJ_group_code']             = $user_info->group_code;
+                                        break;
+                                    case 'TMS3PL':
                                         $money['fk_group_code']              = $user_info->group_code;
                                         $money['fk_type']                    = 'GROUP_CODE';
                                         $money['ZIJ_group_code']             = $user_info->group_code;
@@ -3366,6 +3615,21 @@ class OrderController extends CommonController{
                                         $money['delete_flag']                = 'N';
                                         break;
                                     case 'company':
+                                        $money_['shouk_group_code']           = $line_info->group_code;
+                                        $money_['shouk_type']                 = 'GROUP_CODE';
+                                        $money_['fk_group_code']              = '1234';
+                                        $money_['fk_type']                    = 'PLATFORM';
+                                        $money_['ZIJ_group_code']             = '1234';
+                                        $money_['delete_flag']                = 'N';
+
+                                        $money['shouk_group_code']           = '1234';
+                                        $money['shouk_type']                 = 'PLATFORM';
+                                        $money['fk_group_code']              = $user_info->group_code;
+                                        $money['fk_type']                    = 'GROUP_CODE';
+                                        $money['ZIJ_group_code']             = $user_info->group_code;
+                                        $money['delete_flag']                = 'N';
+                                        break;
+                                    case 'TMS3PL':
                                         $money_['shouk_group_code']           = $line_info->group_code;
                                         $money_['shouk_type']                 = 'GROUP_CODE';
                                         $money_['fk_group_code']              = '1234';
@@ -3712,6 +3976,11 @@ class OrderController extends CommonController{
                                 $money['fk_type']                    = 'GROUP_CODE';
                                 $money['ZIJ_group_code']             = $user_info->group_code;
                                 break;
+                            case 'TMS3PL':
+                                $money['fk_group_code']              = $user_info->group_code;
+                                $money['fk_type']                    = 'GROUP_CODE';
+                                $money['ZIJ_group_code']             = $user_info->group_code;
+                                break;
                         }
                     }else{
                         switch ($project_type){
@@ -3732,6 +4001,14 @@ class OrderController extends CommonController{
                                 $money['delete_flag']                = 'N';
                                 break;
                             case 'company':
+                                $money['shouk_group_code']           = '1234';
+                                $money['shouk_type']                 = 'PLATFORM';
+                                $money['fk_group_code']              = $user_info->group_code;
+                                $money['fk_type']                    = 'GROUP_CODE';
+                                $money['ZIJ_group_code']             = $user_info->group_code;
+                                $money['delete_flag']                = 'N';
+                                break;
+                            case 'TMS3PL':
                                 $money['shouk_group_code']           = '1234';
                                 $money['shouk_type']                 = 'PLATFORM';
                                 $money['fk_group_code']              = $user_info->group_code;
@@ -3776,7 +4053,6 @@ class OrderController extends CommonController{
                         $id = TmsOrder::insert($data);
                         TmsOrderDispatch::insert($inserttt);
                         TmsOrderCost::insert($money);
-
 
                     }
 

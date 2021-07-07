@@ -200,6 +200,71 @@ class FileController extends Controller{
         }
     }
 
+    /**
+     * 多图上传
+     * */
+    public function up_image($pic){
+        if($pic){
+            $data_img = [];
+            foreach ($pic as $key => $value){
+                if ((object)$value->isValid()) {
+                    //括号里面的是必须加的哦,如果括号里面的不加上的话，下面的方法也无法调用的
+                    $name=$value->getClientOriginalName();//得到图片名；
+                    $ext=$value->getClientOriginalExtension();//获取文件的扩展名
+                    $extensions = ["png", "jpg", "gif","image","jpeg"];
+
+                    $size = $value->getSize();
+                    if(!in_array(strtolower($ext),$extensions)) {//限制上传文件的类型
+                        $msg['code'] = 302;
+                        $msg['msg'] = '只能上传 png | jpg | gif格式的图片';
+                        return $msg;
+                    }else{
+                        if($size > 2*1024*1024){
+                            $msg['code'] = 303;
+                            $msg['msg'] = '上传图片不能超过2M';
+                            return $msg;
+                        }
+
+                        $storage_path = 'images/'.date('Y-m-d',time());//上传文件保存的路径
+                        //获取上传图片的临时地址
+                        $pathurl = $value->getRealPath();
+
+                        //生成文件名
+                        $file_name =md5(uniqid($name)).'.'.$ext;
+                        //拼接上传的文件夹路径(按照日期格式1810/17/xxxx.jpg)
+                        $pathName = $storage_path.'/'.$file_name;
+
+                        $filepath=$this->oss_do($pathName,$pathurl);
+
+                        //获取上传图片的大小
+                        $url=getimagesize($filepath);
+                        $width=$url[0];
+                        $height=$url[1];
+
+                        $data['url']=$filepath;
+                        $data['width']=$width;
+                        $data['height']=$height;
+
+                        $data_img[] = $data;
+                    }
+                }else{
+                    $msg['code'] = 301;
+                    $msg['msg'] = '上传的图片无效';
+                    return $msg;
+                }
+            }
+            $msg['code'] = 200;
+            $msg['msg'] = '上传图片成功';
+            $msg['data'] = $data_img;
+            return $msg;
+
+        }else{
+            $msg['code'] = 304;
+            $msg['msg'] = '上传的图片无效';
+            return $msg;
+        }
+    }
+
     /***    execl导入功能      /file/import
      *      前端传递必须参数：
      *      前端传递非必须参数：

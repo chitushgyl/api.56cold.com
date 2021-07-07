@@ -7,6 +7,7 @@ Route::get('/login/login', 'Admin\LoginController@login');
 Route::any('/login/loginOn', 'Admin\LoginController@loginOn');
 Route::any('/login/loginOut', 'Admin\LoginController@loginOut');
 Route::any('/up/upload_img', 'Admin\UpController@upload_img');			//上传EXECL文件
+Route::any('/up/upload_image', 'Admin\UpController@upload_image');			//上传EXECL文件
 /******公用文件触发器*******/
 Route::group([
     "middleware"=>['loginCheck','group'],'prefix' => '','namespace'  => 'Admin',

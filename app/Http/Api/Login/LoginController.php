@@ -319,15 +319,15 @@ class LoginController extends Controller{
 //        $father_tel                    =$request->get('father_tel');
         $reg_place                     =$request->get('reg_type')??'MINI';
         $true_name                     =$request->get('true_name');
+        $clientid                      =$request->get('clientid');
 
-		//DUMP($father_tel);
-
-        /** 虚拟一下数据来做下操作*/
-//        $input['tel']       =$tel   ='18538712250';
-//        $input['code']      =$code  ='1234';
-        //$user_token         ='82d47920dee6d7a5b22c647cbf3c03d9';
-        //$true_name          ='221';
+        /** 虚拟一下数据来做下操作
+        $input['tel']       =$tel   ='15893289182';
+        $input['code']      =$code  ='5680';
+        $input['id_type']   =$id_type  = 'user';
+        $input['type']      =$type  = 'APP';
 		//dump($tel);dd($code);
+        * */
         $rules = [
             'tel' => 'required',
             'code' => 'required',
@@ -399,6 +399,7 @@ class LoginController extends Controller{
             $where_reg=[
                 ['tel','=',$tel],
                 ['reg_type','=',$reg_type],
+                ['delete_flag','=','Y']
             ];
             $self_id = $total_id=UserReg::where($where_reg)->value('total_user_id');
             /** 这里是要判断到底做什么的地方
@@ -412,22 +413,29 @@ class LoginController extends Controller{
             if ($self_id){
                 $where_identity = [
                     ['total_user_id','=',$self_id],
-                    ['type','=',$id_type],
+                    ['type','=','user'],
                     ['delete_flag','=','Y'],
                     ['use_flag','=','Y']
                 ];
-                $count_identity = UserIdentity::where($where_identity)->first();
-                if (!$count_identity){
-                    if($id_type == 'user'){
-                        $identity_type = '赤途承运端';
-                    }else{
-                        $identity_type = '赤途冷链';
+                $where_identity_or = [
+                    ['total_user_id','=',$self_id],
+                    ['type','=','carriage'],
+                    ['delete_flag','=','Y'],
+                    ['use_flag','=','Y']
+                ];
+                $count_identity = UserIdentity::where($where_identity)->orWhere($where_identity_or)->first();
+                if ($count_identity){
+                    if($count_identity->type != $id_type){
+                        if ($id_type == 'user'){
+                            $identity_type = '赤途承运端';
+                        }else{
+                            $identity_type = '赤途冷链';
+                        }
+                        $msg['code'] = 305;
+                        $msg['msg']  = '您已注册'.$identity_type.',同一账号只能注册一个身份';
+                        return $msg;
                     }
-                    $msg['code'] = 305;
-                    $msg['msg']  = '您已注册'.$identity_type.'同一账号只能注册一个身份';
-                    return $msg;
                 }
-
             }
             if($token_info){
                 if($flag== 'N'){
@@ -510,9 +518,10 @@ class LoginController extends Controller{
                 //完成登录
                 if($self_id){
                     //用手机号码登录
-                    $user_token_re         =$this->addToken($self_id,$reg_place,$now_time,$id_type);
+                    $user_token_re         =$this->addToken($self_id,$reg_place,$now_time,$id_type,$clientid);
                     $msg['code']=200;
                     $msg['msg']='登录成功！';
+                    $msg['project_type'] = $user_token_re['project_type'];
                     $msg['ftoken']=$user_token_re['ftoken'];
                     $msg['dtoken']=$user_token_re['dtoken'];
                     return $msg;
@@ -529,9 +538,10 @@ class LoginController extends Controller{
                     $userInfo['tel']        =$tel;
                     $self_id  =$this->addUser($userInfo,$info,$reg_type,$reg_place,$now_time,$total_id,$flag);
 
-                    $user_token_re         =$this->addToken($self_id,$reg_place,$now_time,$id_type);
+                    $user_token_re         =$this->addToken($self_id,$reg_place,$now_time,$id_type,$clientid);
                     $msg['code']=200;
                     $msg['msg']='注册成功！';
+                    $msg['project_type'] = $user_token_re['project_type'];
                     $msg['ftoken']=$user_token_re['ftoken'];
                     $msg['dtoken']=$user_token_re['dtoken'];
                     return $msg;
@@ -559,6 +569,7 @@ class LoginController extends Controller{
         $tel                           =$request->input('tel');
         $password                          =$request->input('password');
         $type                         = $request->input('id_type');
+        $clientid                         = $request->input('clientid');
         //DUMP($father_tel);
 
         /** 虚拟一下数据来做下操作
@@ -589,20 +600,28 @@ class LoginController extends Controller{
             if ($user_id){
                 $user_identity_where = [
                     ['total_user_id','=',$user_id->self_id],
-                    ['type','=',$type],
+                    ['type','=','user'],
                     ['delete_flag','=','Y'],
                     ['use_flag','=','Y']
                 ];
-                $count_identity = UserIdentity::where($user_identity_where)->first();
-                if (!$count_identity){
-                    if($type == 'user'){
-                        $identity_type = '赤途承运端';
-                    }else{
-                        $identity_type = '赤途冷链';
+                $where_identity_or = [
+                    ['total_user_id','=',$user_id->self_id],
+                    ['type','=','carriage'],
+                    ['delete_flag','=','Y'],
+                    ['use_flag','=','Y']
+                ];
+                $count_identity = UserIdentity::where($user_identity_where)->orWhere($where_identity_or)->first();
+                if ($count_identity){
+                    if($count_identity->type != $type){
+                        if ($type == 'user'){
+                            $identity_type = '赤途承运端';
+                        }else{
+                            $identity_type = '赤途冷链';
+                        }
+                        $msg['code'] = 305;
+                        $msg['msg']  = '您已注册'.$identity_type.',同一账号只能注册一个身份';
+                        return $msg;
                     }
-                    $msg['code'] = 305;
-                    $msg['msg']  = '您已注册'.$identity_type.',同一账号只能注册一个身份';
-                    return $msg;
                 }
             }
 
@@ -620,7 +639,7 @@ class LoginController extends Controller{
                 }
 
                 //用手机号码登录
-                $user_token_re         =$this->addToken($user_id->self_id,'',$now_time,$type);
+                $user_token_re         =$this->addToken($user_id->self_id,'',$now_time,$type,$clientid);
                 $msg['code']=200;
                 $msg['msg']='登录成功！';
                 $msg['project_type'] = $user_token_re['project_type'];
@@ -657,7 +676,7 @@ class LoginController extends Controller{
                 $capital_data['update_time']    =$now_time;
                 UserCapital::insert($capital_data);						//写入用户资金表
 
-                $user_token_re         =$this->addToken($data['total_user_id'],'',$now_time,$type);
+                $user_token_re         =$this->addToken($data['total_user_id'],'',$now_time,$type,$clientid);
                 $msg['code']=200;
                 $msg['msg']='注册成功！';
                 $msg['project_type'] = $user_token_re['project_type'];
@@ -785,7 +804,7 @@ class LoginController extends Controller{
     }
 
     /***完成登录***/
-    public function addToken($user_id,$reg_place,$now_time,$type){
+    public function addToken($user_id,$reg_place,$now_time,$type,$clientid){
 		$ftoken                 = md5($user_id.$now_time);
         $dtoken                 = null;
 
@@ -794,6 +813,7 @@ class LoginController extends Controller{
         $data['create_time']    = $now_time;
         $data['user_token']     = $ftoken;
         $data['type']           = $reg_place;
+        $data['clientid']       = $clientid;
         LogLogin::insert($data);
         /** 以上是前端用户的登录**/
 
@@ -808,6 +828,7 @@ class LoginController extends Controller{
            ['delete_flag','=','Y']
         ];
         $info=UserReg::with(['userTotal' => function($query) use($where2,$where3){
+            $query->where($where3);
             $query->select('self_id');
             $query->with(['userIdentity' => function($query)use($where2,$where3) {
                 $query->where($where2);
@@ -818,7 +839,7 @@ class LoginController extends Controller{
                 }]);
             }]);
         }])->where($where)->select('total_user_id')->first();
-//        dd($info);
+
         if($info->userTotal && $info->userTotal->userIdentity && ($info->userTotal->userIdentity->type == 'TMS3PL' || $info->userTotal->userIdentity->type == 'company' ||$info->userTotal->userIdentity->type == 'dispatcher' ||$info->userTotal->userIdentity->type == 'business')){
             /** 后台完成登录*/
             $dtoken                      =md5($info->userTotal->userIdentity->systemAdmin->self_id.$now_time);
@@ -844,7 +865,6 @@ class LoginController extends Controller{
 
         $msg['ftoken']=$ftoken;
         $msg['dtoken']=$dtoken;
-
         return $msg;
 
 

@@ -19,7 +19,17 @@ use Illuminate\Support\Facades\Validator;
 use PhpParser\Node\Stmt\DeclareDeclare;
 
 class TakeController extends Controller{
-
+    /**
+     *  APP订单列表订单状态  /api/take/orderList
+     * */
+    public function orderList(){
+        $order_state_type        =config('tms.take_state_type');
+        $data['page_info']      =$order_state_type;
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
+    }
     /***    上线订单分页      /api/take/onlinePage
      */
     public function onlinePage(Request $request){
@@ -58,7 +68,7 @@ class TakeController extends Controller{
         }
         if ($endcity){
             $where[] = ['gather_shi_name','=',$endcity];
-            $where1[] = ['send_shi_name','=',$startcity];
+            $where1[] = ['gather_shi_name','=',$endcity];
         }
         $select=['self_id','order_type','order_status','receiver_id','clod','gather_time','send_time','company_name','dispatch_flag','group_code','group_name','use_flag','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_sheng_name','send_shi_name'
             ,'send_qu_name','send_address','total_money','good_info','good_number','good_weight','good_volume','carriage_group_name','on_line_money','line_gather_address_id','line_gather_contacts_id','line_gather_name','line_gather_tel',
@@ -93,6 +103,22 @@ class TakeController extends Controller{
             if ($v->tmsCarType){
                 $v->car_type_show = $v->tmsCarType->parame_name;
             }
+            $v->start_time_show = '装车时间 '.$v->send_time;
+            $v->end_time_show = '送达时间 '.$v->gather_time;
+            if ($v->tmsCarType){
+                $v->car_show = '车型 '.$v->tmsCarType->parame_name;
+            }
+            $v->temperture_show = '温度 '.$v->clod;
+            $v->background_color_show = '#0088F4';
+            $v->text_color_show = '#000000';
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+                $v->background_color_show = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->background_color_show = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+            }
         }
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
@@ -111,7 +137,7 @@ class TakeController extends Controller{
             'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi','remark','receipt_flag',
             'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','clod','pick_flag','send_flag','pay_type'
         ];
-//        $self_id='patch_202105151850084713322199';
+//        $self_id='patch_202106231821248642627728';
 //        $info=$details->details($self_id,$table_name,$select);
         $selectList = ['self_id','receipt','order_id','total_user_id','group_code','group_name'];
         $select2 = ['self_id','carriage_id','order_dispatch_id'];
@@ -190,9 +216,97 @@ class TakeController extends Controller{
                 $info->info = $order_info;
                 $info->good_weight = ($info->good_weight/1000).'吨';
             }
+            $info->color = '#FF7A1A';
+            $info->order_id_show = '订单编号'.$info->self_id_show;
+            $order_details = [];
+            $receipt_list = [];
+            $car_info = [];
+            $order_details1['name'] = '订单金额';
+            $order_details1['value'] = '¥'.$info->on_line_money;
+            $order_details1['color'] = '#FF7A1A';
+//            $order_details2['name'] = '是否付款';
+//            $order_details2['value'] = $info->pay_state;
+//            $order_details2['color'] = '#FF7A1A';
 
+            $order_details4['name'] = '收货时间';
+            $order_details4['value'] = $info->gather_time;
+            $order_details4['color'] = '#000000';
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+                $order_details3['name'] = '装车时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+                $order_details5['name'] = '是否装卸';
+                if($info->pick_flag == 'Y'){
+                    $pick_flag_show = '需要装货';
+                }else{
+                    $pick_flag_show = '不需装货';
+                }
+                if ($info->send_flag == 'Y'){
+                    $send_flag_show = '需要卸货';
+                }else{
+                    $send_flag_show = '不需卸货';
+                }
+                $order_details5['value'] = $pick_flag_show.' '.$send_flag_show;
+                $order_details5['color'] = '#000000';
+            }else{
+                $order_details3['name'] = '提货时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details5['color'] = '#000000';
+                $order_details5['name'] = '是否提配';
+                if($info->pick_flag == 'Y'){
+                    $pick_flag_show = '需要提货';
+                }else{
+                    $pick_flag_show = '不需提货';
+                }
+                if ($info->send_flag == 'Y'){
+                    $send_flag_show = '需要配送';
+                }else{
+                    $send_flag_show = '不需配送';
+                }
+                $order_details5['value'] = $pick_flag_show.' '.$send_flag_show;
+                $order_details5['color'] = '#000000';
+            }
+            $order_details6['name'] = '订单备注';
+            $order_details6['value'] = $info->remark;
+            $order_details6['color'] = '#000000';
+//            $order_details7['name'] = '班次号';
+//            $order_details7['value'] = $info->shift_number;
+//            $order_details8['name'] = '时效';
+//            $order_details8['value'] = $info->trunking;
+
+            $order_details9['name'] = '运输信息';
+            $order_details9['value'] = $info->car_info;
+
+            $order_details10['name'] = '回单信息';
+            $order_details10['value'] = $info->receipt;
+
+            $order_details[] = $order_details1;
+//            $order_details[]= $order_details2;
+
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+                $order_details[] = $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }else{
+//                $order_details[]= $order_details7;
+//                $order_details[]= $order_details8;
+                $order_details[]= $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }
+            if(!empty($info->car_info)){
+                $car_info[] = $order_details9;
+            }
+            if (!empty($info->receipt)){
+                $receipt_list[] = $order_details10;
+            }
 //            dd($info->toArray());
             $data['info']=$info;
+            $data['order_details'] = $order_details;
+            $data['receipt_list'] = $receipt_list;
+            $data['car_info'] = $car_info;
             $msg['code']=200;
             $msg['msg']="数据拉取成功";
             $msg['data']=$data;
@@ -266,6 +380,46 @@ class TakeController extends Controller{
             $v->order_type_show=$tms_order_type[$v->order_type]??null;
             $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
             $v->pay_status_text=$pay_status[$v->order_status-1]['pay_status_text']??null;
+
+            if($v->order_type == 'vehicle'){
+                $v->picktime_show = '装车时间 '.$v->send_time;
+            }else{
+                $v->picktime_show = '提货时间 '.$v->send_time;
+            }
+
+            $v->temperture_show ='温度 '.$v->temperture[0];
+            $v->order_id_show = '订单编号'.substr($v->self_id,15);
+            if ($v->order_status == 1){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 2){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 3){
+                $v->state_font_color = '#0088F4';
+            }elseif($v->order_status == 4){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 5){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 6){
+                $v->state_font_color = '#FF9400';
+            }else{
+                $v->state_font_color = '#FF807D';
+            }
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->order_type_color = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+                if ($v->TmsCarType){
+                    $v->car_type_show = $v->TmsCarType->parame_name;
+                    $v->good_info_show = '车型 '.$v->car_type_show;
+                }
+            }else{
+                $v->good_info_show = '货物 '.$v->good_number.'件'.$v->good_weight.'kg'.$v->good_volume.'方';
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+            }
             $button1 = [];
             $button2 = [];
             $button3 = [];

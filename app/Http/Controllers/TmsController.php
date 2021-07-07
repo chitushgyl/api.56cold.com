@@ -271,12 +271,12 @@ class TmsController extends Controller{
         if ($cando == 'Y'){
             $result =  bd_location(2,$pro,$city,$area,$address);
             $data['self_id']            =generate_id('address_');
-            $data['sheng']              =$address_info->address->address->id;
-            $data['sheng_name']         =$address_info->address->address->name;
+            $data['sheng']              =$address_info->id;
+            $data['sheng_name']         =$address_info->name;
             $data['shi']                =$address_info->address->id;
             $data['shi_name']           =$address_info->address->name;
-            $data['qu']                 =$address_info->id;
-            $data['qu_name']            =$address_info->name;
+            $data['qu']                 =$address_info->address->address->id;
+            $data['qu_name']            =$address_info->address->address->name;
             $data['address']            =$address;
             $data['contacts']           =$contacts;
             $data['tel']                =$tel;

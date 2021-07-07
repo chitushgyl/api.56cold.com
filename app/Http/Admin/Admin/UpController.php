@@ -44,6 +44,15 @@ class UpController extends CommonController{
 	//dd($request->all());
         $user_info      = $request->get('user_info');//接收中间件产生的参数11
         $pic			=$request->file('inputfile');
+//        $pic0			=$request->file('inputfile0');
+//        $pic1			=$request->file('inputfile1');
+//        $msg['code'] = 555;
+//        $msg['msg'] = '重新上传';
+//        $msg['data'] = $pic;
+//        $msg['arr']  = $pic0;
+//        $msg['res']  = $pic1;
+//        $msg['info'] = $_FILES;
+//        return $msg;
         $now_time       =date('Y-m-d H:i:s',time());
         $table_name     ="file_warehouse";
 
@@ -51,6 +60,16 @@ class UpController extends CommonController{
         $msg=$file->image($pic);
         return $msg;
 
+    }
+
+    /**
+     * 多图上传
+     * */
+    public function upload_image(Request $request,File $file){
+        $user_info      = $request->get('user_info');//接收中间件产生的参数11
+        $pic			=$_FILES;
+        $msg=$file->up_image($pic);
+        return $msg;
     }
 
     /***    上传EXECL接口      /up/execl

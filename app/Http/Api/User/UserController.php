@@ -98,7 +98,7 @@ class UserController extends Controller{
                         UserIdentity::where([['total_user_id','=',$user_info->total_user_id],['type','=','user'],['delete_flag','=','Y']])->update($data);
                     }else{
                         $data['self_id']            = generate_id('identity_');
-                        $data['create_time']        = $data['update_time'] = $now_time;
+                        $data['create_time']        = $data['update_time'] = date('Y-m-d H:i:s',time());
                         UserIdentity::insert($data);
                     }
 
@@ -116,7 +116,7 @@ class UserController extends Controller{
                         UserIdentity::where([['total_user_id','=',$user_info->total_user_id],['type','=','carriage'],['delete_flag','=','Y']])->update($data);
                     }else{
                         $data['self_id']            = generate_id('identity_');
-                        $data['create_time']        = $data['update_time'] = $now_time;
+                        $data['create_time']        = $data['update_time'] = date('Y-m-d H:i:s',time());
                         UserIdentity::insert($data);
                     }
                 }
@@ -741,9 +741,9 @@ class UserController extends Controller{
      */
     public function get_version(Request $request){
         $user_info    = $request->get('user_info');//获取中间件中的参数
-
+        $type = $request->input('type');
         $where=[
-            ['app_name','=','chitu'],
+            ['app_name','=',$type],
             ['delete_flag','=','Y'],
         ];
         $select=['app_name','app_version','app_content','download_url','os','pubdate','force_upgrade','online','official','delete_flag','version_state'];

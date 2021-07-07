@@ -31,7 +31,8 @@ class DispatchController extends CommonController{
         $group_info             = $request->get('group_info');
         $data['page_info']      =config('page.listrows');
         $data['button_info']    =$request->get('anniu');
-
+        $order_state_type        =config('tms.3pl_dispatch_state');
+        $data['state_info']       =$order_state_type;
         /** 抓取可调度的订单**/
         $where=[
             ['delete_flag','=','Y'],
@@ -233,6 +234,7 @@ class DispatchController extends CommonController{
         $group_info             = $request->get('group_info');
         $buttonInfo             = $request->get('buttonInfo');
 //        dd($buttonInfo);
+        $tms_order_status_type = array_column(config('tms.tms_order_status_type'),'pay_status_text','key');
         $tms_control_type           =array_column(config('tms.tms_control_type'),'name','key');
         $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
         $tms_order_inco_type         =array_column(config('tms.tms_order_inco_type'),'icon','key');
@@ -290,6 +292,7 @@ class DispatchController extends CommonController{
                 $value->on_line_money       = number_format($value->on_line_money/100, 2);
                 $value->total_money       = number_format($value->total_money/100, 2);
                 $value->order_type_show=$tms_order_type[$value->order_type]??null;
+                $value->order_status_show = $tms_order_status_type[$value->order_status] ?? null;
                 $value->type_inco = img_for($tms_order_inco_type[$value->order_type],'no_json')??null;
                 $value->send_time         = date('m-d H:i',strtotime($value->send_time));
                     $value['good_info'] = json_decode($value['good_info'],true);
@@ -309,6 +312,46 @@ class DispatchController extends CommonController{
                     $temperture[$kkk] = $tms_control_type[$vvv];
                 }
                 $value->temperture = implode(',',$temperture);
+
+                if($value->order_type == 'vehicle'){
+                    $value->picktime_show = '装车时间 '.$value->send_time;
+                }else{
+                    $value->picktime_show = '提货时间 '.$value->send_time;
+                }
+
+                $value->temperture_show ='温度 '.$value->temperture;
+                $value->order_id_show = '订单编号'.substr($value->self_id,15);
+                if ($value->order_status == 1){
+                    $value->state_font_color = '#333';
+                }elseif($value->order_status == 2){
+                    $value->state_font_color = '#333';
+                }elseif($value->order_status == 3){
+                    $value->state_font_color = '#0088F4';
+                }elseif($value->order_status == 4){
+                    $value->state_font_color = '#35B85F';
+                }elseif($value->order_status == 5){
+                    $value->state_font_color = '#35B85F';
+                }elseif($value->order_status == 6){
+                    $value->state_font_color = '#FF9400';
+                }else{
+                    $value->state_font_color = '#FF807D';
+                }
+                if($value->order_type == 'vehicle' || $value->order_type == 'lcl'){
+                    $value->order_type_color = '#E4F3FF';
+                    $value->order_type_font_color = '#0088F4';
+                    if ($value->order_type == 'vehicle'){
+                        $value->order_type_color = '#0088F4';
+                        $value->order_type_font_color = '#FFFFFF';
+                    }
+                    if ($value->TmsCarType){
+                        $value->car_type_show = $value->TmsCarType->parame_name;
+                        $value->good_info_show = '车型 '.$value->car_type_show;
+                    }
+                }else{
+                    $value->good_info_show = '货物 '.$value->good_number.'件'.$value->good_weight.'kg'.$value->good_volume.'方';
+                    $value->order_type_color = '#E4F3FF';
+                    $value->order_type_font_color = '#0088F4';
+                }
                 $button1 = [];
                 $button2 = [];
                 $button3 = [];
@@ -716,17 +759,18 @@ class DispatchController extends CommonController{
     /***    调度详情     /tms/dispatch/details
      */
     public function  details(Request $request,Details $details){
+        $tms_order_status_type = array_column(config('tms.tms_order_status_type'),'pay_status_text','key');
         $self_id=$request->input('self_id');
         $table_name='tms_order_dispatch';
         $select=['self_id','order_id','company_id','company_name','create_time','use_flag','delete_flag','group_code','group_name','order_type','order_status','gather_name','remark',
             'gather_tel','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_name','send_tel','send_sheng_name','send_shi_name','send_qu_name','info',
             'send_address','total_money','good_info','good_number','good_weight','good_volume','dispatch_flag','carriage_group_id','carriage_group_name','on_line_flag','on_line_money',
-            'pick_flag','send_flag','clod'];
-//        $self_id='dispatch_202103191304538952361196';
+            'pick_flag','send_flag','clod','total_money','gather_time','send_time'];
+//        $self_id='patch_202106231845194304919865';
 //        $info=$details->details($self_id,$table_name,$select);
 
         $where = [
-           ['self_id','=',$self_id],
+            ['self_id','=',$self_id],
         ];
         $select1 = ['self_id','carriage_id','order_dispatch_id'];
         $select2 = ['self_id','company_id','company_name','carriage_flag','total_money'];
@@ -756,7 +800,10 @@ class DispatchController extends CommonController{
             $info->total_money=$info->total_money/100;
             $info->on_line_money=$info->on_line_money/100;
             $info->clod=json_decode($info->clod,true);
-            $info->order_type=$tms_order_type[$info->order_type];
+            $info->order_type_show=$tms_order_type[$info->order_type];
+            $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
+            $info->self_id_show = substr($info->self_id,15);
+            $info->driver_price = 0;
             $cold = $info->clod;
             foreach ($cold as $key => $value){
                 $cold[$key] =$tms_control_type[$value];
@@ -797,7 +844,104 @@ class DispatchController extends CommonController{
                 $info->receipt = $receipt_info;
             }
 
+            if($info->tmsCarriage){
+                $info->driver_price = $info->tmsCarriage->total_money;
+            }
+            $info->color = '#FF7A1A';
+            $info->order_id_show = '订单编号'.$info->self_id_show;
+            $order_details = [];
+            $receipt_list = [];
+            $car_info = [];
+            $order_details1['name'] = '应收运费';
+            $order_details1['value'] = '¥'.$info->total_money;
+            $order_details1['color'] = '#FF7A1A';
+            if ($info->group_code != $info->receiver_id){
+                $order_details1['value'] = '¥'.$info->on_line_money;
+            }
+//            $order_details2['name'] = '是否付款';
+//            $order_details2['value'] = $info->pay_state;
+
+            $order_details4['name'] = '收货时间';
+            $order_details4['value'] = $info->gather_time;
+            $order_details4['color'] = '#000000';
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+                $order_details3['name'] = '装车时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+                $order_details5['name'] = '是否装卸';
+                if($info->pick_flag == 'Y'){
+                    $pick_flag_show = '需要装货';
+                }else{
+                    $pick_flag_show = '不需装货';
+                }
+                if ($info->send_flag == 'Y'){
+                    $send_flag_show = '需要卸货';
+                }else{
+                    $send_flag_show = '不需卸货';
+                }
+                $order_details5['value'] = $pick_flag_show.' '.$send_flag_show;
+                $order_details5['color'] = '#000000';
+            }else{
+
+                $order_details5['name'] = '是否提配';
+                if($info->pick_flag == 'Y'){
+                    $pick_flag_show = '需要提货';
+                }else{
+                    $pick_flag_show = '不需提货';
+                }
+                if ($info->send_flag == 'Y'){
+                    $send_flag_show = '需要配送';
+                }else{
+                    $send_flag_show = '不需配送';
+                }
+                $order_details5['value'] = $pick_flag_show.' '.$send_flag_show;
+                $order_details5['color'] = '#000000';
+            }
+            $order_details6['name'] = '订单备注';
+            $order_details6['value'] = $info->remark;
+            $order_details6['color'] = '#000000';
+//            $order_details7['name'] = '班次号';
+//            $order_details7['value'] = $info->shift_number;
+//            $order_details8['name'] = '时效';
+//            $order_details8['value'] = $info->trunking;
+
+            $order_details9['name'] = '运输信息';
+            $order_details9['value'] = $info->car_info;
+
+            $order_details10['name'] = '回单信息';
+            $order_details10['value'] = $info->receipt;
+
+            $order_details11['name'] = '应付司机';
+            $order_details11['value'] = '¥'.$info->driver_price;
+            $order_details11['color'] = '#000000';
+
+            $order_details[] = $order_details1;
+//            $order_details[]= $order_details2;
+            if(!empty($info->tmsCarriage)){
+                $car_info[] = $order_details11;
+            }
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+                $order_details[] = $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }else{
+//                $order_details[]= $order_details7;
+//                $order_details[]= $order_details8;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }
+            if(!empty($info->car_info)){
+                $car_info[] = $order_details9;
+            }
+            if (!empty($info->receipt)){
+                $receipt_list[] = $order_details10;
+            }
+
             $data['info']=$info;
+            $data['order_details'] = $order_details;
+            $data['receipt_list'] = $receipt_list;
+            $data['car_info'] = $car_info;
             $log_flag='N';
             $data['log_flag']=$log_flag;
             $log_num='10';

@@ -71,7 +71,7 @@ Route::group([
     Route::any('/order/count_price','OrderController@count_price');
     Route::any('/order/count_klio','OrderController@count_klio');
     Route::any('/order/cityVehical','OrderController@cityVehical');
-
+    Route::any('/order/discount_price','OrderController@discount_price');
 });
 
 Route::group([
@@ -85,6 +85,7 @@ Route::group([
     Route::any('/alipay/online_wechat', 'Pay\AlipayController@online_wechat');
     Route::any('/alipay/paymentAlipay', 'Pay\AlipayController@paymentAlipay');
     Route::any('/alipay/paymentWechat', 'Pay\AlipayController@paymentWechat');
+    Route::any('/alipay/driverWechat', 'Pay\AlipayController@driverWechat');
 });
 Route::any('/alipay/notify', 'Pay\AlipayController@notify');
 Route::any('/alipay/wxpaynotify', 'Pay\AlipayController@wxpaynotify');
@@ -170,5 +171,13 @@ Route::group([
         Route::any('/driver/upload_receipt', 'DriverController@upload_receipt');//3pl司机订单列表
     });
 
+});
+
+Route::group([
+    'prefix' => 'api','namespace'  => 'Tms',
+], function(){
+
+    Route::any('/order/orderList', 'OrderController@orderList');
+    Route::any('/take/orderList', 'TakeController@orderList');//app接单列表头部
 });
 

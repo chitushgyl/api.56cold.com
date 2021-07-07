@@ -99,6 +99,10 @@ class LineController extends Controller{
             if ($v->special == 1){
                 $v->discount_show = img_for('2020-07/hui.png','no_json');
             }
+            $v->trunking_show = $v->trunking.'天';
+            $v->price_show = '元/公斤';
+            $v->startime_show = '发车 '.$v->detime;
+            $v->sendprice_show = '配送费'.$v->send_price.'元';
             if(strtotime(date('Y-m-d H:i',time())) <= (strtotime($time.' '.$v->depart_time)-7200)){
                 $line_info[] = $v;
             }
@@ -224,10 +228,13 @@ class LineController extends Controller{
             }]);
         }])->where($where)->select($select)->first();
         if($info) {
+            $pick_type    = config('tms.tms_pick_type');
+            $send_type    = config('tms.tms_send_type');
             $tms_pick_type    = array_column(config('tms.tms_pick_type'),'name','key');
             $tms_send_type    = array_column(config('tms.tms_send_type'),'name','key');
             $tms_control_type = array_column(config('tms.tms_control_type'),'name','key');
             $tms_line_type    = array_column(config('tms.tms_line_type'),'name','key');
+            $tms_temperture_control             =array_column(config('tms.tms_temperture_control'),'value','key');
             /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
             $info->price      = number_format($info->price/100,2);
             $info->min_money  = number_format($info->min_money/100);
@@ -238,6 +245,15 @@ class LineController extends Controller{
             $info->sendtype  = $tms_send_type[$info->send_type] ?? null;
             $info->temperture    = $tms_control_type[$info->control] ?? null;
             $info->order_type       = $tms_line_type[$info->type] ?? null;
+            $info->control_show = $tms_temperture_control[$info->control] ?? null;
+            $info->shiftnumber_show = '班次号 '.$info->shift_number;
+            $info->price_show = '单价'.$info->price.'元/公斤';
+            $info->startime_show = '发车时间'.$info->depart_time;
+            $info->lineprice_show = '干线最低收费'.$info->min_money.'元';
+            $info->background_color = '#0088F4';
+            $info->text_color = '#FFFFFF';
+            $info->pick_type_show = $pick_type;
+            $info->send_type_show = $send_type;
             $data = [];
             $data['info'] = $info;
             $msg['code']  = 200;
@@ -367,12 +383,12 @@ class LineController extends Controller{
             }
             $lineprice = round($lineprice,2);
             $price_info['line_price'] = round($lineprice1,2); //干线费 price
-            $price_info['more_price'] = $more_price/100;
+            $price_info['more_price'] = $more_price;
 
-
+            $price_info['all_price'] = $price_info['line_price'] + $price_info['pick_price'] + $price_info['send_price'] + $price_info['more_price'];
             $msg['code']  = 200;
             $msg['msg']   = "数据拉取成功";
-            $msg['data']  = $lineprice;
+            $msg['data']  = $price_info['all_price'];
             $msg['price_info'] = $price_info;
             return $msg;
         }else{

@@ -7,14 +7,14 @@
  */
 namespace App\Models\Tms;
 use  Illuminate\Database\Eloquent\Model;
-class TmsDeliveryCity extends Model{
+class TmsBankList extends Model{
     //软删除
     //   use SoftDeletes;
     //模型的连接名称（单独连接其他数据库）
     //protected $connection = 'connection-name';
 
     //指定数据库表 如果表名后带s则不需要 不带则需要
-    protected $table = 'tms_delivery_city';
+    protected $table = 'tms_bank_list';
 
     //指定主键字段 默认为id
     //protected $primaryKey = 'id';
@@ -50,12 +50,12 @@ class TmsDeliveryCity extends Model{
         //写进去的字段不被注入
     ];
 
-    public function systemGroup(){
-        //参数：关联模型名称，外键，主键
-        //如果主键是id可以省略
-        return $this->hasOne('App\Models\Group\systemGroup','self_id','carriage_group_code');
-    }
-
+//一对一
+    //public function wmsOutOrder(){
+    //    //参数：关联模型名称，外键，主键
+    //    //如果主键是id可以省略
+    //    return $this->hasMany('App\Models\Wms\WmsOutOrder','total_id','self_id');
+    //}
 
 
 

@@ -28,9 +28,15 @@ Route::any('/login/account_login', 'Login\LoginController@account_login');      
 Route::any('/anniu_show', 'Login\LoginController@anniu_show');                                          //小程序首页按钮控制
 Route::any('/anniu', 'Login\LoginController@anniu');
 
+/**** 定时任务 ***/
+Route::any('/crondtab/order_unline', 'Crondtab\CrondtabController@order_unline'); //定时下线订单
+Route::any('/crondtab/order_done', 'Crondtab\CrondtabController@order_done'); //定时完成订单
+
 /******支付板块模块*******/
 Route::any('/pay/wx_pay', 'Pay\PayController@wx_pay');
 Route::any('/pay/get_pay_info', 'Pay\PayController@get_pay_info');
+
+
 /******支付回调信息处理*******/
 Route::any('/notify/notify', 'Pay\NotifyController@notify');
 
@@ -54,9 +60,12 @@ Route::group([
     ], function(){
         /*** 首页数据*/
         Route::any('/index', 'HomeController@index');                                 //首页数据
+        Route::any('/foot', 'HomeController@foot');                                   //底部导航
+        Route::any('/owm', 'HomeController@owm');                                   //个人中心的控制
     });
 
 });
+
 
 
 

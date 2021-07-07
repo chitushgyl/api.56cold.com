@@ -275,7 +275,7 @@ class OnlineController extends CommonController{
                 ['self_id','=',$dispatch_id],
             ];
             $select=['self_id','company_name','order_status','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
-                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id','group_code',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address',
                 'good_info','good_number','good_weight','good_volume'];
             $wait_info=TmsOrderDispatch::where($where)->select($select)->first(); //总的数据量
@@ -283,6 +283,11 @@ class OnlineController extends CommonController{
             if(empty($wait_info)){
                 $msg['code'] = 304;
                 $msg['msg'] = '您选择的订单已被承接';
+                return $msg;
+            }
+            if ($wait_info->group_code == $user_info->group_code){
+                $msg['code'] = 305;
+                $msg['msg'] = '不可以接取自己的订单';
                 return $msg;
             }
             $order_where = [
