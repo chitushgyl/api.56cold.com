@@ -2733,7 +2733,7 @@ class OrderController extends Controller{
             }
             // 多点提配费用
 //            $multistorePrice = (count($gather_address)+count($send_address)-2)*$car_type['morepickup_price']*$scale_multistore/100;
-            $multistorePrice = ($startstr_count+$endstr_count)*$car_type['morepickup_price']*$scale_multistore/100;
+            $multistorePrice = ($startstr_count+$endstr_count-2)*$car_type['morepickup_price']*$scale_multistore/100;
             if ($picktype == 1 && $sendtype == 1){
                 $multistorePrice = 0;
             }
