@@ -32,8 +32,8 @@ class PayController extends CommonController{
         $total_amount = trim($price); //付款金额，必填
         $body = trim('余额充值');//商品描述，可空
         $timeExpress = '15m';
-        $notify_url = 'http://api.56cold.com/pay/pay/deposit_notify';//异步通知地址
-        $return_url = "http://admin.56cold.com/tms/balance";//同步跳转
+        $notify_url = 'http://ytapi.56cold.com/pay/pay/deposit_notify';//异步通知地址
+        $return_url = "http://bms.56cold.com/tms/balance";//同步跳转
         //构造参数
         $payRequestBuilder = new \AlipayTradePagePayContentBuilder;
         $payRequestBuilder->setBody($body);
@@ -135,8 +135,8 @@ class PayController extends CommonController{
         $total_amount = trim($price); //付款金额，必填
         $body = trim('订单支付');//商品描述，可空
         $timeExpress = '15m';
-        $notify_url = 'http://api.56cold.com/onlineAlipay_notify';//异步通知地址
-        $return_url = "http://admin.56cold.com/tms/balance";//同步跳转
+        $notify_url = 'http://ytapi.56cold.com/onlineAlipay_notify';//异步通知地址
+        $return_url = "http://bms.56cold.com/tms/balance";//同步跳转
         //构造参数
         $payRequestBuilder = new \AlipayTradePagePayContentBuilder;
         $payRequestBuilder->setBody($body);
@@ -240,8 +240,8 @@ class PayController extends CommonController{
         $total_amount = trim($price); //付款金额，必填
         $body = trim('支付宝订单支付');//商品描述，可空
         $timeExpress = '15m';
-        $notify_url = 'http://api.56cold.com/pay/pay/bulkAlipay_notify';//异步通知地址
-        $return_url = "http://admin.56cold.com/tms/order";//同步跳转
+        $notify_url = 'http://ytapi.56cold.com/pay/pay/bulkAlipay_notify';//异步通知地址
+        $return_url = "http://bms.56cold.com/tms/order";//同步跳转
         //构造参数
         $payRequestBuilder = new \AlipayTradePagePayContentBuilder;
         $payRequestBuilder->setBody($body);

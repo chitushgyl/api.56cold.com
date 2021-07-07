@@ -1156,7 +1156,7 @@ class UserController extends Controller{
 //                $info->state_show = img_for($tms_wallet_status[$info->state],'no_json');
 //            }
             if ($info->state == 'SU'){
-                $info->href = 'admin.56cold.com';
+                $info->href = 'bms.56cold.com';
                 $info->pwd  = '123456';
             }
             $info->state_show = img_for($tms_wallet_status[$info->state],'no_json');

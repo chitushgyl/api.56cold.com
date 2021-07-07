@@ -216,7 +216,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://api.56cold.com/alipay/paymentWechatNotify';
+        $noturl = 'http://ytapi.56cold.com/alipay/paymentWechatNotify';
         $appid = 'wxe2d6b74ba8fa43e7';
         $mch_id = '1481595522';
         $notify_url = $noturl;
@@ -326,7 +326,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://api.56cold.com/alipay/appWechat_notify';
+        $noturl = 'http://ytapi.56cold.com/alipay/appWechat_notify';
         $appid = 'wxe2d6b74ba8fa43e7';
         $mch_id = '1481595522';
         $notify_url = $noturl;
@@ -364,7 +364,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://api.56cold.com/alipay/appWechat_notify';
+        $noturl = 'http://ytapi.56cold.com/alipay/appWechat_notify';
         $appid = 'wx1ed6b733675628df';
         $mch_id = '1487413072';
         $notify_url = $noturl;
@@ -516,7 +516,7 @@ class AlipayController extends Controller{
         $aop->signType = "RSA2";
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "api.56cold.com/alipay/appAlipay_notify";
+        $notifyurl = "http://ytapi.56cold.com/alipay/appAlipay_notify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
             'body' => '支付宝支付',
@@ -675,7 +675,7 @@ class AlipayController extends Controller{
         $aop->signType = "RSA2";
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "api.56cold.com/alipay/paymentAlipayNotify";
+        $notifyurl = "http://ytapi.56cold.com/alipay/paymentAlipayNotify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
             'body' => '支付宝支付',
@@ -918,7 +918,7 @@ class AlipayController extends Controller{
         $aop->signType = "RSA2";
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "api.56cold.com/alipay/onlineApipay_notity";
+        $notifyurl = "http://ytapi.56cold.com/alipay/onlineApipay_notity";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
             'body' => '支付宝支付',
@@ -1047,7 +1047,7 @@ class AlipayController extends Controller{
             return $msg;
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
-        $notify_url = 'http://api.56cold.com/alipay/onlineWechat_notify';
+        $notify_url = 'http://ytapi.56cold.com/alipay/onlineWechat_notify';
         $appid = 'wx1ed6b733675628df';
         $mch_id = '1487413072';
         $key = '011eaf63e5f7944c6a979de570d44aaa';

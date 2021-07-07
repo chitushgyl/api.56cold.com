@@ -32,7 +32,8 @@ class MessageController extends Controller{
 
             //做一个分类变量来实现发送的是什么短信，方便短信发送控制器根据流程做相应的转化
             /*** 这个位置就是要触发短信推送的具体内容***/
-            $templateCode   ='SMS_205246188';
+//            $templateCode   ='SMS_205246188';
+            $templateCode   ='SMS_196658029';
             $send_type      ='verify';
             $code           =rand(1111,9999);
             $smsData        = [
@@ -81,7 +82,7 @@ class MessageController extends Controller{
                 $smsData        = [
                     'name'=>$name,
                 ];
-                
+
                 break;
         }
 
