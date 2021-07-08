@@ -278,7 +278,7 @@ class UserController extends Controller{
                                         $abcd='status2';
                                     }
                                     if ($vv->order_status == 3 || $vv->order_status == 4 || $vv->order_status == 5){
-                                        $abcd='status5';
+                                        $abcd='status3';
                                     }
                                     if ($vv->order_status == 7){
                                         $abcd='status7';
@@ -381,6 +381,9 @@ class UserController extends Controller{
                         if($order_number){
                             foreach ($order_number as $kk => $vv){
                                 $abcd='status';
+                                if ($vv->order_status == 2){
+                                    $abcd='status6';
+                                }
                                 if ($vv->order_status == 3){
                                     $abcd='status1';
                                 }
