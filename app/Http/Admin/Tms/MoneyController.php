@@ -202,7 +202,12 @@ class MoneyController extends CommonController{
                     $v->payment_show = '赤途';
                     break;
                 case 'GROUP_CODE':
-                    $v->payment_show =  $v->tmsGroupCompany->group_name;
+                    if ($v->tmsGroupCompany){
+                        $v->payment_show =  $v->tmsGroupCompany->group_name;
+                    }else{
+                        $v->payment_show =  '';
+                    }
+
                     break;
             }
             switch ($v->shouk_type){
