@@ -765,7 +765,7 @@ class DispatchController extends CommonController{
         $select=['self_id','order_id','company_id','company_name','create_time','use_flag','delete_flag','group_code','group_name','order_type','order_status','gather_name','remark',
             'gather_tel','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_name','send_tel','send_sheng_name','send_shi_name','send_qu_name','info',
             'send_address','total_money','good_info','good_number','good_weight','good_volume','dispatch_flag','carriage_group_id','carriage_group_name','on_line_flag','on_line_money',
-            'pick_flag','send_flag','clod','total_money','gather_time','send_time'];
+            'pick_flag','send_flag','clod','total_money','gather_time','send_time','receiver_id','total_user_id'];
 //        $self_id='patch_202106231845194304919865';
 //        $info=$details->details($self_id,$table_name,$select);
 
@@ -847,6 +847,14 @@ class DispatchController extends CommonController{
             if($info->tmsCarriage){
                 $info->driver_price = $info->tmsCarriage->total_money;
             }
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+                $order_info = $info->info;
+                foreach ($order_info as $kkk => $vvv){
+                    $order_info[$kkk]['good_weight'] = ($vvv['good_weight']/1000).'吨';
+                }
+                $info->info = $order_info;
+                $info->good_weight = ($info->good_weight/1000).'吨';
+            }
             $info->color = '#FF7A1A';
             $info->order_id_show = '订单编号'.$info->self_id_show;
             $order_details = [];
@@ -855,7 +863,7 @@ class DispatchController extends CommonController{
             $order_details1['name'] = '应收运费';
             $order_details1['value'] = '¥'.$info->total_money;
             $order_details1['color'] = '#FF7A1A';
-            if ($info->group_code != $info->receiver_id){
+            if ($info->group_code != $info->receiver_id || $info->total_user_id != $info->receiver_id){
                 $order_details1['value'] = '¥'.$info->on_line_money;
             }
 //            $order_details2['name'] = '是否付款';
