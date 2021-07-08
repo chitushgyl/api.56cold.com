@@ -2923,8 +2923,8 @@ class OrderController extends CommonController{
                             $list['total_money']              = $pick_money*100;
                             $list['on_line_money']            = $pick_money*100;
                             if ($k>0){
-                                $list['total_money']              = $line_info['more_price']*100;
-                                $list['on_line_money']            = $line_info['more_price']*100;
+                                $list['total_money']              = $line_info['more_price'];
+                                $list['on_line_money']            = $line_info['more_price'];
                             }
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
