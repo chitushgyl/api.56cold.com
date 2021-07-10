@@ -3065,7 +3065,7 @@ class OrderController extends Controller{
             $money_info1['name'] = '里程运费';
             $money_info2['name'] = '装货费';
             $money_info3['name'] = '卸货费';
-            $money_info4['name'] = '多点装卸费';
+            $money_info4['name'] = '多点运费';
         }else{
             $money_info1['name'] = '干线费';
             $money_info2['name'] = '提货费';
@@ -3101,6 +3101,8 @@ class OrderController extends Controller{
         $msg['msg']  = '请求成功！';
         $msg['price'] = $discount_price;
         $msg['money_info'] = $money_info;
+        $msg['all_money'] = $lineprice+$pickprice+$sendprice+$moreprice-$discount_price;
+        $msg['total_money'] = $price;
         return $msg;
     }
 
