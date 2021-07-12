@@ -355,7 +355,7 @@ class TakeController extends Controller{
                 $data['info'] = $data['info']->where('order_status',6);
             }
         }
-        $data['info'] = $data['info']->select($select)->get();
+        $data['info'] = $data['info']->orderBy('create_time','desc')->select($select)->get();
 //        dd($data['info']);
 
         $tms_pick_type    = array_column(config('tms.tms_pick_type'),'name','key');
