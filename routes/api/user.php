@@ -33,6 +33,7 @@ Route::group([
         Route::any('/get_version', 'UserController@get_version');                   //获取App版本号
         Route::any('/attestation', 'UserController@attestation');                   //企业认证
         Route::any('/details', 'UserController@details');                   //企业认证
+        Route::any('/log_off', 'UserController@log_off');                   //企业认证
     });
 });
 

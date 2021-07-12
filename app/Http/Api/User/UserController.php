@@ -13,6 +13,7 @@ use App\Models\Tms\TmsOrder;
 use App\Models\Tms\TmsOrderDispatch;
 use App\Models\User\UserBank;
 use App\Models\User\UserCapital;
+use App\Models\User\UserReg;
 use App\Models\User\UserTotal;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\DB;
@@ -1175,5 +1176,39 @@ class UserController extends Controller{
             return $msg;
         }
     }
+
+    /**
+     * 注销账号
+     * */
+    public function log_off(Request $request){
+        $project_type       =$request->get('project_type');
+        $now_time   = date('Y-m-d H:i:s',time());
+        $user_info  = $request->get('user_info');//接收中间件产生的参数
+        $input		= $request->all();
+
+        $total_user_id = $user_info->total_user_id;
+        $user = UserIdentity::where('total_user_id',$total_user_id)->select('total_user_id','type')->get();
+//        dd($user->toArray());
+        $user_type = [];
+        foreach ($user as $key =>$value){
+            $user_type[] = $value->type;
+        }
+        if (in_array('TMS3PL',$user_type) || in_array('company',$user_type)){
+            $msg['code'] = 301;
+            $msg['msg']  = '请联系客服注销账户!';
+            return $msg;
+        }
+        $data['delete_flag'] = 'Y';
+        $data['update_time'] = date('Y-m-d H:i:s',time());
+        UserIdentity::where('total_user_id',$total_user_id)->update($data);
+        UserTotal::where('total_user_id',$total_user_id)->update($data);
+        UserReg::where('total_user_id',$total_user_id)->update($data);
+
+        $msg['code'] = 200;
+        $msg['msg']  = '注销成功!';
+        return $msg;
+    }
+
+
 }
 ?>
