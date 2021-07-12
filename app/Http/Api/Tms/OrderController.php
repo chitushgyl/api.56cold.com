@@ -3040,7 +3040,12 @@ class OrderController extends Controller{
         $sendprice = $request->input('sendprice'); // 卸货费/配送费
         $moreprice = $request->input('moreprice'); // 多点装卸费/多点提货费
         $lineprice = $request->input('lineprice'); // 运费/干线费
-        $total_price = $price + $moreprice;
+        if ($type == 'vehicle'){
+            $total_price = $price + $moreprice;
+        }else{
+            $total_price = $price;
+        }
+
 //        $price = '500';
         if($pay_type == 'online') {
             if ($price > 10000) {
