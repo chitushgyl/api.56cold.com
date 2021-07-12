@@ -3102,7 +3102,7 @@ class OrderController extends Controller{
         $msg['price'] = $discount_price;
         $msg['money_info'] = $money_info;
         $msg['all_money'] = $lineprice+$pickprice+$sendprice+$moreprice-$discount_price;
-        $msg['total_money'] = $price;
+        $msg['total_money'] = $price + $moreprice;
         return $msg;
     }
 
