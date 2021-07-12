@@ -1201,8 +1201,8 @@ class UserController extends Controller{
         $data['delete_flag'] = 'Y';
         $data['update_time'] = date('Y-m-d H:i:s',time());
         UserIdentity::where('total_user_id',$total_user_id)->update($data);
-        UserTotal::where('total_user_id',$total_user_id)->update($data);
-        UserReg::where('total_user_id',$total_user_id)->update($data);
+//        UserTotal::where('total_user_id',$total_user_id)->update($data);
+//        UserReg::where('total_user_id',$total_user_id)->update($data);
 
         $msg['code'] = 200;
         $msg['msg']  = '注销成功!';
