@@ -3043,6 +3043,7 @@ class OrderController extends Controller{
         $sendprice = $request->input('sendprice'); // 卸货费/配送费
         $moreprice = $request->input('moreprice'); // 多点装卸费/多点提货费
         $lineprice = $request->input('lineprice'); // 运费/干线费
+        $total_price = $price + $moreprice;
 //        $price = '500';
         if($pay_type == 'online') {
             if ($price > 10000) {
@@ -3102,7 +3103,7 @@ class OrderController extends Controller{
         $msg['price'] = $discount_price;
         $msg['money_info'] = $money_info;
         $msg['all_money'] = $lineprice+$pickprice+$sendprice+$moreprice-$discount_price;
-        $msg['total_money'] = $price + $moreprice;
+        $msg['total_money'] = $total_price;
         return $msg;
     }
 
