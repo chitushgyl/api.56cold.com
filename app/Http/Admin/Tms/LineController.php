@@ -1455,7 +1455,31 @@ class LineController extends CommonController{
                     $list['file_id']            =$file_id;
                     $datalist[]=$list;
 
-                    TmsDeliveryCity::where('use_flag','Y')->where('delete_flag','Y')->get();
+                    /***  生成落地配线路  **/
+                    $delivery = TmsDeliveryCity::where('delete_flag','Y')->where('use_flag','Y')->get();
+                    $line_log_info = [];
+                    foreach ($delivery as $kkk  => $vvv){
+                        if ($vvv->city == $list['gather_shi_name']){
+//                            $line = TmsLine::where('self_id',$self_id)->first();
+
+                            $line_log = $list;
+                            unset($line_log['id']);
+                            $line_log['self_id'] = generate_id('line_');
+                            $line_log['shift_number'] = 'CT'.get_word($list['send_shi_name']).get_word($list['gather_shi_name']).get_word($list['send_qu_name']).get_word($list['gather_qu_name']).date('d',time());
+                            $line_log['special'] = 1;
+                            $line_log['min_number']  = $vvv->min_number;
+                            $line_log['max_number']  = $vvv->max_number;
+                            $line_log['unit_price']  = $vvv->unit_price;
+                            $line_log['start_price'] = $vvv->start_price;
+                            $line_log['max_price']   = $vvv->max_price;
+                            $line_log['carriage_id'] = $vvv->carriage_group_code;//落地配承运公司
+                            $line_log['carriage_group_code'] = $group_code;//平台线路关联公司
+                            $line_log['group_code']  = '1234';
+                            $line_log['group_name']  = '赤途平台';
+                            $line_log_info[] = $line_log;
+                        }
+
+                    }
                 }
                 $a++;
             }
@@ -1469,7 +1493,7 @@ class LineController extends CommonController{
             }
             $count=count($datalist);
             $id= TmsLine::insert($datalist);
-
+            TmsLine::insert($line_log_info);
 
             $operationing->new_info=$datalist;
 
