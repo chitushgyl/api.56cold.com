@@ -174,7 +174,7 @@ class IndexController extends CommonController{
 
         $title_count['vehical_order_count'] = $vehical_order_count;
         $title_count['line_order_count'] = $line_order_count;
-        $title_count['count_weight'] = $count_weight;
+        $title_count['count_weight'] = round($count_weight,2);
         $title_count['count_done_order'] = $count_done_order;
 
         if ($line_count){
