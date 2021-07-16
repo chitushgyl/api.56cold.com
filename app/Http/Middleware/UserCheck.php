@@ -36,7 +36,7 @@ class UserCheck{
             //dump($token_info->user_id);
 			$reg_select=['self_id','total_user_id','reg_type',
             'tel','authority','token_appid','token_id','token_img','token_name','foot_info','union_id','foot_info'];
-			
+
 			$user_where=[
 				['self_id','=',$token_info->user_id],
 			];
@@ -152,7 +152,7 @@ class UserCheck{
         $anniu_where['type']='button';
         $anniu_where['delete_flag']='Y';
         $anniu_where['project_type'] = $project_type.'_button';
-        $select=['id','name','app_path','project_type','level','path','button_color'];
+        $select=['id','name','app_path','project_type','level','path','button_color','app_url'];
 
         $anniu=SysFoot::where($anniu_where)->select($select)->get();
 

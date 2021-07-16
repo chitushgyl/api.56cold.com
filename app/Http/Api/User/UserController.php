@@ -41,7 +41,7 @@ class UserController extends Controller{
 //        $project_type       ='dispatcher';
         /**初始化一下数据**/
         $info          =null;
-        $select=['name','type','path','active_img','inactive_img','app_path'];
+        $select=['name','type','path','active_img','inactive_img','app_path','app_url'];
         $user_foot_where=[
             ['use_flag','=','Y'],
             ['delete_flag','=','Y'],
@@ -148,7 +148,7 @@ class UserController extends Controller{
         }
 
 
-        $select=['id','node','name','type','path','inactive_img','list_flag','number_flag','app_path'];
+        $select=['id','node','name','type','path','inactive_img','list_flag','number_flag','app_path','app_url'];
         $user_foot_where=[
             ['use_flag','=','Y'],
             ['delete_flag','=','Y'],

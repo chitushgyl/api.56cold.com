@@ -31,7 +31,7 @@ class LoginCheck{
 
         $user_info=null;
         /**查询出这个用户的信息出来**/
-        $user_where=[		
+        $user_where=[
             ['user_token','=',$user_token],
             ['use_flag','=','Y'],
             ['delete_flag','=','Y'],
@@ -120,7 +120,7 @@ class LoginCheck{
          **/
         $group_info['group_id']=null;
         $group_info['group_code']=null;
-		
+
 		//dump($user_info->systemAdmin->systemAuthority->group_id);
 		//dump($user_info->systemAdmin->systemGroup->group_id);
         if($user_info->systemAdmin->systemAuthority->group_id  =='all' && $user_info->systemAdmin->systemGroup->group_id	=='all'){
@@ -173,7 +173,7 @@ class LoginCheck{
         $user_info->menu_id=$menu_id;
 
 
-//dd($user_info->toArray());1  
+//dd($user_info->toArray());1
         /** **/
         if($user_info->group_id){
             if($user_info->group_id == 'all'){
@@ -208,7 +208,7 @@ class LoginCheck{
         $button_where['delete_flag']='Y';
         $button_where['project_type'] = $user_info->type.'_button';
 //            dd($anniu_where['project_type']);
-        $select=['id','name','app_path','project_type','level','path','button_color'];
+        $select=['id','name','app_path','project_type','level','path','button_color','app_url'];
 
         $button=SysFoot::where($button_where)->select($select)->get();
 
