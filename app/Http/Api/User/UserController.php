@@ -883,8 +883,22 @@ class UserController extends Controller{
 
 
             $attestation['name'] = $name;
-            $attestation['image'] = img_for($image,'in');
-            $attestation['road'] = img_for($road,'in');
+            if (is_array($image) || is_object($image)){
+                $attestation['image'] = img_for($image,'in');
+            }else{
+                $msg['code'] = 305;
+                $msg['msg']  = '图片上传失败,请重新上传';
+                return $msg;
+            }
+            if($type == 'TMS3PL'){
+                if (is_array($road) || is_object($road)){
+                    $attestation['road'] = img_for($road,'in');
+                }else{
+                    $msg['code'] = 305;
+                    $msg['msg']  = '图片上传失败,请重新上传';
+                    return $msg;
+                }
+            }
             $attestation['address'] = $address;
             $attestation['sheng_name'] = $sheng_name;
             $attestation['shi_name'] = $shi_name;
