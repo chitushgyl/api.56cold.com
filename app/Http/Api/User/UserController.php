@@ -410,6 +410,49 @@ class UserController extends Controller{
                         $vvv->number = '99+';
                     }
                     break;
+                case 'business_order':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['group_code','=',$user_info->group_code],
+                            ['read_flag','=','N'],
+                        ];
+                        $order_number=TmsOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 2){
+                                    $abcd='status6';
+                                }
+                                if ($vv->order_status == 3){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status2';
+                                }
+//                            if ($vv->order_status == 6){
+//                                $abcd='status3';
+//                            }
+                                if ($vv->order_status == 7){
+                                    $abcd='status4';
+                                }
+
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number +=$vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
                 case 'company_order':
                     foreach ($v->sysFoot as $kkk => $vvv){
                         $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
@@ -450,6 +493,41 @@ class UserController extends Controller{
                     }
                     break;
                 case 'TMS3PL_order_take':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['receiver_id','=',$user_info->group_code],
+                        ];
+                        $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 2 || $vv->order_status == 3){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status2';
+                                }
+//                            if ($vv->order_status == 6){
+//                                $abcd='status3';
+//                            }
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number += $vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
+                case 'dispatch_order_take':
                     foreach ($v->sysFoot as $kkk => $vvv){
                         $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
                         $vvv->number=0;
