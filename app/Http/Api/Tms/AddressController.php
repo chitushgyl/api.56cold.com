@@ -311,5 +311,47 @@ class AddressController extends Controller{
         return $msg;
     }
 
+    /**
+     * 获取市内整车已开放城市
+     * */
+    public function get_address(Request $request){
+        $list = TmsCity::where('delete_flag','Y')->select(['self_id','city','c_city'])->get();
+        $msg['code'] = 200;
+        $msg['msg']  = "数据拉取成功";
+        $msg['data'] = $list;
+        return $msg;
+    }
+
+    /**
+     * 根据市区名称获取市ID，区ID  /api/address/get_address_id
+     * */
+    public function get_address_id(Request $request){
+        $pro    = $request->input('pro');
+        $city   = $request->input('city');//市名称
+        $area   = $request->input('area');//区名称
+        $where = [
+            ['city'=>$city],
+
+        ];
+        /** 虚拟数据
+        $pro = $input['pro'] = '贵州';
+        $city = $input['city'] = '毕节';
+        $area = $input['area'] = '威宁';
+         ***/
+        $pro_info = SysAddress::where('name','like','%'.$pro.'%')->first();
+        $city_info = SysAddress::where('name','like','%'.$city.'%')->where('parent_id',$pro_info->id)->first();
+        $area_info = SysAddress::where('name','like','%'.$area.'%')->where('parent_id',$city_info->id)->first();
+
+        $info = [
+            'pro'=>$pro_info->id,
+            'city'=>$city_info->id,
+            'area'=>$area_info->id,
+        ];
+        $msg['data'] = $info;
+        $msg['code'] = 200;
+        $msg['msg']  = '数据拉取成功';
+        return $msg;
+    }
+
 }
 ?>

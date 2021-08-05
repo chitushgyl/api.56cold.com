@@ -11,7 +11,7 @@ function generate_id($kk){
 
 /*** md5加密*/
 function get_md5($money){
-    $mon=md5(md5($money)."baoyan");
+    $mon=md5(md5($money)."chitu");
     return $mon;
 }
 /*** 图片的for循环处理1*/
@@ -174,7 +174,7 @@ function arr_check($shuzu,$arr){
         if($cando == 'Y'){
             foreach ($list as $k => $v){
                 $abcd=null;
-                $abcd=array_count_values(array_filter($v));    
+                $abcd=array_count_values(array_filter($v));
                 foreach($abcd as $kk => $vv){
                     if($vv>1){
                         $cando='N';
