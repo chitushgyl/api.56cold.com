@@ -312,17 +312,6 @@ class AddressController extends Controller{
     }
 
     /**
-     * 获取市内整车已开放城市
-     * */
-    public function get_address(Request $request){
-        $list = TmsCity::where('delete_flag','Y')->select(['self_id','city','c_city'])->get();
-        $msg['code'] = 200;
-        $msg['msg']  = "数据拉取成功";
-        $msg['data'] = $list;
-        return $msg;
-    }
-
-    /**
      * 根据市区名称获取市ID，区ID  /api/address/get_address_id
      * */
     public function get_address_id(Request $request){
