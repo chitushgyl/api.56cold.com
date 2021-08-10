@@ -246,6 +246,7 @@ class DispatchController extends CommonController{
         $page           =$request->input('page')??1;
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
+        $app_status = $request->input('app_status');
 //        $input['group_code'] = $group_code =  '1234';
         $rules=[
             'group_code'=>'required',
@@ -275,7 +276,11 @@ class DispatchController extends CommonController{
                 ->where($where);
             if ($order_status){
                 if ($order_status == 1){
-                    $data['info'] = $data['info']->where('dispatch_flag','Y')->whereIn('order_status',[2,3]);
+                    if ($app_status){
+                        $data['info'] = $data['info']->whereIn('order_status',[2,3]);
+                    }else{
+                        $data['info'] = $data['info']->where('dispatch_flag','Y')->whereIn('order_status',[2,3]);
+                    }
                 }elseif($order_status == 2){
                     $data['info'] = $data['info']->whereIn('order_status',[4,5]);
                 }else{
