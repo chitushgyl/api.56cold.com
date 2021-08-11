@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**生成唯一的ID**/
 function generate_id($kk){
     list($s1, $s2) = explode(' ', microtime());
@@ -11,7 +11,7 @@ function generate_id($kk){
 
 /*** md5加密*/
 function get_md5($money){
-    $mon=md5(md5($money)."chitu");
+    $mon=md5(md5($money)."baoyan");
     return $mon;
 }
 /*** 图片的for循环处理1*/
