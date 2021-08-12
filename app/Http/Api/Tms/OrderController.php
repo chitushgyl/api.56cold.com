@@ -2021,8 +2021,10 @@ class OrderController extends Controller{
                             $center_list = '有从'. $data['send_shi_name'].'发往'.$data['gather_shi_name'].'的整车订单';
                             $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
 //                            $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
-                            $A = $this->send_push_msg($push_contnect);
+//                            $A = $this->send_push_msg($push_contnect);
+                            $this->sendPushMessage('订单信息','有新订单',$center_list);
                         }
+
 
                     }
 
@@ -3026,6 +3028,34 @@ class OrderController extends Controller{
 
 //        $a =  $gt->pushIGtMsgL($data, $cid);
         $a =  $gt->PushMessageToList($data, $cid);
+    }
+
+    public function sendPushMessage($group_name,$title,$content){
+        $where = [
+            ['type','=','carriage'],
+        ];
+        $select = ['user_id','clientid','type'];
+        $info = UserIdentity::with(['logLogin'=>function($query)use($select) {
+            $query->where('type', '!=', 'after');
+            $query->select($select);
+        }])
+            ->where($where)->orWhere('type','TMS3PL')->orWhere('type','business')
+            ->select('total_user_id','type')
+            ->get();
+        $clientid_list = [];
+        foreach ($info as $key =>$value){
+            if ($value->logLogin){
+                foreach ($value->logLogin as $k =>$v){
+                    if ($v->clientid != null && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
+                        $clientid_list[] = $v->clientid;
+                    }
+                }
+            }
+        }
+        $cid = array_unique($clientid_list);
+        include_once base_path( '/vendor/push/GeTui.php');
+        $geTui = new \GeTui();
+        $result = $geTui->pushToList($group_name,$title,$content,$cid);
     }
 
     /**

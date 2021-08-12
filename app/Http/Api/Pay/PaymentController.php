@@ -12,7 +12,7 @@ use App\Http\Controllers\Controller;
 use EasyWeChat\Foundation\Application;
 
 
-class AlipayController extends Controller{
+class PaymentController extends Controller{
 
     /** H5支付宝支付**/
     public function alipay(Request $request){
@@ -561,7 +561,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         $type  = $request->input('type');
-        $user_type  = $request->input('$user_type');
+        $user_type  = $request->input('user_type');
         if (empty($type)){
             $msg['code'] = 303;
             $msg['msg']  = '请选择支付类型';
