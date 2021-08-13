@@ -3046,16 +3046,20 @@ class OrderController extends Controller{
         foreach ($info as $key =>$value){
             if ($value->logLogin){
                 foreach ($value->logLogin as $k =>$v){
-                    if ($v->clientid != null && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
+                    if ($v->clientid != null && $v->clientid == 'null' && $v->clientid  && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
                         $clientid_list[] = $v->clientid;
                     }
                 }
             }
         }
         $cid = array_unique($clientid_list);
+        $cid_list = [];
+        foreach ($cid as $kk =>$vv){
+            array_push($cid_list,$vv);
+        }
         include_once base_path( '/vendor/push/GeTui.php');
         $geTui = new \GeTui();
-        $result = $geTui->pushToList($group_name,$title,$content,$cid);
+        $result = $geTui->pushToList($group_name,$title,$content,$cid_list);
     }
 
     /**

@@ -207,7 +207,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-        $data['price'] = $price = 0.01;
+//        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -216,7 +216,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://api.56cold.com/alipay/paymentWechatNotify';
+        $noturl = 'http://ytapi.56cold.com/alipay/paymentWechatNotify';
         $appid = 'wxe2d6b74ba8fa43e7';
         $mch_id = '1481595522';
         $notify_url = $noturl;
@@ -317,7 +317,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-        $data['price'] = $price = 0.01;
+//        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -326,7 +326,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://api.56cold.com/alipay/appWechat_notify';
+        $noturl = 'http://ytapi.56cold.com/alipay/appWechat_notify';
         $appid = 'wxe2d6b74ba8fa43e7';
         $mch_id = '1481595522';
         $notify_url = $noturl;
@@ -355,7 +355,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-        $data['price'] = $price = 0.01;
+//        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -364,7 +364,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://api.56cold.com/alipay/appWechat_notify';
+        $noturl = 'http://ytapi.56cold.com/alipay/appWechat_notify';
         $appid = 'wx1ed6b733675628df';
         $mch_id = '1487413072';
         $notify_url = $noturl;
@@ -493,7 +493,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
-        $price = 0.01;
+//        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -516,7 +516,7 @@ class AlipayController extends Controller{
         $aop->signType = "RSA2";
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "http://api.56cold.com/alipay/appAlipay_notify";
+        $notifyurl = "http://ytapi.56cold.com/alipay/appAlipay_notify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
             'body' => '支付宝支付',
@@ -537,12 +537,12 @@ class AlipayController extends Controller{
      * APP支付宝支付回调
      * */
     public function appAlipay_notify(){
-        file_put_contents(base_path('/storage/ali.txt'),$_POST);
+//        file_put_contents(base_path('/storage/ali.txt'),$_POST);
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         $aop = new \AopClient();
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $flag = $aop->rsaCheckV1($_POST, NULL, "RSA2");
-        file_put_contents(base_path('/storage/a.txt'),$flag);
+//        file_put_contents(base_path('/storage/a.txt'),$flag);
         if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
             $now_time = date('Y-m-d H:i:s',time());
             $pay['order_id'] = $_POST['out_trade_no'];
@@ -554,9 +554,9 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
-            file_put_contents(base_path('/storage/al.txt'),'123');
+//            file_put_contents(base_path('/storage/al.txt'),'123');
             $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
-            if ($order->order_status == 2){
+            if ($order->order_status == 2 ||$order->order_status == 3){
                 echo 'success';
                 return false;
             }
@@ -652,7 +652,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
-        $price = 0.01;
+//        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -675,7 +675,7 @@ class AlipayController extends Controller{
         $aop->signType = "RSA2";
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "http://api.56cold.com/alipay/paymentAlipayNotify";
+        $notifyurl = "http://ytapi.56cold.com/alipay/paymentAlipayNotify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
             'body' => '支付宝支付',
@@ -1174,16 +1174,20 @@ class AlipayController extends Controller{
         foreach ($info as $key =>$value){
             if ($value->logLogin){
                 foreach ($value->logLogin as $k =>$v){
-                    if ($v->clientid != null && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
+                    if ($v->clientid != null &&$v->clientid == "null" && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
                         $clientid_list[] = $v->clientid;
                     }
                 }
             }
         }
         $cid = array_unique($clientid_list);
+        $cid_list = [];
+        foreach ($cid as $kk =>$vv){
+            array_push($cid_list,$vv);
+        }
         include_once base_path( '/vendor/push/GeTui.php');
         $geTui = new \GeTui();
-        $result = $geTui->pushToList($group_name,$title,$content,$cid);
+        $result = $geTui->pushToList($group_name,$title,$content,$cid_list);
     }
 
 

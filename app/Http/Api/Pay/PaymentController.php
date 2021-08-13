@@ -195,7 +195,7 @@ class PaymentController extends Controller{
     /**
      * 群推送（根据clientid推送）
      * */
-    public function send_push_msg($data){
+    public function send_push_msg($group_name,$title,$content){
         $where = [
             ['type','=','carriage'],
         ];
@@ -211,14 +211,20 @@ class PaymentController extends Controller{
         foreach ($info as $key =>$value){
             if ($value->logLogin){
                 foreach ($value->logLogin as $k =>$v){
-                    $clientid_list[] = $v->clientid;
+                    if ($v->clientid != null  && $v->clientid == "null" && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
+                        $clientid_list[] = $v->clientid;
+                    }
                 }
             }
         }
         $cid = array_unique($clientid_list);
-        include_once base_path( '/vendor/getui/GeTui.php');
-        $gt = new \getui\GeTui();
-        $a =  $gt->PushMessageToList($data, $cid);
+        $cid_list = [];
+        foreach ($cid as $kk =>$vv){
+            array_push($cid_list,$vv);
+        }
+        include_once base_path( '/vendor/push/GeTui.php');
+        $geTui = new \GeTui();
+        $result = $geTui->pushToList($group_name,$title,$content,$cid_list);
     }
 
     /**

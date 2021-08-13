@@ -424,7 +424,7 @@ class LineController extends CommonController{
         $time5                  =$request->input('time5');
         $time6                  =$request->input('time6');
         $combination            =$request->input('combination');
-        $more_price            =$request->input('more_price');
+        $more_price             =$request->input('more_price');
 
         /** 地址接收数据**/
         $gather_address_id      =$request->input('gather_address_id');
@@ -444,12 +444,12 @@ class LineController extends CommonController{
         $send_contacts_name     =$request->input('send_contacts_name');
         $send_contacts_tel      =$request->input('send_contacts_tel');
         $more_price             =$request->input('more_price');
-        $special             =$request->input('special');
+        $special                =$request->input('special');
         $min_number             =$request->input('min_number');
         $max_number             =$request->input('max_number');
         $unit_price             =$request->input('unit_price');
-        $start_price             =$request->input('start_price');
-        $max_price             =$request->input('max_price');
+        $start_price            =$request->input('start_price');
+        $max_price              =$request->input('max_price');
 
 
 
@@ -652,20 +652,15 @@ class LineController extends CommonController{
                     $data['start_price']                = $start_price*100;
                     $data['max_price']                  = $max_price*100;
 
-//                    dump($list);
-
                     $wheres['self_id'] = $self_id;
                     $old_info=TmsLine::where($wheres)->first();
 
                     if($old_info){
-
                         $data['update_time']=$now_time;
                         $id=TmsLine::where($wheres)->update($data);
 
-
                         $operationing->access_cause='修改线路';
                         $operationing->operation_type='update';
-
 
                     }else{
                         $self_id=generate_id('line_');
@@ -680,7 +675,6 @@ class LineController extends CommonController{
                         foreach ($delivery as $kkk  => $vvv){
                             if ($vvv->city == $data['gather_shi_name']){
                                 $line = TmsLine::where('self_id',$self_id)->first();
-
                                 $line_log = $line->attributesToArray();
                                 unset($line_log['id']);
                                 $line_log['self_id'] = generate_id('line_');

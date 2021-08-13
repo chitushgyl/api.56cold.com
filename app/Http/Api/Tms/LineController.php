@@ -293,7 +293,7 @@ class LineController extends Controller{
         $input['send_type'] = $send_type = 'Y';  // 'Y' 配送  'N' 自提
         $input['volume'] = $volume = 2;
         $input['weight'] = $weight = 1000;
-        $input['line_id'] = $line_id = 'line_20210401181248762631785';
+        $input['line_id'] = $line_id = 'line_2021081217345645546727';
         * **/
         $rules = [
             'line_id'=>'required',
@@ -309,17 +309,17 @@ class LineController extends Controller{
         if ($gather_address){
             $pick_info=json_decode($gather_address,true);
             foreach ($pick_info as $k=> $v){
-                $startstr[]=$v['area'].$v['city'].$v['info'].$v['pro'];
+                $startstr[]=$v['pro'].$v['city'].$v['area'].$v['info'];
             }
-            $startstr = count(array_unique($startstr));
+            $startstr_count = count(array_unique($startstr));
         }
         $endstr = [];
         if ($send_address){
             $send_info=json_decode($send_address,true);
             foreach ($send_info as $k=> $v){
-                $endstr[]=$v['area'].$v['city'].$v['info'].$v['pro'];
+                $endstr[]=$v['pro'].$v['city'].$v['area'].$v['info'];
             }
-            $endstr = count(array_unique($endstr));
+            $endstr_count = count(array_unique($endstr));
         }
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {
@@ -371,14 +371,14 @@ class LineController extends Controller{
                     $price_info['send_price'] = line_count_price($line,$number);
                     $lineprice = $lineprice + $price_info['send_price'];
                 }else{
-                    $lineprice = $lineprice + $endstr*($line->send_price/100);
-                    $price_info['send_price'] = $endstr*($line->send_price/100); //配送费
+                    $lineprice = $lineprice + $endstr_count*($line->send_price/100);
+                    $price_info['send_price'] = $endstr_count*($line->send_price/100); //配送费
                 }
             }
             //计算落地配线路配送费
 
-            if ($startstr - 1 >0){
-                $more_price = ($startstr - 1)*$line->more_price/100;
+            if ($startstr_count - 1 >0){
+                $more_price = ($startstr_count - 1)*$line->more_price/100;
                 $lineprice = $lineprice+$more_price;
             }
             $lineprice = round($lineprice,2);
