@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Api\Pay;
+use App\Models\Group\SystemGroup;
 use App\Models\Tms\TmsOrder;
 use App\Models\Tms\TmsOrderCost;
 use App\Models\Tms\TmsOrderDispatch;
@@ -379,10 +380,10 @@ class PaymentController extends Controller{
             if($order->group_code){
                 $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
                 if($group->company_type != 'TMS3PL'){
-                    $A = $this->send_push_msg($push_contnect);
+                    $A = $this->send_push_msg('订单信息','有新订单',$center_list);
                 }
             }else{
-                $A = $this->send_push_msg($push_contnect);
+                $A = $this->send_push_msg('订单信息','有新订单',$center_list);
             }
             if ($id){
                 echo 'success';
@@ -698,10 +699,10 @@ class PaymentController extends Controller{
             if($order->group_code){
                 $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
                 if($group->company_type != 'TMS3PL'){
-                    $A = $this->send_push_msg($push_contnect);
+                    $A = $this->send_push_msg('订单信息','有新订单',$center_list);
                 }
             }else{
-                $A = $this->send_push_msg($push_contnect);
+                $A = $this->send_push_msg('订单信息','有新订单',$center_list);
             }
             if ($id){
                 echo 'success';
@@ -962,7 +963,14 @@ class PaymentController extends Controller{
         $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
         $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
 //                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
-        $A = $this->send_push_msg($push_contnect);
+        if($order->group_code){
+            $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
+            if($group->company_type != 'TMS3PL'){
+                $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+            }
+        }else{
+            $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+        }
         if ($id){
             $msg['code'] = 200;
             $msg['msg']  = '支付成功！';

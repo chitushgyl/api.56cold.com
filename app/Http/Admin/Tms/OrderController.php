@@ -281,9 +281,9 @@ class OrderController extends CommonController{
                 if($value->id == 161){
                     $button3[] = $value;
                 }
-//                if ($value->id == 183){
-//                    $button4[] = $value;
-//                }
+                if ($value->id == 184){
+                    $button4[] = $value;
+                }
                 if ($value->id == 162){
                     $button4[] = $value;
                 }
@@ -300,15 +300,15 @@ class OrderController extends CommonController{
                 if ($v->order_status == 2 && $v->order_type == 'vehicle'){
                     $v->button  = $button1;
                 }
-//                if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
-//                    $v->button  = $button4;
-//                }
-                if ($v->order_status == 5 && $user_info->type == 'company'){
+                if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
                     $v->button  = $button4;
                 }
-//                if ($v->order_status == 6 && $user_info->type == 'company'){
+//                if ($v->order_status == 5 && $v->group_code != $v->receiver_id){
 //                    $v->button  = $button4;
 //                }
+                if ($v->order_status == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+                    $v->button  = $button4;
+                }
 
 
             }
@@ -2292,6 +2292,53 @@ class OrderController extends CommonController{
             if ($TmsOrderDispatch){
                 $dispatch_list = array_column($TmsOrderDispatch->toArray(),'self_id');
                 $orderStatus = TmsOrderDispatch::where('delete_flag','=','Y')->whereIn('self_id',$dispatch_list)->update($update);
+
+                /*** 订单完成后，如果订单是在线支付，添加运费到承接司机或3pl公司余额 **/
+                if ($orderStatus){
+//                    if ($order->pay_type == 'online'){
+//                        dd($dispatch_list);
+                    foreach ($dispatch_list as $key => $value){
+
+                        $carriage_order = TmsOrderDispatch::where('self_id','=',$value)->first();
+                        $idit = substr($carriage_order->receiver_id,0,5);
+                        if ($idit == 'user_'){
+                            $wallet_where = [
+                                ['total_user_id','=',$carriage_order->receiver_id]
+                            ];
+                            $data['wallet_type'] = 'user';
+                            $data['total_user_id'] = $carriage_order->receiver_id;
+                        }else{
+                            $wallet_where = [
+                                ['group_code','=',$carriage_order->receiver_id]
+                            ];
+                            $data['wallet_type'] = '3PLTMS';
+                            $data['group_code'] = $carriage_order->receiver_id;
+                        }
+                        $wallet = UserCapital::where($wallet_where)->select(['self_id','money'])->first();
+
+                        $money['money'] = $wallet->money + $carriage_order->on_line_money;
+                        $data['money'] = $carriage_order->on_line_money;
+                        if ($carriage_order->group_code == $carriage_order->receiver_id){
+                            $money['money'] = $wallet->money + $carriage_order->total_money;
+                            $data['money'] = $carriage_order->total_money;
+                        }
+
+                        $money['update_time'] = $now_time;
+                        UserCapital::where($wallet_where)->update($money);
+
+                        $data['self_id'] = generate_id('wallet_');
+                        $data['produce_type'] = 'in';
+                        $data['capital_type'] = 'wallet';
+                        $data['create_time'] = $now_time;
+                        $data['update_time'] = $now_time;
+                        $data['now_money'] = $money['money'];
+                        $data['now_money_md'] = get_md5($money['money']);
+                        $data['wallet_status'] = 'SU';
+
+                        UserWallet::insert($data);
+                    }
+//                    }
+                }
             }
 
             if($id){
