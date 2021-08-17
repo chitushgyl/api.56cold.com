@@ -302,10 +302,10 @@ class OrderController extends CommonController{
                 if ($v->order_status == 2 && $v->order_type == 'vehicle'){
                     $v->button  = $button1;
                 }
-                if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+                if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
                     $v->button  = $button4;
                 }
-                if ($v->order_status == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+                if ($v->order_status == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
                     $v->button  = $button5;
                 }
 
@@ -404,6 +404,7 @@ class OrderController extends CommonController{
         $car_type      = $request->input('car_type')??''; //车型
         $pay_type      = $request->input('pay_type');
         $remark        = $request->input('remark');
+        $app_flag      = $request->input('app_flag');//app上下单   1 是 2 PC下单
         if (empty($price)){
             $price = $request->input('line_price');
         }
@@ -427,6 +428,7 @@ class OrderController extends CommonController{
         $input['clod']                      =$clod='refrigeration';
         $input['car_type']                  =$car_type='type_202102051755118039490396';
         $input['remark']                    =$remark='';
+        $input['app_flag']                  =$app_flag = 1;
         $input['pay_type']                  =$pay_type='offline';
         $input['gather_time']               = $gather_time = '2021-05-22';
         $input['send_time']                 = $send_time = '2021-05-20';
