@@ -271,6 +271,7 @@ class OrderController extends CommonController{
             $button2 = [];
             $button3 = [];
             $button4 = [];
+            $button5 = [];
             foreach ($buttonInfo as $key =>$value){
                 if ($value->id == 124 ){
                     $button1[] = $value;
@@ -283,6 +284,7 @@ class OrderController extends CommonController{
                 }
                 if ($value->id == 184){
                     $button4[] = $value;
+                    $button5[] = $value;
                 }
                 if ($value->id == 162){
                     $button4[] = $value;
@@ -303,11 +305,8 @@ class OrderController extends CommonController{
                 if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
                     $v->button  = $button4;
                 }
-//                if ($v->order_status == 5 && $v->group_code != $v->receiver_id){
-//                    $v->button  = $button4;
-//                }
                 if ($v->order_status == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
-                    $v->button  = $button4;
+                    $v->button  = $button5;
                 }
 
 
