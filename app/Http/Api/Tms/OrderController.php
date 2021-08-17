@@ -337,13 +337,14 @@ class OrderController extends Controller{
         $dispatcher    = $request->input('dispatcher') ?? [];
         $clod          = $request->input('clod');
         $more_money    = $request->input('more_money') ? $request->input('more_money') - 0 : null ;//多点费用
-        $gather_time    = $request->input('gather_time')??null;
-        $send_time    = $request->input('send_time')??null;
-        $pay_type    = $request->input('pay_type');
-        $car_type    = $request->input('car_type')??''; //车型
-        $remark    = $request->input('remark')??''; //备注
-        $depart_time    = $request->input('depart_time')??null; //干线发车时间
-        $reduce_price    = $request->input('reduce_price');//立减金额
+        $gather_time   = $request->input('gather_time')??null;
+        $send_time     = $request->input('send_time')??null;
+        $pay_type      = $request->input('pay_type');
+        $car_type      = $request->input('car_type')??''; //车型
+        $remark        = $request->input('remark')??''; //备注
+        $app_flag      = $request->input('app_flag');
+        $depart_time   = $request->input('depart_time')??null; //干线发车时间
+        $reduce_price  = $request->input('reduce_price');//立减金额
        /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
@@ -1675,6 +1676,7 @@ class OrderController extends Controller{
                     $data['good_info']   = $good_info;
                     $data['clod']        = json_encode($clodss,JSON_UNESCAPED_UNICODE);
                     $data['remark']      = $remark;
+                    $data['app_flag']                   = $app_flag;
                     $data['send_time']   = $send_time;
                     $data['reduce_price'] = $reduce_price;
                     $wheres['self_id'] = $self_id;
@@ -1835,6 +1837,7 @@ class OrderController extends Controller{
                     $data['pay_type']                   = $pay_type;
                     $data['car_type']                   = $car_type;
                     $data['remark']                     = $remark;
+                    $data['app_flag']                   = $app_flag;
                     $data['reduce_price']               = $reduce_price;
                     /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
                     $inserttt=[];
