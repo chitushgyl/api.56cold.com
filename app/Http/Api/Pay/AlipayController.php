@@ -207,7 +207,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-//        $data['price'] = $price = 0.01;
+        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -216,7 +216,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://ytapi.56cold.com/alipay/paymentWechatNotify';
+        $noturl = 'http://api.56cold.com/alipay/paymentWechatNotify';
         $appid = 'wxe2d6b74ba8fa43e7';
         $mch_id = '1481595522';
         $notify_url = $noturl;
@@ -317,7 +317,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-//        $data['price'] = $price = 0.01;
+        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -326,7 +326,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://ytapi.56cold.com/alipay/appWechat_notify';
+        $noturl = 'http://api.56cold.com/alipay/appWechat_notify';
         $appid = 'wxe2d6b74ba8fa43e7';
         $mch_id = '1481595522';
         $notify_url = $noturl;
@@ -355,7 +355,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         //$user_id = 1;
-//        $data['price'] = $price = 0.01;
+        $data['price'] = $price = 0.01;
         $data['ordernumber'] = $self_id;
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -364,7 +364,7 @@ class AlipayController extends Controller{
         }
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $data['ordernumber'];
-        $noturl = 'http://ytapi.56cold.com/alipay/appWechat_notify';
+        $noturl = 'http://api.56cold.com/alipay/appWechat_notify';
         $appid = 'wx1ed6b733675628df';
         $mch_id = '1487413072';
         $notify_url = $noturl;
@@ -493,7 +493,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
-//        $price = 0.01;
+        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -516,7 +516,7 @@ class AlipayController extends Controller{
         $aop->signType = "RSA2";
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "http://ytapi.56cold.com/alipay/appAlipay_notify";
+        $notifyurl = "http://api.56cold.com/alipay/appAlipay_notify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
             'body' => '支付宝支付',
@@ -652,7 +652,7 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
-//        $price = 0.01;
+        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -675,7 +675,7 @@ class AlipayController extends Controller{
         $aop->signType = "RSA2";
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "http://ytapi.56cold.com/alipay/paymentAlipayNotify";
+        $notifyurl = "http://api.56cold.com/alipay/paymentAlipayNotify";
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
         $bizcontent = json_encode([
             'body' => '支付宝支付',
@@ -1188,6 +1188,45 @@ class AlipayController extends Controller{
         include_once base_path( '/vendor/push/GeTui.php');
         $geTui = new \GeTui();
         $result = $geTui->pushToList($group_name,$title,$content,$cid_list);
+    }
+
+    /**
+     * 小程序支付 /alipay/routinePay
+     * */
+    public function routinePay(Request $request){
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+//        $input = $request->post();
+        $self_id = $request->input('self_id');//订单ID
+        $price = $request->input('price');//支付金额
+        $openid = $request->input('openid');//小程序用户唯一标识
+        include_once base_path( '/vendor/wxAppPay/weixin.php');
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+        $body = '订单支付';
+        $out_trade_no = $self_id;
+        $noturl = \Yii::$app->params['RETRUN_URL'].'/wechat/pay/vehical_notify';
+        $appid = 'wx6a57ad920bb0fb17';
+        $mch_id = '1481595522';
+        $notify_url = $noturl;
+        $key = 'FdzK0xScm6GRS0zUW4LRYOak5rZA9k3o';
+        $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify_url,$key);
+        $params['openid'] = $openid;                    //用户唯一标识
+        $params['body'] = '整车微信支付';                       //商品描述
+        $params['out_trade_no'] = $out_trade_no;    //自定义的订单号
+        $params['total_fee'] = $price*100;                       //订单金额 只能为整数 单位为分
+        $params['trade_type'] = 'JSAPI';                      //交易类型 JSAPI | NATIVE | APP | WAP
+        $params['attach'] = $user_id;                      //附加参数（用户ID）
+        $result = $wechatAppPay->jsapi($params);
+//        print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
+//        exit();
+        //2.创建小程序端预支付参数
+        /** @var TYPE_NAME $result */
+        $data = @$wechatAppPay->getPayParams($result);
+        return json_encode(['code'=>200,'msg'=>'请求成功','data'=>$data]);
     }
 
 

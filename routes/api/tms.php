@@ -87,6 +87,7 @@ Route::group([
     Route::any('/alipay/paymentAlipay', 'Pay\AlipayController@paymentAlipay');
     Route::any('/alipay/paymentWechat', 'Pay\AlipayController@paymentWechat');
     Route::any('/alipay/driverWechat', 'Pay\AlipayController@driverWechat');
+    Route::any('/alipay/routinePay', 'Pay\AlipayController@routinePay');
 });
 Route::any('/alipay/notify', 'Pay\AlipayController@notify');
 Route::any('/alipay/wxpaynotify', 'Pay\AlipayController@wxpaynotify');
@@ -116,8 +117,16 @@ Route::group([
         Route::any('/wallet/wallet_info', 'WalletController@wallet_info');
         Route::any('/wallet/withdraw_money', 'WalletController@withdraw_money');
         Route::any('/wallet/getAccount', 'WalletController@getAccount');
+        Route::any('/wallet/get_wallet', 'WalletController@get_wallet');
         /**TMS线路列表 - 用户端**/
 
+        /**TMS仓库列表 - 承运端**/
+        Route::any('/warehouse/warehousePage', 'WarehouseController@warehousePage');
+        Route::any('/warehouse/createWarehouse', 'WarehouseController@createWarehouse');
+        Route::any('/warehouse/addWarehouse','WarehouseController@addWarehouse');
+        Route::any('/warehouse/warehouseUseFlag','WarehouseController@warehouseUseFlag');
+        Route::any('/warehouse/warehouseDelFlag','WarehouseController@warehouseDelFlag');
+        Route::any('/warehouse/details','WarehouseController@details');
         /**TMS订单管理 - 用户端**/
         Route::any('/order/orderPage', 'OrderController@orderPage');
         Route::any('/order/details', 'OrderController@details');

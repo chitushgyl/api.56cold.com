@@ -579,8 +579,37 @@ class WalletController extends Controller{
         return $msg;
     }
 
-    public function get_function(){
+    /**
+     * 获取余额  /api/wallet/get_wallet
+     * */
+    public function get_wallet(Request $request){
+        $project_type       =$request->get('project_type');
+        $user_info  = $request->get('user_info');//接收中间件产生的参数
+        /** 接收数据*/
+        $self_id = $request->input('self_id');
+//         $self_id = 'bank_202101302000010319404301';
+        if ($project_type == 'user' || $project_type == 'driver'){
+            $total_user_id = $user_info->total_user_id;
+            $where   = [
+                ['delete_flag','=','Y'],
+                ['total_user_id','=',$total_user_id],
+            ];
+        }else{
+            $total_user_id = $user_info->group_code;
+            $where   = [
+                ['delete_flag','=','Y'],
+                ['group_code','=',$total_user_id],
+            ];
+        }
 
+        $select  = ['self_id','total_user_id','money','group_code'];
+        $info = UserCapital::where($where)->select($select)->first();
+        $info->money = number_format($info->money/100,2);
+        $msg['code']  = 200;
+        $msg['msg']   = "数据拉取成功";
+        $msg['data']  = $info;
+        //dd($msg);
+        return $msg;
     }
 
 }
