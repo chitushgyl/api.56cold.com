@@ -277,6 +277,14 @@ class WarehouseController extends Controller{
             $info->handle_price = number_format($info->handle_price/100,2);
             $info->property_price = number_format($info->property_price/100,2);
             $info->sorting_price = number_format($info->sorting_price/100,2);
+            $image_info = [];
+            if ($info->picture){
+                $image = json_decode($info->picture,true);
+                foreach ($image as $key => $value){
+                    $image_info[] = img_for($value,'more');
+                }
+            }
+            $info->picture = $image_info;
             $msg['code']  = 200;
             $msg['msg']   = "数据拉取成功";
             $msg['data']  = $info;
