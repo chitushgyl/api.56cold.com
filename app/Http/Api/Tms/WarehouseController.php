@@ -31,7 +31,7 @@ class WarehouseController extends Controller{
         ];
 
         $where = get_list_where($search);
-        $select = ['self_id','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
+        $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
             'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
         $data['info'] = TmsWarehouse::where($where)
             ->offset($firstrow)
@@ -69,7 +69,7 @@ class WarehouseController extends Controller{
             ['delete_flag','=','Y'],
             ['self_id','=',$self_id],
         ];
-        $select = ['self_id','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
+        $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
             'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
 
         $data['info'] = TmsWarehouse::where($where)->select($select)->first();
@@ -263,7 +263,7 @@ class WarehouseController extends Controller{
     public function  details(Request $request,Details $details){
         $self_id    = $request->input('self_id');
         $table_name = 'tms_car';
-        $select = ['self_id','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
+        $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
             'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
         // $self_id = 'car_202101111749191839630920';
         $info = $details->details($self_id,$table_name,$select);
