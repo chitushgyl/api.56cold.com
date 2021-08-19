@@ -150,8 +150,8 @@ class AddressController extends Controller{
             $data['qu']                 =$address_info->id;
             $data['qu_name']            =$address_info->name;
             $data['address']            =$address;
-            $data['contacts']            =$contacts;
-            $data['tel']            =$tel;
+            $data['contacts']           =$contacts;
+            $data['tel']                =$tel;
 
             $wheres['self_id'] = $self_id;
 
@@ -174,6 +174,10 @@ class AddressController extends Controller{
                     break;
                 case 'carriage':
                     $data['total_user_id']    = $user_info->total_user_id;
+                    break;
+                case 'company':
+                    $data['group_code']     = $user_info->userIdentity->group_code;
+                    $data['group_name']     = $user_info->userIdentity->group_name;
                     break;
                 default:
                     break;
