@@ -70,7 +70,7 @@ class UpController extends CommonController{
 
         $browse_type=$request->path();
         $msg=$file->image($pic);
-        return json_encode($msg);
+        return json_encode($msg,JSON_UNESCAPED_UNICODE);
 
     }
     /**
