@@ -111,7 +111,7 @@ class WarehouseController extends Controller{
         $contact           = $request->input('contact');//联系人
         $tel               = $request->input('tel');//电话
         $areanumber        = $request->input('areanumber');//面积
-        $wtype             = $request->input('wtype');//仓储类型 1仓储型 2中转型
+        $wtype             = $request->input('wtype');//仓储类型 1仓储型 storage 2中转型 transfer
         $remark            = $request->input('remark');//备注
         $price             = $request->input('price');//备注
         $store_price       = $request->input('store_price');//存储费
@@ -182,7 +182,7 @@ class WarehouseController extends Controller{
             $data['property_price']    = $property_price*100;
             $data['sorting_price']     = $sorting_price*100;
             $data['group_code']        = $group_code;
-            $data['picture']           = $picture;
+            $data['picture']           = img_for($picture,'more');
 
             $wheres['self_id'] = $self_id;
             $old_info = TmsWarehouse::where($wheres)->first();
@@ -219,7 +219,6 @@ class WarehouseController extends Controller{
             }
             return $msg;
         }
-
     }
 
     /*
