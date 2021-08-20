@@ -1208,10 +1208,10 @@ class AlipayController extends Controller{
         }
         $body = '订单支付';
         $out_trade_no = $self_id;
-        $noturl = \Yii::$app->params['RETRUN_URL'].'/wechat/pay/vehical_notify';
+        $notify = 'http://api.56cold.com/alipay/appWechat_notify';
         $appid = 'wx6a57ad920bb0fb17';
         $mch_id = '1481595522';
-        $notify_url = $noturl;
+        $notify_url = $notify;
         $key = 'FdzK0xScm6GRS0zUW4LRYOak5rZA9k3o';
         $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify_url,$key);
         $params['openid'] = $openid;                    //用户唯一标识
