@@ -264,7 +264,7 @@ class WarehouseController extends Controller{
         $table_name = 'tms_warehouse';
         $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
             'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
-        // $self_id = 'car_202101111749191839630920';
+//         $self_id = 'ware_20210820131302105995787';
         $info = $details->details($self_id,$table_name,$select);
 
         if($info) {
@@ -276,14 +276,7 @@ class WarehouseController extends Controller{
             $info->handle_price = number_format($info->handle_price/100,2);
             $info->property_price = number_format($info->property_price/100,2);
             $info->sorting_price = number_format($info->sorting_price/100,2);
-            $image_info = [];
-            if ($info->picture){
-                $image = json_decode($info->picture,true);
-                foreach ($image as $key => $value){
-                    $image_info[] = img_for($value,'more');
-                }
-            }
-            $info->picture = $image_info;
+            $info->picture_show = img_for($info->picture,'more');
             $msg['code']  = 200;
             $msg['msg']   = "数据拉取成功";
             $msg['data']  = $info;
