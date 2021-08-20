@@ -870,5 +870,25 @@ class LoginController extends Controller{
 
     }
 
+
+    /**
+     * 小程序获取openid /user/get_openid
+     * */
+    public function get_openid(Request $request){
+        $code = $request->input('code');
+        $url="https://api.weixin.qq.com/sns/jscode2session?appid=wx6a57ad920bb0fb17&secret=56af26758d185576d5ca1463269d407f&js_code=".$code."&grant_type=authorization_code";
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        //设置是否输出header
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        //设置是否输出结果
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        //设置是否检查服务器端的证书
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $data = curl_exec($curl);
+        curl_close($curl);
+        return json_encode(array("code"=>200,"msg"=>'',"data"=>$data));
+    }
+
 }
 ?>
