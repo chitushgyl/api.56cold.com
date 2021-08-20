@@ -182,7 +182,7 @@ class WarehouseController extends Controller{
             $data['property_price']    = $property_price*100;
             $data['sorting_price']     = $sorting_price*100;
             $data['group_code']        = $group_code;
-            $data['picture']           = img_for($picture,'more');
+            $data['picture']           = img_for($picture,'in');
 
             $wheres['self_id'] = $self_id;
             $old_info = TmsWarehouse::where($wheres)->first();
