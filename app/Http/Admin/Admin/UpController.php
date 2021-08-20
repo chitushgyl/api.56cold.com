@@ -61,7 +61,18 @@ class UpController extends CommonController{
         return $msg;
 
     }
+    public function uploadImg(Request $request,File $file){
+        //dd($request->all());
+        $user_info      = $request->get('user_info');//接收中间件产生的参数11
+        $pic			=$request->file('inputfile');
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ="file_warehouse";
 
+        $browse_type=$request->path();
+        $msg=$file->image($pic);
+        return json_encode($msg);
+
+    }
     /**
      * 多图上传
      * */

@@ -8,6 +8,7 @@ Route::any('/login/loginOn', 'Admin\LoginController@loginOn');
 Route::any('/login/loginOut', 'Admin\LoginController@loginOut');
 Route::any('/up/upload_img', 'Admin\UpController@upload_img');			//上传EXECL文件
 Route::any('/up/upload_image', 'Admin\UpController@upload_image');			//上传EXECL文件
+Route::any('/up/uploadImg', 'Admin\UpController@uploadImg');			//上传EXECL文件
 /******公用文件触发器*******/
 Route::group([
     "middleware"=>['loginCheck','group'],'prefix' => '','namespace'  => 'Admin',
@@ -61,7 +62,7 @@ Route::group([
         Route::any('/company/createCompanyPay', 'CompanyController@createCompanyPay');              //新建商户支付体系
         Route::any('/company/createCompanyShare', 'CompanyController@createCompanyShare');          //新建商户分享
         Route::any('/company/details', 'CompanyController@details');                  //商户详情
-		Route::any('/company/addCompany', 'CompanyController@addCompany');  
+		Route::any('/company/addCompany', 'CompanyController@addCompany');
         Route::group([
             "middleware"=>['daily'],
         ], function(){
@@ -160,7 +161,7 @@ Route::group([
         Route::any('/staff/staffPage', 'StaffController@staffPage');                                //员工分页数据加载
         Route::any('/staff/createStaff', 'StaffController@createStaff');                            //员工添加剂修改页面
         Route::any('/staff/details', 'StaffController@details');                          //员工详情
-		
+
 
         Route::group([
             "middleware"=>['daily'],
@@ -216,7 +217,7 @@ Route::group([
         ], function(){
             Route::any('/package/addPackage', 'PackageController@addPackage');                                          //创建套餐入库
         });
-		
+
 		Route::any('/address/address', 'AdderssController@address');//获取tms地址
 
     });
