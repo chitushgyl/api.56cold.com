@@ -69,7 +69,7 @@ class UpController extends CommonController{
         $table_name     ="file_warehouse";
 
         $browse_type=$request->path();
-        $msg=$file->img($pic);
+        $msg=json_encode($file->img($pic),JSON_UNESCAPED_UNICODE);
         return $msg;
 
     }
