@@ -82,6 +82,7 @@ class WarehouseController extends Controller{
             $data['info']->handle_price = $data['info']->handle_price/100;
             $data['info']->property_price = $data['info']->property_price/100;
             $data['info']->sorting_price = $data['info']->sorting_price/100;
+            $data['info']->picture_show = img_for($data['info']->picture,'more');
         }
         $msg['code'] = 200;
         $msg['msg']  = "数据拉取成功";
