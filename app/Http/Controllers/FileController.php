@@ -32,7 +32,7 @@ class FileController extends Controller{
         }
         $imgPath=QrCode::format('png')->size(300)->generate($msgggg,$pathurl);
         /** 以上为生成了一个本地文件***/
-        
+
         /** 现在上传到OSS上面去**/
         $storage_path2 = 'images/'.date('Y-m-d',time());//上传文件保存的路径
         $pathName = $storage_path2.'/'.$file_name;
@@ -125,7 +125,7 @@ class FileController extends Controller{
         }else{
             $msg['code'] = 304;
             $msg['msg'] = '上传的图片无效';
-			
+
             return $msg;
         }
     }
@@ -195,11 +195,78 @@ class FileController extends Controller{
             $msg['code'] = 304;
             //$msg['msg'] = '上传的图片无效';
 			$msg['msg'] = $pic;
-			
+
             return $msg;
         }
     }
 
+
+    public function img($pic){
+        //dd($user_info);
+        //dump($pic);
+        if($pic){
+            if ($pic->isValid()) {
+                //括号里面的是必须加的哦,如果括号里面的不加上的话，下面的方法也无法调用的
+                $name=$pic->getClientOriginalName();//得到图片名；
+                $ext=$pic->getClientOriginalExtension();//获取文件的扩展名
+                $extensions = ["png", "jpg", "gif","image","jpeg"];
+
+                $size = $pic->getSize();
+                if(!in_array(strtolower($ext),$extensions)) {//限制上传文件的类型
+                    $msg['code'] = 302;
+                    $msg['msg'] = '只能上传 png | jpg | gif格式的图片';
+                    return $msg;
+                }else{
+                    if($size > 2*1024*1024){
+                        $msg['code'] = 303;
+                        $msg['msg'] = '上传图片不能超过2M';
+                        return $msg;
+                    }
+
+                    $storage_path = 'images/'.date('Y-m-d',time());//上传文件保存的路径
+                    //获取上传图片的临时地址
+                    $pathurl = $pic->getRealPath();
+
+                    //生成文件名
+                    $file_name =md5(uniqid($name)).'.'.$ext;
+                    //拼接上传的文件夹路径(按照日期格式1810/17/xxxx.jpg)
+                    $pathName = $storage_path.'/'.$file_name;
+
+                    $filepath=$this->oss_do($pathName,$pathurl);
+
+
+                    //获取上传图片的大小
+                    $url=getimagesize($filepath);
+                    $width=$url[0];
+                    $height=$url[1];
+
+                    $data['url']=$filepath;
+                    $data['width']=$width;
+                    $data['height']=$height;
+
+
+                    $msg['code'] = 200;
+                    $msg['msg'] = '上传图片成功';
+                    $msg['data'] = json_encode($data,JSON_UNESCAPED_UNICODE);
+
+
+                    return $msg;
+
+                    //
+                }
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '上传的图片无效';
+                return $msg;
+            }
+        }else{
+            $msg['code'] = 304;
+            //$msg['msg'] = '上传的图片无效';
+            $msg['msg'] = $pic;
+
+            return $msg;
+        }
+    }
     /**
      * 多图上传
      * */
@@ -332,7 +399,7 @@ class FileController extends Controller{
         }else{
             $msg['code'] = 304;
             $msg['msg'] = '上传的图片无效';
-			
+
             return $msg;
         }
     }
