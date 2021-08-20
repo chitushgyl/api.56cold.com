@@ -48,6 +48,7 @@ class WarehouseController extends Controller{
             $v->handle_price = number_format($v->handle_price/100,2);
             $v->property_price = number_format($v->property_price/100,2);
             $v->sorting_price = number_format($v->sorting_price/100,2);
+            $v->picture_show = img_for($v->picture,'more');
 
         }
         $msg['code'] = 200;
