@@ -247,7 +247,7 @@ class FileController extends Controller{
 
                     $msg['code'] = 200;
                     $msg['msg'] = '上传图片成功';
-                    $msg['data'] = json_encode($data,JSON_UNESCAPED_UNICODE);
+                    $msg['data'] = $data;
 
 
                     return $msg;
