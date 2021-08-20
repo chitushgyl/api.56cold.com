@@ -1206,16 +1206,16 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
+        $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
         $notify = 'http://api.56cold.com/alipay/appWechat_notify';
         $appid = 'wx6a57ad920bb0fb17';
         $mch_id = '1481595522';
-        $notify_url = $notify;
         $key = 'FdzK0xScm6GRS0zUW4LRYOak5rZA9k3o';
-        $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify_url,$key);
+        $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify,$key);
         $params['openid'] = $openid;                    //用户唯一标识
-        $params['body'] = '整车微信支付';                       //商品描述
+        $params['body'] = $body;                       //商品描述
         $params['out_trade_no'] = $out_trade_no;    //自定义的订单号
         $params['total_fee'] = $price*100;                       //订单金额 只能为整数 单位为分
         $params['trade_type'] = 'JSAPI';                      //交易类型 JSAPI | NATIVE | APP | WAP
