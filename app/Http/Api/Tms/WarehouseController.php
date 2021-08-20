@@ -257,11 +257,11 @@ class WarehouseController extends Controller{
     }
 
     /**
-     *    车辆详情     /api/warehouse/details
+     *    仓库详情     /api/warehouse/details
      */
     public function  details(Request $request,Details $details){
         $self_id    = $request->input('self_id');
-        $table_name = 'tms_car';
+        $table_name = 'tms_warehouse';
         $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
             'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
         // $self_id = 'car_202101111749191839630920';
