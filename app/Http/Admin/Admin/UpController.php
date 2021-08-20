@@ -70,7 +70,7 @@ class UpController extends CommonController{
 
         $browse_type=$request->path();
         $msg=$file->img($pic);
-        return (Object)$msg;
+        return $msg;
 
     }
     /**
