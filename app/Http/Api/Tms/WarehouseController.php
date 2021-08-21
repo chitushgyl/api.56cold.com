@@ -117,11 +117,11 @@ class WarehouseController extends Controller{
         $remark            = $request->input('remark');//备注
         $price             = $request->input('price');//备注
         $store_price       = $request->input('store_price');//存储费
-        $area_price        = $request->input('area_price');//租金
+        $area_price        = $request->input('area_price');//平方价 租金
         $handle_price      = $request->input('handle_price');//操作费
         $property_price    = $request->input('property_price');//物业费
         $sorting_price     = $request->input('sorting_price');//分拣费
-        $group_code        = $request->input('group_code');//分拣费
+        $group_code        = $request->input('group_code');//
         $picture           = $request->input('picture');//仓库图片
 
         /*** 虚拟数据

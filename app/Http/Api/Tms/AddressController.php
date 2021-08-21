@@ -324,7 +324,6 @@ class AddressController extends Controller{
         $area   = $request->input('area');//区名称
         $where = [
             ['city'=>$city],
-
         ];
         /** 虚拟数据
         $pro = $input['pro'] = '贵州';
@@ -332,7 +331,17 @@ class AddressController extends Controller{
         $area = $input['area'] = '威宁';
          ***/
         $pro_info = SysAddress::where('name','like','%'.$pro.'%')->first();
+        if(empty($pro_info)){
+            $msg['code'] = 301;
+            $msg['msg']  = '暂无合适数据';
+            return $msg;
+        }
         $city_info = SysAddress::where('name','like','%'.$city.'%')->where('parent_id',$pro_info->id)->first();
+        if(empty($city_info)){
+            $msg['code'] = 301;
+            $msg['msg']  = '暂无合适数据';
+            return $msg;
+        }
         $area_info = SysAddress::where('name','like','%'.$area.'%')->where('parent_id',$city_info->id)->first();
 
         $info = [
