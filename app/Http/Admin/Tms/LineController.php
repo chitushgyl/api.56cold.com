@@ -1050,14 +1050,12 @@ class LineController extends CommonController{
            ['line_id','=',$self_id],
            ['order_status','in',[2,3,4,5]]
         ];
-        $order_info = TmsOrder::where('line_id',$self_id)->select('self_id')->get();
+        $order_info = TmsOrder::where($order_where)->select('self_id')->get()->toArray();
         if ($order_info){
             $msg['code'] = 301;
             $msg['msg']  = '该线路有未完成订单不能删除';
             return $msg;
         }
-//        dump($line->toArray());
-
         if($line){
             switch ($line->type){
                 case 'combination':
