@@ -1029,7 +1029,7 @@ class LineController extends CommonController{
         $operationing->table_id = $self_id;
         $operationing->now_time = $now_time;
 
-//        $self_id='line_202101071834126555383754';
+//        $self_id='line_202108211358022844377973';
         $where['self_id']=$self_id;
         $where['delete_flag']='Y';
         $select=['self_id','use_flag','delete_flag', 'update_time', 'group_code', 'group_name','type'];
@@ -1046,11 +1046,7 @@ class LineController extends CommonController{
             'use_flag'=>$line->use_flag,
             'update_time'=>$now_time
         ];
-        $order_where = [
-           ['line_id','=',$self_id],
-           ['order_status','in',[2,3,4,5]]
-        ];
-        $order_info = TmsOrder::where($order_where)->select('self_id')->get()->toArray();
+        $order_info = TmsOrder::where('line_id',$self_id)->whereIn('order_status',[2,3,4,5])->select('self_id')->get()->toArray();
         if ($order_info){
             $msg['code'] = 301;
             $msg['msg']  = '该线路有未完成订单不能删除';
