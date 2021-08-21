@@ -2,6 +2,7 @@
 namespace App\Http\Admin\Tms;
 use App\Http\Controllers\FileController as File;
 use App\Models\Tms\TmsDeliveryCity;
+use App\Models\Tms\TmsOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
 use Illuminate\Support\Facades\Input;
@@ -1045,6 +1046,16 @@ class LineController extends CommonController{
             'use_flag'=>$line->use_flag,
             'update_time'=>$now_time
         ];
+        $order_where = [
+           ['line_id','=',$self_id],
+           ['order_status','in',[2,3,4,5]]
+        ];
+        $order_info = TmsOrder::where('line_id',$self_id)->select('self_id')->get();
+        if ($order_info){
+            $msg['code'] = 301;
+            $msg['msg']  = '该线路有未完成订单不能删除';
+            return $msg;
+        }
 //        dump($line->toArray());
 
         if($line){
