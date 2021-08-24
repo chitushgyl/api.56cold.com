@@ -22,20 +22,37 @@ class WarehouseController extends Controller{
         /**接收数据*/
         $num      = $request->input('num')??10;
         $page     = $request->input('page')??1;
+        $wtype    = $request->input('wtype');
+        $city     = $request->input('city');
+        $area     = $request->input('area');
+        $area_price     = $request->input('area_price');
         $listrows = $num;
         $firstrow = ($page-1)*$listrows;
 
         $search = [
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ['type'=>'=','name'=>'group_code','value'=>$user_info->group_code],
+            ['type'=>'=','name'=>'wtype','value'=>$wtype],
+            ['type'=>'=','name'=>'area_price','value'=>$user_info->group_code],
         ];
+        if ($city) {
+            $where[] = ['city','like','%'.$city.'%'];
+        }
+        if ($area) {
+            $where[] = ['area','like','%'.$area.'%'];
+        }
 
         $where = get_list_where($search);
         $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
             'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
         $data['info'] = TmsWarehouse::where($where)
             ->offset($firstrow)
-            ->limit($listrows)
+            ->limit($listrows);
+        
+        if ($area_price){
+            $data['info'] = $data['info']->orderBy('area_price','desc');
+        }
+        $data['info'] =$data['info']
             ->orderBy('create_time', 'desc')
             ->select($select)
             ->get();
