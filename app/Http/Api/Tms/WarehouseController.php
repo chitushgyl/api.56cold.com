@@ -30,7 +30,6 @@ class WarehouseController extends Controller{
         $area_price     = $request->input('area_price');
         $listrows = $num;
         $firstrow = ($page-1)*$listrows;
-        $area_price = '1';
         $search = [
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ['type'=>'=','name'=>'group_code','value'=>$group_code],
