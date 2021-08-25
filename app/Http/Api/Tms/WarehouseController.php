@@ -141,8 +141,10 @@ class WarehouseController extends Controller{
         $handle_price      = $request->input('handle_price');//操作费
         $property_price    = $request->input('property_price');//物业费
         $sorting_price     = $request->input('sorting_price');//分拣费
+        $other_price       = $request->input('other_price');//其他价格
         $group_code        = $request->input('group_code');//
         $picture           = $request->input('picture');//仓库图片
+        $rent_type         = $request->input('rent_type');//出租方式 1整租 2分租 3托管 4其他
 
         /*** 虚拟数据
         //      $input['self_id']            =$self_id        ='good_202007011336328472133661';
@@ -164,6 +166,8 @@ class WarehouseController extends Controller{
              $input['sorting_price']         =$sorting_price  ='2';
              $input['group_code']            =$group_code     ='group_';
              $input['picture']               =$picture        ='';
+             $input['other_price']           =$other_price    ='';
+             $input['rent_type']             =$rent_type      ='';
 
          **/
         $rules = [
@@ -180,7 +184,7 @@ class WarehouseController extends Controller{
             'areanumber.required'=>'请填写仓库面积',
             'contact.required'=>'请填写联系人姓名',
             'tel.required'=>'请填写联系人电话',
-            'control.required'=>'请填写仓储费',
+//            'control.required'=>'请填写仓储费',
         ];
 
         $validator = Validator::make($input,$rules,$message);
@@ -203,8 +207,10 @@ class WarehouseController extends Controller{
             $data['handle_price']      = $handle_price*100;
             $data['property_price']    = $property_price*100;
             $data['sorting_price']     = $sorting_price*100;
+            $data['other_price']       = $other_price*100;
             $data['group_code']        = $group_code;
             $data['picture']           = img_for($picture,'in');
+            $data['rent_type']         = $rent_type;
 
             $wheres['self_id'] = $self_id;
             $old_info = TmsWarehouse::where($wheres)->first();
