@@ -23,23 +23,28 @@ class WarehouseController extends Controller{
         $num      = $request->input('num')??10;
         $page     = $request->input('page')??1;
         $wtype    = $request->input('wtype');
+        $pro    = $request->input('pro');
         $city     = $request->input('city');
         $area     = $request->input('area');
+        $group_code     = $request->input('group_code');
         $area_price     = $request->input('area_price');
         $listrows = $num;
         $firstrow = ($page-1)*$listrows;
-
+        $area_price = '1';
         $search = [
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-            ['type'=>'=','name'=>'group_code','value'=>$user_info->group_code],
+            ['type'=>'=','name'=>'group_code','value'=>$group_code],
             ['type'=>'=','name'=>'wtype','value'=>$wtype],
-            ['type'=>'=','name'=>'area_price','value'=>$user_info->group_code],
+//            ['type'=>'=','name'=>'area_price','value'=>$area_price],
         ];
+        if ($pro){
+            $search[] = ['type'=>'like','name'=>'pro','value'=>$pro];
+        }
         if ($city) {
-            $where[] = ['city','like','%'.$city.'%'];
+            $search[] = ['type'=>'like','name'=>'city','value'=>$city];
         }
         if ($area) {
-            $where[] = ['area','like','%'.$area.'%'];
+            $search[] = ['type'=>'like','name'=>'area','value'=>$area];
         }
 
         $where = get_list_where($search);
@@ -48,15 +53,14 @@ class WarehouseController extends Controller{
         $data['info'] = TmsWarehouse::where($where)
             ->offset($firstrow)
             ->limit($listrows);
-        
+
         if ($area_price){
-            $data['info'] = $data['info']->orderBy('area_price','desc');
+            $data['info'] = $data['info']->orderBy('area_price','asc');
         }
         $data['info'] =$data['info']
             ->orderBy('create_time', 'desc')
             ->select($select)
             ->get();
-
         foreach ($data['info'] as $k=>$v) {
             $v->rent_type_show = $tms_warehouse_type[$v->rent_type] ?? null;
             $v->price = number_format($v->price/100,2);
