@@ -61,7 +61,7 @@ class WarehouseController extends Controller{
             ->select($select)
             ->get();
         foreach ($data['info'] as $k=>$v) {
-            $v->rent_type_show = $tms_warehouse_type[$v->rent_type] ?? null;
+            $v->rent_type_show = $tms_warehouse_type[$v->wtype] ?? null;
             $v->price = number_format($v->price/100,2);
             $v->store_price = number_format($v->store_price/100,2);
             $v->area_price = number_format($v->area_price/100,2);
@@ -95,7 +95,7 @@ class WarehouseController extends Controller{
 
         $data['info'] = TmsWarehouse::where($where)->select($select)->first();
         if ($data['info']){
-            $data['info']->rent_type_show = $tms_warehouse_type[$data['info']->rent_type] ?? null;
+            $data['info']->rent_type_show = $tms_warehouse_type[$data['info']->wtype] ?? null;
             $data['info']->price = $data['info']->price/100;
             $data['info']->store_price = $data['info']->store_price/100;
             $data['info']->area_price = $data['info']->area_price/100;
@@ -297,7 +297,8 @@ class WarehouseController extends Controller{
 
         if($info) {
             /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
-            $info->rent_type_show = $tms_warehouse_type[$info->rent_type] ?? null;
+            $tms_warehouse_type     = array_column(config('tms.tms_warehouse_type'),'name','key');
+            $info->rent_type_show = $tms_warehouse_type[$info->wtype] ?? null;
             $info->price = number_format($info->price/100,2);
             $info->store_price = number_format($info->store_price/100,2);
             $info->area_price = number_format($info->area_price/100,2);
@@ -305,6 +306,35 @@ class WarehouseController extends Controller{
             $info->property_price = number_format($info->property_price/100,2);
             $info->sorting_price = number_format($info->sorting_price/100,2);
             $info->picture_show = img_for($info->picture,'more');
+            $warehouse_list = [];
+            $warehouse_info1['name'] = '出租面积';
+            $warehouse_info1['value'] = $info->areanumber;
+            $warehouse_info2['name'] = '仓库类型' ;
+            $warehouse_info2['value'] = $info->rent_type_show;
+            $warehouse_info3['name'] = '物业费';
+            $warehouse_info3['value'] = $info->property_price;
+            $warehouse_info4['name'] = '存储费' ;
+            $warehouse_info4['value'] = $info->store_price;
+            $warehouse_info5['name'] = '操作费';
+            $warehouse_info5['value'] = $info->handle_price;
+            $warehouse_info6['name'] = '分拣费';
+            $warehouse_info6['value'] = $info->sorting_price;
+
+            $warehouse_list[] = $warehouse_info1;
+            $warehouse_list[] = $warehouse_info2;
+            if ($info->property_price){
+                $warehouse_list[] = $warehouse_info3;
+            }
+            if ($info->store_price){
+                $warehouse_list[] = $warehouse_info4;
+            }
+            if ($info->handle_price){
+                $warehouse_list[] = $warehouse_info5;
+            }
+            if ($info->sorting_price){
+                $warehouse_list[] = $warehouse_info6;
+            }
+            $info->warehouse_info_show = $warehouse_list;
             $msg['code']  = 200;
             $msg['msg']   = "数据拉取成功";
             $msg['data']  = $info;
