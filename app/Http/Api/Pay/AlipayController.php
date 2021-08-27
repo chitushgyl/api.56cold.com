@@ -240,7 +240,6 @@ class AlipayController extends Controller{
         $self_id   = $request->input('self_id');// 订单ID
         $price     = $request->input('price');// 支付金额
         $price     = 0.01;
-        $type      = 3;
         if (!$user_info){
             $msg['code'] = 401;
             $msg['msg']  = '未登录，请完成登录！';
