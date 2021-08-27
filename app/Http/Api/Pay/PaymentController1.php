@@ -1210,9 +1210,9 @@ class PaymentController1 extends Controller{
         $body = '订单支付';
         $out_trade_no = $self_id;
         $notify = 'https://api.56cold.com/alipay/appWechat_notify';
-        $appid = 'wx6a57ad920bb0fb17';
-        $mch_id = '1481595522';
-        $key = 'FdzK0xScm6GRS0zUW4LRYOak5rZA9k3o';
+        $appid = '';
+        $mch_id = '';
+        $key = '';
         $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify,$key);
         $params['openid'] = $openid;                    //用户唯一标识
         $params['body'] = $body;                       //商品描述
