@@ -1003,7 +1003,7 @@ class AlipayController extends Controller{
         $body = '订单支付';
         $out_trade_no = $self_id;
         $notify = 'https://api.56cold.com/alipay/appWechat_notify';
-        $config    = config('tms.wechat_config_user');//引入配置文件参数
+        $config    = config('tms.routine_config_user');//引入配置文件参数
         $appid  = $config['appid'];
         $mch_id = $config['mch_id'];
         $key    = $config['key'];
