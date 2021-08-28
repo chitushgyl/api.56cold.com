@@ -212,7 +212,7 @@ class AlipayController extends Controller{
         foreach ($info as $key =>$value){
             if ($value->logLogin){
                 foreach ($value->logLogin as $k =>$v){
-                    if ($v->clientid != null  && $v->clientid == "null" && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
+                    if ($v->clientid != null  && $v->clientid != "null" && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
                         $clientid_list[] = $v->clientid;
                     }
                 }
