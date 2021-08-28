@@ -176,7 +176,7 @@ class WarehouseController extends Controller{
             'areanumber'=>'required',
             'contact'=>'required',
             'tel'=>'required',
-            'store_price'=>'required',
+//            'store_price'=>'required',
         ];
         $message = [
             'warehouse_name.required'=>'请填写仓库名称',
@@ -308,17 +308,17 @@ class WarehouseController extends Controller{
             $info->picture_show = img_for($info->picture,'more');
             $warehouse_list = [];
             $warehouse_info1['name'] = '出租面积';
-            $warehouse_info1['value'] = $info->areanumber;
+            $warehouse_info1['value'] = $info->areanumber.'㎡';
             $warehouse_info2['name'] = '仓库类型' ;
             $warehouse_info2['value'] = $info->rent_type_show;
             $warehouse_info3['name'] = '物业费';
-            $warehouse_info3['value'] = $info->property_price;
+            $warehouse_info3['value'] = $info->property_price.'元/吨';
             $warehouse_info4['name'] = '存储费' ;
-            $warehouse_info4['value'] = $info->store_price;
+            $warehouse_info4['value'] = $info->store_price.'元/吨';
             $warehouse_info5['name'] = '操作费';
-            $warehouse_info5['value'] = $info->handle_price;
+            $warehouse_info5['value'] = $info->handle_price.'元/㎡';
             $warehouse_info6['name'] = '分拣费';
-            $warehouse_info6['value'] = $info->sorting_price;
+            $warehouse_info6['value'] = $info->sorting_price.'元/件';
 
             $warehouse_list[] = $warehouse_info1;
             $warehouse_list[] = $warehouse_info2;
