@@ -370,7 +370,6 @@ class AlipayController extends Controller{
                         $orderStatus = TmsOrderDispatch::where('self_id',$value->self_id)->update($order_update);
                     }
                 }
-
             }
             /**推送**/
             $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
@@ -641,7 +640,7 @@ class AlipayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
             $order = TmsOrder::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
-            if ($order->order_status == 2){
+            if ($order->order_status == 2 || $order->order_status == 3){
                 echo 'success';
                 return false;
             }
