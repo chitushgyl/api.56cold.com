@@ -324,16 +324,16 @@ class WarehouseController extends Controller{
 
             $warehouse_list[] = $warehouse_info1;
             $warehouse_list[] = $warehouse_info2;
-            if ($info->property_price <=0){
+            if ($info->property_price > 0){
                 $warehouse_list[] = $warehouse_info3;
             }
-            if ($info->store_price <=0){
+            if ($info->store_price >0){
                 $warehouse_list[] = $warehouse_info4;
             }
-            if ($info->handle_price<=0){
+            if ($info->handle_price>0){
                 $warehouse_list[] = $warehouse_info5;
             }
-            if ($info->sorting_price<=0){
+            if ($info->sorting_price>0){
                 $warehouse_list[] = $warehouse_info6;
             }
             $info->warehouse_info_show = $warehouse_list;
