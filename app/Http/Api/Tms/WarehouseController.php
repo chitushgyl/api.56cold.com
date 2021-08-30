@@ -53,8 +53,10 @@ class WarehouseController extends Controller{
             ->offset($firstrow)
             ->limit($listrows);
 
-        if ($area_price){
+        if ($area_price == 1){
             $data['info'] = $data['info']->orderBy('area_price','asc');
+        }else{
+            $data['info'] = $data['info']->orderBy('area_price','desc');
         }
         $data['info'] =$data['info']
             ->orderBy('create_time', 'desc')
@@ -322,16 +324,16 @@ class WarehouseController extends Controller{
 
             $warehouse_list[] = $warehouse_info1;
             $warehouse_list[] = $warehouse_info2;
-            if ($info->property_price){
+            if ($info->property_price <=0){
                 $warehouse_list[] = $warehouse_info3;
             }
-            if ($info->store_price){
+            if ($info->store_price <=0){
                 $warehouse_list[] = $warehouse_info4;
             }
-            if ($info->handle_price){
+            if ($info->handle_price<=0){
                 $warehouse_list[] = $warehouse_info5;
             }
-            if ($info->sorting_price){
+            if ($info->sorting_price<=0){
                 $warehouse_list[] = $warehouse_info6;
             }
             $info->warehouse_info_show = $warehouse_list;

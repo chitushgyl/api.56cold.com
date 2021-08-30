@@ -25,39 +25,7 @@ class BillController extends Controller{
         $listrows      = $num;
         $firstrow      = ($page-1)*$listrows;
         $search = [];
-        switch ($project_type){
-            case 'user':
-                $search = [
-                    ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-                    ['type'=>'=','name'=>'total_user_id','value'=>$user_info->total_user_id],
-                ];
-                break;
-            case 'carriage':
-                $search = [
-                    ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-                    ['type'=>'=','name'=>'total_user_id','value'=>$user_info->total_user_id],
-                ];
-                break;
-            case 'customer':
-                $search = [
-                    ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-                    ['type'=>'=','name'=>'company_id','value'=>$user_info->company_id],
-                ];
-                break;
-            case 'carriers':
-                $search = [
-                    ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-                    ['type'=>'=','name'=>'company_id','value'=>$user_info->userIdentity->company_id],
-                ];
-                break;
-            default:
-                $search = [
-                    ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-                    ['type'=>'=','name'=>'total_user_id','value'=>$user_info->total_user_id],
-                ];
-                break;
 
-        }
 
         $where=get_list_where($search);
 

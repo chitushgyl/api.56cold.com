@@ -167,6 +167,20 @@ Route::group([
         Route::any('/take/upload_receipt','TakeController@upload_receipt');
         Route::any('/take/order_cancel','TakeController@order_cancel');
 
+        /** TMS用户开票**/
+        Route::any('/bill/billPage','BillController@billPage');
+        Route::any('/bill/createBill','BillController@createBill');
+        Route::any('/bill/billAdd','BillController@billAdd');
+        Route::any('/bill/delFlag','BillController@delFlag');
+        Route::any('/bill/details','BillController@details');
+        Route::any('/bill/commonBillList','BillController@commonBillList');
+        Route::any('/bill/commonBillPage','BillController@commonBillPage');
+        Route::any('/bill/createCommonBill','BillController@createCommonBill');
+        Route::any('/bill/addCommonBill','BillController@addCommonBill');
+        Route::any('/bill/useCommonBill','BillController@createCommonBill');
+        Route::any('/bill/delCommonBill','BillController@createCommonBill');
+        Route::any('/bill/billDetails','BillController@billDetails');
+
     });
     Route::group([
         'prefix' => 'api','namespace'  => 'Tms',
