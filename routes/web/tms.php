@@ -168,7 +168,7 @@ Route::group([
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-        
+
         Route::any('/order/orderUseFlag', 'OrderController@orderUseFlag');
         Route::any('/order/orderDelFlag', 'OrderController@orderDelFlag');
     });
@@ -243,6 +243,15 @@ Route::group([
     ], function(){
 
     });
+
+    /** TMS开票**/
+    Route::any('/bill/commonBillList','BillController@commonBillList');
+    Route::any('/bill/commonBillPage','BillController@commonBillPage');
+    Route::any('/bill/createCommonBill','BillController@createCommonBill');
+    Route::any('/bill/addCommonBill','BillController@addCommonBill');
+    Route::any('/bill/useCommonBill','BillController@useCommonBill');
+    Route::any('/bill/delCommonBill','BillController@delCommonBill');
+    Route::any('/bill/billDetails','BillController@billDetails');
 });
 
 

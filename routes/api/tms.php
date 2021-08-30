@@ -177,8 +177,8 @@ Route::group([
         Route::any('/bill/commonBillPage','BillController@commonBillPage');
         Route::any('/bill/createCommonBill','BillController@createCommonBill');
         Route::any('/bill/addCommonBill','BillController@addCommonBill');
-        Route::any('/bill/useCommonBill','BillController@createCommonBill');
-        Route::any('/bill/delCommonBill','BillController@createCommonBill');
+        Route::any('/bill/useCommonBill','BillController@useCommonBill');
+        Route::any('/bill/delCommonBill','BillController@delCommonBill');
         Route::any('/bill/billDetails','BillController@billDetails');
 
     });
