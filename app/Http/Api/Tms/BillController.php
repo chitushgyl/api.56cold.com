@@ -2,6 +2,7 @@
 namespace App\Http\Api\Tms;
 use App\Models\Tms\TmsBill;
 use App\Models\Tms\TmsCommonBill;
+use App\Models\Tms\TmsOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
@@ -57,6 +58,7 @@ class BillController extends Controller{
         $self_id = $request->input('self_id');
 //        $self_id = 'car_20210313180835367958101';
         $tax_type = array_column(config('tms.tax_type'),'name','key');
+        $bill_type = array_column(config('tms.bill_type'),'name','key');
 
         $where = [
             ['delete_flag','=','Y'],
@@ -67,6 +69,7 @@ class BillController extends Controller{
         $data['info'] = TmsBill::where($where)->select($select)->first();
         if ($data['info']){
             $data['info']->tax_type_show =  $tax_type[$data['info']->type] ?? null;
+            $data['info']->bill_type_show =  $bill_type[$data['info']->bill_type] ?? null;
         }
         $msg['code'] = 200;
         $msg['msg']  = "数据拉取成功";
@@ -87,7 +90,8 @@ class BillController extends Controller{
         /** 接收数据*/
         $self_id               = $request->input('self_id');
         $order_id              = $request->input('order_id'); //订单ID
-        $type                  = $request->input('type'); //发票抬头类型
+        $type                  = $request->input('type'); //发票类型：普票normal  增值税专票special
+        $bill_type             = $request->input('bill_type'); //发票抬头类型
         $company_title         = $request->input('company_title');
         $company_tax_number    = $request->input('company_tax_number');
         $bank_name             = $request->input('bank_name');
@@ -96,6 +100,7 @@ class BillController extends Controller{
         $company_tel           = $request->input('company_tel');
         $name                  = $request->input('name');
         $tel                   = $request->input('tel');
+        $contact_address       = $request->input('contact_address');
         $remark                = $request->input('remark');
         $tax_price             = $request->input('tax_price');
 
@@ -111,6 +116,7 @@ class BillController extends Controller{
                 'bank_num'=>'required',
                 'company_address'=>'required',
                 'company_tel'=>'required',
+                'bill_type'=>'required',
             ];
             $message = [
                 'company_title.required'=>'请填写公司抬头',
@@ -119,6 +125,7 @@ class BillController extends Controller{
                 'bank_num.required'=>'请填写开户行账号',
                 'company_address.required'=>'请填写企业注册地址',
                 'company_tel.required'=>'请填写企业联系电话',
+                'bill_type.required'=>'请选择发票类型',
             ];
         }else{
             $rules = [
@@ -134,6 +141,7 @@ class BillController extends Controller{
         if($validator->passes()) {
             $data['order_id']            = $order_id;
             $data['type']                = $type;
+            $data['bill_type']           = $bill_type;
             $data['company_title']       = $company_title;
             $data['company_tax_number']  = $company_tax_number;
             $data['bank_name']           = $bank_name;
@@ -142,6 +150,7 @@ class BillController extends Controller{
             $data['company_tel']         = $company_tel;
             $data['name']                = $name;
             $data['tel']                 = $tel;
+            $data['contact_address']     = $contact_address;
             $data['remark']              = $remark;
             $data['tax_price']           = $tax_price;
 
@@ -203,8 +212,62 @@ class BillController extends Controller{
     /**
      * 开票详情 /api/bill/details
      * */
-    public function details(Request $request){
+    public function details(Request $request,Details $details){
+        $self_id    = $request->input('self_id');
+        $table_name = 'tms_bill';
+        $select = ['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
+            'total_user_id','group_name','group_code','delete_flag','create_time'];
+        $select1 = ['self_id','send_shi_name','gather_shi_name','total_money'];
+        // $self_id = 'car_202101111749191839630920';
+        $info = $details->details($self_id,$table_name,$select);
+        if($info) {
+            /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
+            $tax_type     = array_column(config('tms.tax_type'),'name','key');
+            $bill_type = array_column(config('tms.bill_type'),'name','key');
+            $info->tax_price = number_format($info->tax_price/100,2);
+            $info->tax_type_show = $tax_type[$info->type]??null;
+            $info->bill_type_show = $bill_type[$info->bill_type]??null;
+            $data['info'] = $info;
+            $msg['code']  = 200;
+            $msg['msg']   = "数据拉取成功";
+            $msg['data']  = $data;
+            return $msg;
+        }else{
+            $msg['code'] = 300;
+            $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
+    }
 
+    /**
+     * 开票关联订单 /api/bill/orderList
+     * */
+    public function orderList(Request $request){
+        $self_id    = $request->input('order_id');
+        $table_name = 'tms_bill';
+        $order_id = explode(',','',$self_id);
+        $select = ['self_id','send_shi_name','gather_shi_name','total_money','on_line_money','create_time','update_time','send_sheng_name','send_qu_name',
+            'gather_sheng_name','gather_qu_name'];
+        // $self_id = 'car_202101111749191839630920';
+        $info = TmsOrder::whereIn('self_id',$order_id)->select($select)->get();
+//        $info = $details->details($self_id,$table_name,$select);
+        if($info) {
+            /** 如果需要对数据进行处理，请自行在下面对 $info 进行处理工作*/
+            foreach ($info as $k =>$v){
+                $v->total_money = number_format($v->total_money/100,2);
+                $v->on_line_money = number_format($v->on_line_money/100,2);
+            }
+
+            $data['info'] = $info;
+            $msg['code']  = 200;
+            $msg['msg']   = "数据拉取成功";
+            $msg['data']  = $data;
+            return $msg;
+        }else{
+            $msg['code'] = 300;
+            $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
     }
 
 

@@ -173,6 +173,7 @@ Route::group([
         Route::any('/bill/billAdd','BillController@billAdd');
         Route::any('/bill/delFlag','BillController@delFlag');
         Route::any('/bill/details','BillController@details');
+        Route::any('/bill/orderList','BillController@orderList');
         Route::any('/bill/commonBillList','BillController@commonBillList');
         Route::any('/bill/commonBillPage','BillController@commonBillPage');
         Route::any('/bill/createCommonBill','BillController@createCommonBill');
