@@ -13,6 +13,121 @@ use App\Http\Controllers\DetailsController as Details;
 
 
 class BillController extends Controller{
+    /**
+     *可开票订单列表 /api/bill/order_list
+     * */
+    public function order_list(Request $request){
+        $pay_status     =config('tms.tms_order_status_type');
+        $tms_order_type        = array_column(config('tms.tms_order_type'),'name','key');
+        $project_type       =$request->get('project_type');
+        /** 接收中间件参数**/
+        $user_info     = $request->get('user_info');//接收中间件产生的参数
+        $button_info =     $request->get('buttonInfo');
+        $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
+
+
+        /**接收数据*/
+        $num           = $request->input('num')??10;
+        $page          = $request->input('page')??1;
+        $tax_flag      = $request->input('tax_flag');
+        $listrows      = $num;
+        $firstrow      = ($page-1)*$listrows;
+        //获取前一个月的时间
+        $lasttime = date('Y-m-d H:i:s',strtotime('-1 month'));
+
+        $search=[
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
+            ['type'=>'=','name'=>'total_user_id','value'=>$user_info->total_user_id],
+            ['type'=>'=','name'=>'order_status','value'=>6],
+            ['type'=>'=','name'=>'tax_flag','value'=>$tax_flag]
+        ];
+
+        $where  = get_list_where($search);
+        $select = ['self_id','group_name','company_name','create_user_name','create_time','use_flag','order_type','order_status','car_type','clod','pick_flag','send_flag',
+            'gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address','pay_state',
+            'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
+            'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time','tax_flag'];
+        $select2 = ['self_id','parame_name'];
+        $data['info'] = TmsOrder::with(['TmsCarType' => function($query) use($select2){
+            $query->select($select2);
+        }])
+            ->where($where)
+            ->where('create_time','>',$lasttime);
+
+        $data['info'] = $data['info']->offset($firstrow)
+            ->limit($listrows)
+            ->orderBy('update_time', 'desc')
+            ->select($select)
+            ->get();
+
+        foreach ($data['info'] as $k=>$v) {
+            $v->total_money       = number_format($v->total_money/100, 2);
+            $v->good_weight       = floor($v->good_weight);
+            $v->good_volume       = floor($v->good_volume);
+            $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
+            $v->order_status_show=$pay_status[$v->order_status-1]['pay_status_text']??null;
+            $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
+            $v->self_id_show = substr($v->self_id,15);
+            $v->clod=json_decode($v->clod,true);
+            $v->send_time = date('m-d H:i',strtotime($v->send_time));
+            $info_clod = $v->clod;
+            foreach ($info_clod as $key => $value){
+                $info_clod[$key]=$tms_control_type[$value];
+            }
+            $v->clod = $info_clod;
+            $temperture = $v->clod;
+            foreach ($temperture as $key => $value){
+                $temperture[$key] = $value;
+            }
+            $v->temperture = implode(',',$temperture);
+            if($v->order_type == 'vehicle'){
+                $v->picktime_show = '装车时间 '.$v->send_time;
+            }else{
+                $v->picktime_show = '提货时间 '.$v->send_time;
+            }
+
+            $v->temperture_show ='温度 '.$v->clod[0];
+            $v->order_id_show = '订单编号'.substr($v->self_id,15);
+            if ($v->order_status == 1){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 2){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 3){
+                $v->state_font_color = '#0088F4';
+            }elseif($v->order_status == 4){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 5){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 6){
+                $v->state_font_color = '#FF9400';
+            }else{
+                $v->state_font_color = '#FF807D';
+            }
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->order_type_color = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+                if ($v->TmsCarType){
+                    $v->car_type_show = $v->TmsCarType->parame_name;
+                    $v->good_info_show = '车型 '.$v->car_type_show;
+                }
+            }else{
+                $v->good_info_show = '货物 '.$v->good_number.'件'.$v->good_weight.'kg'.$v->good_volume.'方';
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+            }
+
+        }
+//        dd($data['info']->toArray());
+        $msg['code'] = 200;
+        $msg['msg']  = "数据拉取成功";
+        $msg['data'] = $data;
+        return $msg;
+    }
+
       /**
        * 开票列表（历史记录） /api/bill/billPage
        * */
@@ -245,7 +360,7 @@ class BillController extends Controller{
     public function orderList(Request $request){
         $self_id    = $request->input('order_id');
         $table_name = 'tms_bill';
-        $order_id = explode(',','',$self_id);
+        $order_id = json_decode($self_id,true);
         $select = ['self_id','send_shi_name','gather_shi_name','total_money','on_line_money','create_time','update_time','send_sheng_name','send_qu_name',
             'gather_sheng_name','gather_qu_name'];
         // $self_id = 'car_202101111749191839630920';
@@ -272,7 +387,7 @@ class BillController extends Controller{
 
 
     /**
-     * 常用开票抬头列表  api/bill/commonBillList
+     * 常用开票抬头列表  /api/bill/commonBillList
      * */
     public function commonBillList(Request $request){
         $data['page_info']      =config('page.listrows');
@@ -286,7 +401,7 @@ class BillController extends Controller{
     }
 
     /**
-     * 常用开票抬头列表  api/bill/commonBillPage
+     * 常用开票抬头列表  /api/bill/commonBillPage
      * */
     public function commonBillPage(Request $request){
         /** 接收中间件参数**/

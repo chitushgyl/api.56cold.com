@@ -168,6 +168,7 @@ Route::group([
         Route::any('/take/order_cancel','TakeController@order_cancel');
 
         /** TMS用户开票**/
+        Route::any('/bill/order_list','BillController@order_list');
         Route::any('/bill/billPage','BillController@billPage');
         Route::any('/bill/createBill','BillController@createBill');
         Route::any('/bill/billAdd','BillController@billAdd');

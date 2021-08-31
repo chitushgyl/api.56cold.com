@@ -244,7 +244,24 @@ Route::group([
 
     });
 
+    /*** 推送**/
+    Route::any('/push/pushList', 'PushController@pushList');
+    Route::any('/push/pushPage', 'PushController@pushPage');
+    Route::any('/push/addPush', 'PushController@addPush');
+    Route::any('/push/pushObject', 'PushController@pushObject');
+    Route::any('/push/toPush', 'PushController@toPush');
+    Route::group([
+        "middleware"=>['daily'],
+    ], function(){
+
+    });
+
     /** TMS开票**/
+    Route::any('/bill/orderList','BillController@orderList');
+    Route::any('/bill/billList','BillController@billList');
+    Route::any('/bill/billPage','BillController@billPage');
+    Route::any('/bill/addBill','BillController@addBill');
+    Route::any('/bill/billDelFlag','BillController@billDelFlag');
     Route::any('/bill/commonBillList','BillController@commonBillList');
     Route::any('/bill/commonBillPage','BillController@commonBillPage');
     Route::any('/bill/createCommonBill','BillController@createCommonBill');
@@ -252,6 +269,11 @@ Route::group([
     Route::any('/bill/useCommonBill','BillController@useCommonBill');
     Route::any('/bill/delCommonBill','BillController@delCommonBill');
     Route::any('/bill/billDetails','BillController@billDetails');
+    Route::group([
+        "middleware"=>['daily'],
+    ], function(){
+
+    });
 });
 
 
