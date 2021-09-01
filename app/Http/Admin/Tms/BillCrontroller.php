@@ -348,7 +348,7 @@ class BillCrontroller extends CommonController{
             $data['tel']                 = $tel;
             $data['contact_address']     = $contact_address;
             $data['remark']              = $remark;
-            $data['tax_price']           = $tax_price;
+            $data['tax_price']           = $tax_price*100;
 
             $wheres['self_id'] = $self_id;
             $old_info = TmsBill::where($wheres)->first();
