@@ -276,6 +276,19 @@ Route::group([
     ], function(){
 
     });
+
+    /** TMS仓库**/
+    Route::any('/warehouse/warehousePage', 'WarehouseController@warehousePage');
+    Route::any('/warehouse/createWarehouse', 'WarehouseController@createWarehouse');
+    Route::any('/warehouse/addWarehouse','WarehouseController@addWarehouse');
+    Route::any('/warehouse/warehouseUseFlag','WarehouseController@warehouseUseFlag');
+    Route::any('/warehouse/warehouseDelFlag','WarehouseController@warehouseDelFlag');
+    Route::any('/warehouse/details','WarehouseController@details');
+    Route::group([
+        "middleware"=>['daily'],
+    ], function(){
+
+    });
 });
 
 
