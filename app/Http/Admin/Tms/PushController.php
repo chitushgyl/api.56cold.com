@@ -161,7 +161,7 @@ class PushController extends CommonController{
      /**
       * 启用禁用推送消息 /tms/push/pushUseFlag
       * */
-    public function pushUseFlag(Request $request,Status $status){
+    public function pushUseFlag(Request $request){
         $now_time=date('Y-m-d H:i:s',time());
         $operationing = $request->get('operationing');//接收中间件产生的参数
         $table_name='tms_push';
@@ -169,8 +169,10 @@ class PushController extends CommonController{
         $self_id=$request->input('self_id');
         $flag='useFlag';
 //        $self_id='car_202012242220439016797353';
-
-        $status_info=$status->changeFlag($table_name,$medol_name,$self_id,$flag,$now_time);
+        $update['use_flag'] = 'N';
+        $update['update_time'] = $now_time;
+//        $status_info=$status->changeFlag($table_name,$medol_name,$self_id,$flag,$now_time);
+        $status_info=TmsPush::where('self_id',$self_id)->update($update);
 
         $operationing->access_cause='启用/禁用';
         $operationing->table=$table_name;
@@ -190,7 +192,7 @@ class PushController extends CommonController{
     /**
      * 删除推送消息 /tms/push/pushDelFlag
      * */
-    public function pushDelFlag(Request $request,Status $status){
+    public function pushDelFlag(Request $request){
         $now_time=date('Y-m-d H:i:s',time());
         $operationing = $request->get('operationing');//接收中间件产生的参数
         $table_name='tms_push';
@@ -198,9 +200,11 @@ class PushController extends CommonController{
         $self_id=$request->input('self_id');
         $flag='delFlag';
 //        $self_id='car_202012242220439016797353';
+        $update['delete_flag'] = 'N';
+        $update['update_time'] = $now_time;
+//        $status_info=$status->changeFlag($table_name,$medol_name,$self_id,$flag,$now_time);
 
-        $status_info=$status->changeFlag($table_name,$medol_name,$self_id,$flag,$now_time);
-
+        $status_info=TmsPush::where('self_id',$self_id)->update($update);
         $operationing->access_cause='删除';
         $operationing->table=$table_name;
         $operationing->table_id=$self_id;
