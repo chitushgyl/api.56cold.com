@@ -8,6 +8,8 @@ use App\Models\User\UserIdentity;
 use App\Models\User\UserTotal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\StatusController as Status;
+use App\Http\Controllers\DetailsController as Details;
 
 class PushController extends CommonController{
 
