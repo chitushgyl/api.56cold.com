@@ -294,13 +294,25 @@ class PushController extends CommonController{
             $user_list = json_decode($user_list,true);
             $push_info = TmsPush::where('self_id',$push_id)->select(['push_title','push_content','self_id','is_push'])->first();
             $push_cid = [];
+            $push_list = [];
             foreach ($user_list as $key => $value){
                 $login_info = LogLogin::where('user_id',$value)->select(['clientid'])->get();
-                $push_cid[] = array_unique($login_info);
+                foreach ($login_info as $k =>$v){
+//                    dd($v->toArray());
+                    if ($v->clientid != "null" && $v->clientid != null && $v->clientid != 'undefined' && $v->clientid != 'clientid'){
+                        $push_cid[] = $v->clientid;
+                    }
+                }
+            }
+            $push_cid = array_unique($push_cid);
+
+            $cid_list = [];
+            foreach ($push_cid as $kk =>$vv){
+                array_push($cid_list,$vv);
             }
             include_once base_path( '/vendor/push/GeTui.php');
             $geTui = new \GeTui();
-            $result = $geTui->pushToList('推送信息',$push_info->title,$push_info->content,$push_cid);
+            $result = $geTui->pushToList('推送信息',$push_info->title,$push_info->content,$cid_list);
             if ($result['code'] != 0){
                 $msg['code']=301;
                 $msg['msg']="推送失败";
