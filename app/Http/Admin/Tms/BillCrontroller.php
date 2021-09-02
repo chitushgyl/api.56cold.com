@@ -4,6 +4,7 @@ namespace App\Http\Admin\Tms;
 
 use App\Models\Tms\TmsBill;
 use App\Models\Tms\TmsCommonBill;
+use App\Models\Tms\TmsOrder;
 use http\Env\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -102,6 +103,7 @@ class BillCrontroller extends CommonController{
 
         foreach ($data['items'] as $k=>$v) {
             $v->total_money = number_format($v->total_money/100, 2);
+            $v->total_money_show = $v->total_money;
             $v->order_status_show=$tms_order_status_type[$v->order_status]??null;
             $v->order_type_show=$tms_order_type[$v->order_type]??null;
             $v->type_inco = img_for($tms_order_inco_type[$v->order_type],'no_json')??null;
@@ -364,6 +366,8 @@ class BillCrontroller extends CommonController{
                 $data['group_code']    = $user_info->group_code;
                 $data['create_time']      = $data['update_time'] = $now_time;
                 $id = TmsBill::insert($data);
+                $update['tax_flag'] ='Y';
+                $order_info = TmsOrder::whereIn('self_id',json_decode($order_id,true))->update($update);
                 $operationing->access_cause='新增开票';
                 $operationing->operation_type='create';
 

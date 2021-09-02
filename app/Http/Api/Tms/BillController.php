@@ -285,7 +285,7 @@ class BillController extends Controller{
                 $data['create_time']      = $data['update_time'] = $now_time;
                 $id = TmsBill::insert($data);
                 $update['tax_flag'] ='Y';
-                $order_info = TmsOrder::whereIn('self_id',$order_id)->update($update);
+                $order_info = TmsOrder::whereIn('self_id',json_decode($order_id,true))->update($update);
             }
 
             if($id){
