@@ -239,7 +239,7 @@ class AlipayController extends Controller{
         $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
         $self_id   = $request->input('self_id');// 订单ID
         $price     = $request->input('price');// 支付金额
-//        $price     = 0.01;
+        $price     = 0.01;
         if (!$user_info){
             $msg['code'] = 401;
             $msg['msg']  = '未登录，请完成登录！';
@@ -572,7 +572,7 @@ class AlipayController extends Controller{
             $msg['msg']  = '请选择支付类型';
             return $msg;
         }
-//        $price = 0.01;
+        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -998,7 +998,7 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-//        $price = 0.01;
+        $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
         $notify = 'https://ytapi.56cold.com/alipay/appWechat_notify';
