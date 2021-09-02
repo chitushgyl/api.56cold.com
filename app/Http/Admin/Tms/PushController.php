@@ -76,6 +76,9 @@ class PushController extends CommonController{
                 $data['group_show']='Y';
                 break;
         }
+        foreach ($data['items'] as $k=>$v) {
+            $v->button_info=$button_info;
+        }
 
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
@@ -232,7 +235,7 @@ class PushController extends CommonController{
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
             $user_list = json_decode($user_list,true);
-            $push_info = TmsPush::where('push_id',$push_id)->select(['push_title','push_content','self_id','is_push'])->first();
+            $push_info = TmsPush::where('self_id',$push_id)->select(['push_title','push_content','self_id','is_push'])->first();
             $push_cid = [];
             foreach ($user_list as $key => $value){
                 $login_info = LogLogin::where('user_id',$value)->value('clientid');
