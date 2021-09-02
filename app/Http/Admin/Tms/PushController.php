@@ -156,6 +156,63 @@ class PushController extends CommonController{
              return $msg;
          }
      }
+     /**
+      * 启用禁用推送消息 /tms/push/pushUseFlag
+      * */
+    public function pushUseFlag(Request $request,Status $status){
+        $now_time=date('Y-m-d H:i:s',time());
+        $operationing = $request->get('operationing');//接收中间件产生的参数
+        $table_name='tms_push';
+        $medol_name='TmsPush';
+        $self_id=$request->input('self_id');
+        $flag='useFlag';
+//        $self_id='car_202012242220439016797353';
+
+        $status_info=$status->changeFlag($table_name,$medol_name,$self_id,$flag,$now_time);
+
+        $operationing->access_cause='启用/禁用';
+        $operationing->table=$table_name;
+        $operationing->table_id=$self_id;
+        $operationing->now_time=$now_time;
+        $operationing->old_info=$status_info['old_info'];
+        $operationing->new_info=$status_info['new_info'];
+        $operationing->operation_type=$flag;
+
+        $msg['code']=$status_info['code'];
+        $msg['msg']=$status_info['msg'];
+        $msg['data']=$status_info['new_info'];
+
+        return $msg;
+    }
+
+    /**
+     * 删除推送消息 /tms/push/pushDelFlag
+     * */
+    public function pushDelFlag(Request $request,Status $status){
+        $now_time=date('Y-m-d H:i:s',time());
+        $operationing = $request->get('operationing');//接收中间件产生的参数
+        $table_name='tms_push';
+        $medol_name='TmsPush';
+        $self_id=$request->input('self_id');
+        $flag='delFlag';
+//        $self_id='car_202012242220439016797353';
+
+        $status_info=$status->changeFlag($table_name,$medol_name,$self_id,$flag,$now_time);
+
+        $operationing->access_cause='删除';
+        $operationing->table=$table_name;
+        $operationing->table_id=$self_id;
+        $operationing->now_time=$now_time;
+        $operationing->old_info=$status_info['old_info'];
+        $operationing->new_info=$status_info['new_info'];
+        $operationing->operation_type=$flag;
+
+        $msg['code']=$status_info['code'];
+        $msg['msg']=$status_info['msg'];
+        $msg['data']=$status_info['new_info'];
+
+        return $msg;
+    }
 
      /**
       * 推送对象列表 /tms/push/pushObject
