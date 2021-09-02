@@ -49,7 +49,7 @@ class PushController extends CommonController{
 
         $where=get_list_where($search);
 
-        $select=['self_id','push_content','use_flag','delete_flag','create_time','update_time'];
+        $select=['self_id','push_content','use_flag','delete_flag','create_time','update_time','push_title'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsPush::where($where)->count(); //总的数据量
