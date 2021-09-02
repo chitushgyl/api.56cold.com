@@ -238,7 +238,7 @@ class PushController extends CommonController{
             $push_info = TmsPush::where('self_id',$push_id)->select(['push_title','push_content','self_id','is_push'])->first();
             $push_cid = [];
             foreach ($user_list as $key => $value){
-                $login_info = LogLogin::where('user_id',$value)->value('clientid');
+                $login_info = LogLogin::where('user_id',$value)->select(['clientid'])->get();
                 $push_cid[] = array_unique($login_info);
             }
             include_once base_path( '/vendor/push/GeTui.php');
