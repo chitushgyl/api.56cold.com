@@ -101,6 +101,7 @@ class PushController extends CommonController{
          $input              =$request->all();
          //dd($input);
          /** 接收数据*/
+         $self_id             =$request->input('self_id');
          $push_title          =$request->input('push_title');
          $push_content        =$request->input('push_content');
          /*** 虚拟数据
@@ -160,11 +161,11 @@ class PushController extends CommonController{
         $now_time=date('Y-m-d H:i:s',time());
         $operationing = $request->get('operationing');//接收中间件产生的参数
         $tms_user_type    	 =array_column(config('tms.tms_user_type'),'name','key');
-//        $num            =$request->input('num')??10;
-//        $page           =$request->input('page')??1;
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
         $type       =$request->input('type');
-//        $listrows       =$num;
-//        $firstrow       =($page-1)*$listrows;
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
 
         $search=[
             ['type'=>'=','name'=>'type','value'=>$type],
@@ -177,22 +178,22 @@ class PushController extends CommonController{
         $select = ['type','total_user_id'];
         $select1 = ['self_id','tel'];
 
-        $info = UserIdentity::with(['userTotal'=>function($query)use($where,$select1) {
+        $data['info'] = UserIdentity::with(['userTotal'=>function($query)use($where,$select1) {
             $query->select($select1);
         }])
             ->where($where)
             ->orderBy('create_time','desc')
-//            ->offset($firstrow)->limit($listrows)
+            ->offset($firstrow)->limit($listrows)
             ->select($select)
             ->get();
-
-        foreach ($info as $key =>$value){
+        $data['total'] = UserIdentity::where($where)->count();
+        foreach ($data['info'] as $key =>$value){
              $value->type_show = $tms_user_type[$value->type];
              $value->show_name = $value->userTotal->tel;
         }
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
-        $msg['data']=$info;
+        $msg['data']=$data;
         return $msg;
     }
 
@@ -230,6 +231,7 @@ class PushController extends CommonController{
 
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
+            $user_list = json_decode($user_list,true);
             $push_info = TmsPush::where('push_id',$push_id)->select(['push_title','push_content','self_id','is_push'])->first();
             $push_cid = [];
             foreach ($user_list as $key => $value){
@@ -245,7 +247,7 @@ class PushController extends CommonController{
                 return $msg;
             }
             $msg['code']=200;
-            $msg['msg']="数据拉取成功";
+            $msg['msg']="推送成功";
             return $msg;
         }else{
             //前端用户验证没有通过

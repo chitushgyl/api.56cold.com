@@ -62,6 +62,7 @@ class BillController extends Controller{
 
         foreach ($data['info'] as $k=>$v) {
             $v->total_money       = number_format($v->total_money/100, 2);
+            $v->total_money_count = $v->total_money;
             $v->good_weight       = floor($v->good_weight);
             $v->good_volume       = floor($v->good_volume);
             $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
@@ -283,6 +284,8 @@ class BillController extends Controller{
 //                $data['create_user_name'] = $token_name;
                 $data['create_time']      = $data['update_time'] = $now_time;
                 $id = TmsBill::insert($data);
+                $update['tax_flag'] ='Y';
+                $order_info = TmsOrder::whereIn('self_id',$order_id)->update($update);
             }
 
             if($id){
