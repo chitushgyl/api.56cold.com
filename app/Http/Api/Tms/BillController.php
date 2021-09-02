@@ -152,7 +152,7 @@ class BillController extends Controller{
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
         $data['info'] = TmsBill::where($where)
             ->offset($firstrow)
             ->limit($listrows)
@@ -181,7 +181,7 @@ class BillController extends Controller{
             ['self_id','=',$self_id],
         ];
         $select = ['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
         $data['info'] = TmsBill::where($where)->select($select)->first();
         if ($data['info']){
             $data['info']->tax_type_show =  $tax_type[$data['info']->type] ?? null;
@@ -334,7 +334,7 @@ class BillController extends Controller{
         $self_id    = $request->input('self_id');
         $table_name = 'tms_bill';
         $select = ['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
         $select1 = ['self_id','send_shi_name','gather_shi_name','total_money'];
         // $self_id = 'car_202101111749191839630920';
         $info = $details->details($self_id,$table_name,$select);

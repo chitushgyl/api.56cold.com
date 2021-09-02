@@ -2,6 +2,7 @@
 
 namespace App\Http\Admin\Tms;
 
+use App\Http\Controllers\DetailsController as Details;
 use App\Models\Tms\TmsBill;
 use App\Models\Tms\TmsCommonBill;
 use App\Models\Tms\TmsOrder;
@@ -215,7 +216,7 @@ class BillCrontroller extends CommonController{
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsBill::where($where)->count(); //总的数据量
@@ -255,6 +256,33 @@ class BillCrontroller extends CommonController{
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;
         //dd($msg);
+        return $msg;
+    }
+
+    /**
+     * 新建开票      /tms/bill/createBill
+     */
+    public function createBill(Request $request){
+        /** 接收数据*/
+        $self_id = $request->input('self_id');
+//        $self_id = 'car_20210313180835367958101';
+        $tax_type = array_column(config('tms.tax_type'),'name','key');
+        $bill_type = array_column(config('tms.bill_type'),'name','key');
+
+        $where = [
+            ['delete_flag','=','Y'],
+            ['self_id','=',$self_id],
+        ];
+        $select = ['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
+        $data['info'] = TmsBill::where($where)->select($select)->first();
+        if ($data['info']){
+            $data['info']->tax_type_show =  $tax_type[$data['info']->type] ?? null;
+            $data['info']->bill_type_show =  $bill_type[$data['info']->bill_type] ?? null;
+        }
+        $msg['code'] = 200;
+        $msg['msg']  = "数据拉取成功";
+        $msg['data'] = $data;
         return $msg;
     }
 
@@ -424,6 +452,36 @@ class BillCrontroller extends CommonController{
         $msg['data']=$status_info['new_info'];
 
         return $msg;
+    }
+
+    /**
+     * 开票详情 /tms/bill/details
+     * */
+    public function details(Request $request, Details $details){
+        $self_id    = $request->input('self_id');
+        $table_name = 'tms_bill';
+        $select = ['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
+        $select1 = ['self_id','send_shi_name','gather_shi_name','total_money'];
+        // $self_id = 'car_202101111749191839630920';
+        $info = $details->details($self_id,$table_name,$select);
+        if($info) {
+            /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
+            $tax_type     = array_column(config('tms.tax_type'),'name','key');
+            $bill_type = array_column(config('tms.bill_type'),'name','key');
+            $info->tax_price = number_format($info->tax_price/100,2);
+            $info->tax_type_show = $tax_type[$info->type]??null;
+            $info->bill_type_show = $bill_type[$info->bill_type]??null;
+            $data['info'] = $info;
+            $msg['code']  = 200;
+            $msg['msg']   = "数据拉取成功";
+            $msg['data']  = $data;
+            return $msg;
+        }else{
+            $msg['code'] = 300;
+            $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
     }
 
     /**
@@ -727,6 +785,32 @@ class BillCrontroller extends CommonController{
         }
 
         return $msg;
+    }
+
+    /**
+     * 常用发票详情 /tms/bill/billDetails
+     * */
+    public function billDetails(Request $request, Details $details){
+        $self_id    = $request->input('self_id');
+        $table_name = 'tms_common_bill';
+        $select     = ['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
+            'total_user_id','group_code','delete_flag','create_time','default_flag'
+        ];
+        // $self_id='address_202101111755143321983342';
+        $info = $details->details($self_id,$table_name,$select);
+
+        if($info) {
+            /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
+            $data['info'] = $info;
+            $msg['code']  = 200;
+            $msg['msg']   = "数据拉取成功";
+            $msg['data']  = $data;
+            return $msg;
+        }else{
+            $msg['code'] = 300;
+            $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
     }
 
 
