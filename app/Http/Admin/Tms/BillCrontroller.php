@@ -485,6 +485,37 @@ class BillCrontroller extends CommonController{
     }
 
     /**
+     * 开票关联订单 /api/bill/order_list
+     * */
+    public function order_list(Request $request){
+        $self_id    = $request->input('order_id');
+        $table_name = 'tms_bill';
+        $order_id = json_decode($self_id,true);
+        $select = ['self_id','send_shi_name','gather_shi_name','total_money','create_time','update_time','send_sheng_name','send_qu_name',
+            'gather_sheng_name','gather_qu_name'];
+        // $self_id = 'car_202101111749191839630920';
+        $info = TmsOrder::whereIn('self_id',$order_id)->select($select)->get();
+//        $info = $details->details($self_id,$table_name,$select);
+        if($info) {
+            /** 如果需要对数据进行处理，请自行在下面对 $info 进行处理工作*/
+            foreach ($info as $k =>$v){
+                $v->total_money = number_format($v->total_money/100,2);
+//                $v->on_line_money = number_format($v->on_line_money/100,2);
+            }
+
+            $data['info'] = $info;
+            $msg['code']  = 200;
+            $msg['msg']   = "数据拉取成功";
+            $msg['data']  = $data;
+            return $msg;
+        }else{
+            $msg['code'] = 300;
+            $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
+    }
+
+    /**
      * 常用开票抬头  /tms/bill/commonBillList
      * */
     public function commonBillList(Request $request){

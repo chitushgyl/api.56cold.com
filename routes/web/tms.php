@@ -250,6 +250,8 @@ Route::group([
     Route::any('/push/addPush', 'PushController@addPush');
     Route::any('/push/pushObject', 'PushController@pushObject');
     Route::any('/push/toPush', 'PushController@toPush');
+    Route::any('/push/pushDelFlag', 'PushController@pushDelFlag');
+    Route::any('/push/pushUseFlag', 'PushController@pushUseFlag');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
@@ -264,6 +266,7 @@ Route::group([
     Route::any('/bill/delFlag','BillController@delFlag');
     Route::any('/bill/details','BillController@details');
     Route::any('/bill/orderList','BillController@orderList');
+    Route::any('/bill/order_list','BillController@order_list');
     Route::any('/bill/commonBillList','BillController@commonBillList');
     Route::any('/bill/commonBillPage','BillController@commonBillPage');
     Route::any('/bill/createCommonBill','BillController@createCommonBill');
