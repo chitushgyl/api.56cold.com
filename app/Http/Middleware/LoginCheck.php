@@ -28,7 +28,7 @@ class LoginCheck{
 //        $user_token='ea8d7f618cd0457bc0eb6f8eebc1f85a';             //集团总公司账号
 //        $user_token='ea8d7f618cd0457bc0eb6f8eebc1f85a';             //集团分公司的账号
 //          $user_token='1fdd810d5b91634d0175c33abc121d41';
-dd($user_token);
+//dd($user_token);
         $user_info=null;
         /**查询出这个用户的信息出来**/
         $user_where=[
