@@ -27,7 +27,7 @@ class LoginCheck{
 //        $user_token='7425eaf643bc795f1b64e348849eefa7';             //超级管理员
 //        $user_token='ea8d7f618cd0457bc0eb6f8eebc1f85a';             //集团总公司账号
 //        $user_token='ea8d7f618cd0457bc0eb6f8eebc1f85a';             //集团分公司的账号
-
+          $user_token='1fdd810d5b91634d0175c33abc121d41';
 
         $user_info=null;
         /**查询出这个用户的信息出来**/

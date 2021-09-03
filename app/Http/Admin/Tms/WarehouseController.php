@@ -1,5 +1,6 @@
 <?php
-namespace App\Http\Api\Tms;
+//namespace App\Http\Api\Tms;
+namespace App\Http\Admin\Tms;
 use App\Models\Tms\TmsWarehouse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
