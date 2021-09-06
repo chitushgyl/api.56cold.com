@@ -9,7 +9,7 @@ use App\Models\Tms\TmsOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class BillCrontroller extends CommonController {
+class BillController extends CommonController {
     /**
      * 开票订单列表 /tms/bill/orderList
      * */
