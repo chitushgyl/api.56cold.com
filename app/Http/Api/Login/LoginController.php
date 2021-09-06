@@ -10,6 +10,8 @@ use App\Models\User\UserTotal;
 use App\Models\User\UserTelCheck;
 use App\Models\Log\LogLogin;
 use App\Models\User\UserCapital;
+use App\Tools\CartNumber;
+use App\Models\SysFoot;
 
 
 
@@ -888,6 +890,52 @@ class LoginController extends Controller{
         $data = curl_exec($curl);
         curl_close($curl);
         return json_encode(array("code"=>200,"msg"=>'',"data"=>$data));
+    }
+
+    /**
+     * 用户底部导航      /login/foot
+     */
+    public function foot(Request $request,CartNumber $cartNumber){
+        $user_info          =$request->get('user_info');
+        $project_type       =$request->get('project_type');
+        $group_info         =$request->get('group_info');
+        $group_code         =$group_info->group_code??config('page.platform.group_code');
+        $project_type       ='user';
+        /**初始化一下数据**/
+        $info          =null;
+        $select=['name','type','path','active_img','inactive_img','app_path','app_url'];
+        $user_foot_where=[
+            ['use_flag','=','Y'],
+            ['delete_flag','=','Y'],
+            ['project_type','=',$project_type],
+        ];
+
+        if($user_info){
+            $foot_in=json_decode($user_info->foot_info);
+        }else{
+            $foot_in=null;
+        }
+
+        if($foot_in){
+            $info = SysFoot::where($user_foot_where)->whereIn('id',$foot_in)->select($select)->orderBy('sort','asc')->get();
+        }else{
+            $info = SysFoot::where($user_foot_where)->select($select)->orderBy('sort','asc')->get();
+        }
+        foreach ($info as $k => $v){
+            $v->number=0;
+            if($v->type=='cart' && $user_info){
+                $v->number=$cartNumber->cart_number($user_info,$group_code);
+            }
+            $v->active_img      =img_for($v->active_img,'no_json');
+            $v->inactive_img    =img_for($v->inactive_img,'no_json');
+        }
+
+        $msg['code']=200;
+        $msg['msg']='数据拉取成功！';
+        $msg['data']=$info;
+        //dd($msg['data']->toArray());
+        return $msg;
+
     }
 
 }

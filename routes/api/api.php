@@ -26,6 +26,7 @@ Route::any('/login/mini_login', 'Login\LoginController@mini_login');            
 Route::any('/login/tel_login', 'Login\LoginController@tel_login');                                      //手机号码授权登录
 Route::any('/login/account_login', 'Login\LoginController@account_login');                                      //手机号码授权登录
 Route::any('/login/get_openid', 'Login\LoginController@get_openid');                                      //手机号码授权登录
+Route::any('/login/foot', 'Login\LoginController@foot');                                      //初始默认登录
 Route::any('/anniu_show', 'Login\LoginController@anniu_show');                                          //小程序首页按钮控制
 Route::any('/anniu', 'Login\LoginController@anniu');
 
