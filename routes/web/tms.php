@@ -259,11 +259,10 @@ Route::group([
     });
 
     /** TMS开票**/
-    Route::any('/bill/order_list','BillController@order_list');
     Route::any('/bill/billPage','BillController@billPage');
     Route::any('/bill/createBill','BillController@createBill');
-    Route::any('/bill/billAdd','BillController@billAdd');
-    Route::any('/bill/delFlag','BillController@delFlag');
+    Route::any('/bill/addBill','BillController@addBill');
+    Route::any('/bill/billDelFlag','BillController@billDelFlag');
     Route::any('/bill/details','BillController@details');
     Route::any('/bill/orderList','BillController@orderList');
     Route::any('/bill/order_list','BillController@order_list');
