@@ -319,6 +319,11 @@ class AlipayController extends Controller{
                 echo 'success';
                 return false;
             }
+            $payment_info = TmsPayment::where('order_id',$_POST['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+            if ($payment_info){
+                echo 'success';
+                return false;
+            }
             if ($order->total_user_id){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
@@ -375,14 +380,17 @@ class AlipayController extends Controller{
             $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
             $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
 //                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
-            if($order->group_code){
-                $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
-                if($group->company_type != 'TMS3PL'){
+            if ($order->order_type == 'vehicle'){
+                if($order->group_code){
+                    $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
+                    if($group->company_type != 'TMS3PL'){
+                        $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+                    }
+                }else{
                     $A = $this->send_push_msg('订单信息','有新订单',$center_list);
                 }
-            }else{
-                $A = $this->send_push_msg('订单信息','有新订单',$center_list);
             }
+
             if ($id){
                 echo 'success';
             }else{
@@ -417,6 +425,11 @@ class AlipayController extends Controller{
 //            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
             $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_state'])->first();
             if ($order->pay_state == 'Y'){
+                echo 'success';
+                return false;
+            }
+            $payment_info = TmsPayment::where('order_id',$_POST['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+            if ($payment_info){
                 echo 'success';
                 return false;
             }
@@ -644,6 +657,11 @@ class AlipayController extends Controller{
                 echo 'success';
                 return false;
             }
+            $payment_info = TmsPayment::where('order_id',$array_data['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+            if ($payment_info){
+                echo 'success';
+                return false;
+            }
             if ($order->total_user_id){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
@@ -695,13 +713,15 @@ class AlipayController extends Controller{
             $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
             $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
 //                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
-            if($order->group_code){
-                $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
-                if($group->company_type != 'TMS3PL'){
-                    $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+            if ($order->order_type == 'vehicle') {
+                if ($order->group_code) {
+                    $group = SystemGroup::where('self_id', $order->group_code)->select('self_id', 'group_name', 'company_type')->first();
+                    if ($group->company_type != 'TMS3PL') {
+                        $A = $this->send_push_msg('订单信息', '有新订单', $center_list);
+                    }
+                } else {
+                    $A = $this->send_push_msg('订单信息', '有新订单', $center_list);
                 }
-            }else{
-                $A = $this->send_push_msg('订单信息','有新订单',$center_list);
             }
             if ($id){
                 echo 'success';
@@ -734,6 +754,11 @@ class AlipayController extends Controller{
             $pay['self_id'] = generate_id('pay_');//微信账号
             $order = TmsOrder::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_state'])->first();
             if ($order->pay_state == 'Y'){
+                echo 'success';
+                return false;
+            }
+            $payment_info = TmsPayment::where('order_id',$array_data['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+            if ($payment_info){
                 echo 'success';
                 return false;
             }
@@ -805,7 +830,7 @@ class AlipayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
             $order = TmsOrderDispatch::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
-            $payment_info = TmsPayment::where('dispatch_id',$_POST['out_trade_no'])->select(['pay_result','state','dispatch_id'])->first();
+            $payment_info = TmsPayment::where('dispatch_id',$array_data['out_trade_no'])->select(['pay_result','state','dispatch_id'])->first();
             if ($payment_info){
                 echo 'fail';
                 return false;
