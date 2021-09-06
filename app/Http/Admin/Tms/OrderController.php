@@ -3607,8 +3607,8 @@ class OrderController extends CommonController{
                             $list['send_time']                = date('Y-m-d H:i:s',strtotime($depart_time)+24*$line_info->trunking*3600);
                             $list['gather_time']              = null;
                             $list['reduce_price']             = 0;
-                            $list['total_money']              = $send_money*100;
-                            $list['on_line_money']            = $send_money*100;
+                            $list['total_money']              = $line_info['send_price'];
+                            $list['on_line_money']            = $line_info['send_price'];
                             if ($line_info->special == 1){
                                 $list['total_money'] = line_count_price($line_info,$list['good_number']);
                                 $list['on_line_money'] = line_count_price($line_info,$list['good_number']);
