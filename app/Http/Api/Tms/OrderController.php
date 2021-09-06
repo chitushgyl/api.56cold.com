@@ -1492,8 +1492,8 @@ class OrderController extends Controller{
                             $list['total_money']              = $line_info['send_price'];
                             $list['on_line_money']            = $line_info['send_price'];
                             if ($line_info->special == 1){
-                                $list['total_money'] = line_count_price($line_info,$list['good_number']);
-                                $list['on_line_money'] = line_count_price($line_info,$list['good_number']);
+                                $list['total_money'] = line_count_price($line_info,$list['good_number'])*100;
+                                $list['on_line_money'] = line_count_price($line_info,$list['good_number'])*100;
                             }
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
