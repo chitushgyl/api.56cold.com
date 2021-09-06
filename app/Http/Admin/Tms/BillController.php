@@ -200,6 +200,7 @@ class BillController extends CommonController {
         $group_info     = $request->get('group_info');//接收中间件产生的参数
         $button_info    = $request->get('anniu');//接收中间件产生的参数
         $tax_type = array_column(config('tms.tax_type'),'name','key');
+        $bill_type = array_column(config('tms.bill_type'),'name','key');
         /**接收数据*/
         $num            =$request->input('num')??10;
         $page           =$request->input('page')??1;
@@ -256,7 +257,7 @@ class BillController extends CommonController {
             }
 
         }
-        
+
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;

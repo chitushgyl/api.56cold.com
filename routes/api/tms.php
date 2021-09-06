@@ -41,6 +41,7 @@ Route::group([
 
         Route::any('/address/get_address', 'AddressController@get_address');
         Route::any('/address/get_address_id', 'AddressController@get_address_id');
+        Route::any('/address/get_all_address', 'AddressController@get_all_address');
 		/**TMS车辆管理 - 承运端**/
 		Route::any('/car/createCar','CarController@createCar');
 		Route::any('/car/getCar','CarController@getCar');

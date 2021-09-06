@@ -355,5 +355,16 @@ class AddressController extends Controller{
         return $msg;
     }
 
+    public function get_all_address(Request $request){
+
+        $data['info'] = SysAddress::where('name','like','%'.'市')->get();
+
+        $msg['code'] = 200;
+        $msg['msg']  = "数据拉取成功";
+        $msg['data'] = $data;
+        //dd($msg);
+        return $msg;
+    }
+
 }
 ?>
