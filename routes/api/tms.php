@@ -13,6 +13,7 @@
 |
 */
 // 用户端APP
+Route::any('/api/address/get_city', 'Address\AddressController@get_city');
 Route::group([
     "middleware"=>['frontCheck','userCheck'],
 ], function(){
@@ -37,7 +38,7 @@ Route::group([
 		/**TMS地址管理 - 用户端**/
 
 		Route::any('/address/createAddress','AddressController@createAddress');
-        Route::any('/address/get_city', 'AddressController@get_city');
+
         Route::any('/address/get_address', 'AddressController@get_address');
         Route::any('/address/get_address_id', 'AddressController@get_address_id');
 		/**TMS车辆管理 - 承运端**/
