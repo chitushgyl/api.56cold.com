@@ -1489,8 +1489,8 @@ class OrderController extends Controller{
                             $list['send_time']                = date('Y-m-d H:i:s',strtotime($depart_time)+24*$line_info->trunking*3600);
                             $list['gather_time']              = null;
                             $list['reduce_price']             = 0;
-                            $list['total_money']              = $send_money*100;
-                            $list['on_line_money']            = $send_money*100;
+                            $list['total_money']              = $line_info['send_price'];
+                            $list['on_line_money']            = $line_info['send_price'];
                             if ($line_info->special == 1){
                                 $list['total_money'] = line_count_price($line_info,$list['good_number']);
                                 $list['on_line_money'] = line_count_price($line_info,$list['good_number']);
@@ -1569,7 +1569,7 @@ class OrderController extends Controller{
                             $money['dispatch_id']                = $list['self_id'];
                             $money['create_time']                = $now_time;
                             $money['update_time']                = $now_time;
-                            $money['money']                      = $send_money*100;
+                            $money['money']                      = $list['total_money'];
                             $money['money_type']                 = 'send';
                             $money['type']                       = 'out';
                             $money['settle_flag']                = 'W';
@@ -1580,7 +1580,7 @@ class OrderController extends Controller{
                             $money_['dispatch_id']                = $list['self_id'];
                             $money_['create_time']                = $now_time;
                             $money_['update_time']                = $now_time;
-                            $money_['money']                      = $send_money*100;
+                            $money_['money']                      = $list['total_money'];
                             $money_['money_type']                 = 'send';
                             $money_['type']                       = 'in';
                             $money_['settle_flag']                = 'W';
