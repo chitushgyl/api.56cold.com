@@ -13,7 +13,6 @@
 |
 */
 // 用户端APP
-Route::any('/api/address/get_city', 'Address\AddressController@get_city');
 Route::group([
     "middleware"=>['frontCheck','userCheck'],
 ], function(){
@@ -204,7 +203,7 @@ Route::group([
 Route::group([
     'prefix' => 'api','namespace'  => 'Tms',
 ], function(){
-
+    Route::any('/address/get_city', 'AddressController@get_city');
     Route::any('/order/orderList', 'OrderController@orderList');
     Route::any('/take/orderList', 'TakeController@orderList');//app接单列表头部
 });
