@@ -1,16 +1,15 @@
 <?php
-
 namespace App\Http\Admin\Tms;
 
+use App\Http\Controllers\CommonController;
 use App\Http\Controllers\DetailsController as Details;
 use App\Models\Tms\TmsBill;
 use App\Models\Tms\TmsCommonBill;
 use App\Models\Tms\TmsOrder;
-use http\Env\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-//class BillCrontroller extends CommonController{
-class BillCrontroller extends Controller{
+class BillCrontroller extends CommonController {
     /**
      * 开票订单列表 /tms/bill/orderList
      * */
