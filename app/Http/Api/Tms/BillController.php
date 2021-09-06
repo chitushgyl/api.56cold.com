@@ -365,7 +365,7 @@ class BillController extends Controller{
         $table_name = 'tms_bill';
         $order_id = json_decode($self_id,true);
         $select = ['self_id','send_shi_name','gather_shi_name','total_money','create_time','update_time','send_sheng_name','send_qu_name',
-            'gather_sheng_name','gather_qu_name'];
+            'gather_sheng_name','gather_qu_name','gather_time'];
         // $self_id = 'car_202101111749191839630920';
         $info = TmsOrder::whereIn('self_id',$order_id)->select($select)->get();
 //        $info = $details->details($self_id,$table_name,$select);

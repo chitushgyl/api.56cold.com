@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Validator;
 
 class BillController extends CommonController {
     /**
-     * 开票订单列表 /tms/bill/orderList
+     * 开票订单列表 /tms/bill/order_list
      * */
-    public function orderList(Request $request){
+    public function order_list(Request $request){
         $tms_order_status_type    =array_column(config('tms.tms_order_status_type'),'pay_status_text','key');
         $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
         $tms_control_type         =array_column(config('tms.tms_control_type'),'name','key');
@@ -485,14 +485,14 @@ class BillController extends CommonController {
     }
 
     /**
-     * 开票关联订单 /api/bill/order_list
+     * 开票关联订单 /api/bill/ordeList
      * */
-    public function order_list(Request $request){
+    public function orderList(Request $request){
         $self_id    = $request->input('order_id');
         $table_name = 'tms_bill';
         $order_id = json_decode($self_id,true);
         $select = ['self_id','send_shi_name','gather_shi_name','total_money','create_time','update_time','send_sheng_name','send_qu_name',
-            'gather_sheng_name','gather_qu_name'];
+            'gather_sheng_name','gather_qu_name','gather_time'];
         // $self_id = 'car_202101111749191839630920';
         $info = TmsOrder::whereIn('self_id',$order_id)->select($select)->get();
 //        $info = $details->details($self_id,$table_name,$select);
@@ -608,12 +608,13 @@ class BillController extends CommonController {
             ['self_id','=',$self_id],
         ];
         $select=['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
-            'total_user_id','group_code','delete_flag','create_time','default_flag'];
+            'total_user_id','group_code','delete_flag','create_time','default_flag','license'];
 
         $data['info']=TmsCommonBill::where($where)->select($select)->first();
 
         if ($data['info']){
             $data['info']->type_show = $tax_type[$data['info']->type] ??null;
+            $data['info']->license = img_for($data['info']->license,'one');
         }
 
         $msg['code']=200;
