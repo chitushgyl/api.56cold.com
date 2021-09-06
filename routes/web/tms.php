@@ -281,6 +281,7 @@ Route::group([
     });
 
     /** TMS仓库**/
+    Route::any('/warehouse/warehouseList', 'WarehouseController@warehouseList');
     Route::any('/warehouse/warehousePage', 'WarehouseController@warehousePage');
     Route::any('/warehouse/createWarehouse', 'WarehouseController@createWarehouse');
     Route::any('/warehouse/addWarehouse','WarehouseController@addWarehouse');

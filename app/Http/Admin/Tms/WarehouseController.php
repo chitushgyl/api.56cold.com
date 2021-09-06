@@ -1,5 +1,6 @@
 <?php
-namespace App\Http\Aadmin\Tms;
+namespace App\Http\Admin\Tms;
+use App\Http\Controllers\CommonController;
 use App\Models\Tms\TmsWarehouse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -9,7 +10,7 @@ use App\Http\Controllers\StatusController as Status;
 use App\Http\Controllers\DetailsController as Details;
 
 
-class WarehouseController extends Controller{
+class WarehouseController extends CommonController {
     /**
      *仓库列表头部      /tms/warehouse/warehouseList
      * */
