@@ -136,6 +136,8 @@ class BillController extends Controller{
         /** 接收中间件参数**/
         $user_info     = $request->get('user_info');//接收中间件产生的参数
         $project_type       =$request->get('project_type');
+        $tax_type = array_column(config('tms.tax_type'),'name','key');
+        $bill_type = array_column(config('tms.bill_type'),'name','key');
 //        $total_user_id = $user_info->total_user_id;
         /**接收数据*/
         $num           = $request->input('num')??10;
@@ -160,6 +162,15 @@ class BillController extends Controller{
             ->select($select)
             ->get();
         $data['total'] = TmsBill::where($where)->count();
+        foreach ($data['info'] as $key => $value){
+            $value->tax_type_show =  $tax_type[$value->type] ?? null;
+            $value->bill_type_show =  $bill_type[$value->bill_type] ?? null;
+            if ($value->bill_flag == 'Y'){
+                $value->bill_flag_show = '已开票';
+            }else{
+                $value->bill_flag_show = '未开票';
+            }
+        }
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;

@@ -247,11 +247,16 @@ class BillController extends CommonController {
 
         foreach ($data['items'] as $k=>$v) {
             $v->button_info=$button_info;
-            $v->car_possess_show=$tms_car_possess_type[$v->car_possess]??null;
-            $v->tms_control_type_show=$tms_control_type[$v->control]??null;
+            $v->tax_type_show =  $tax_type[$v->type] ?? null;
+            $v->bill_type_show =  $bill_type[$v->bill_type] ?? null;
+            if ($v->bill_flag == 'Y'){
+                $v->bill_flag_show = '已开票';
+            }else{
+                $v->bill_flag_show = '未开票';
+            }
+
         }
-
-
+        
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;
