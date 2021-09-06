@@ -152,7 +152,7 @@ class BillController extends Controller{
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag'];
         $data['info'] = TmsBill::where($where)
             ->offset($firstrow)
             ->limit($listrows)
