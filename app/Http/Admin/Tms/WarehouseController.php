@@ -29,6 +29,7 @@ class WarehouseController extends CommonController {
     public function warehousePage(Request $request){
         $group_info     = $request->get('group_info');//接收中间件产生的参数
         $user_info     = $request->get('user_info');//接收中间件产生的参数
+        $button_info    = $request->get('anniu');//接收中间件产生的参数
         $tms_warehouse_type = array_column(config('tms.tms_warehouse_type'),'name','key');
 
         /**接收数据*/
@@ -118,6 +119,7 @@ class WarehouseController extends CommonController {
                 break;
         }
         foreach ($data['info'] as $k=>$v) {
+            $v->button_info=$button_info;
             $v->rent_type_show = $tms_warehouse_type[$v->wtype] ?? null;
             $v->price = number_format($v->price/100,2);
             $v->store_price = number_format($v->store_price/100,2);
@@ -126,6 +128,7 @@ class WarehouseController extends CommonController {
             $v->property_price = number_format($v->property_price/100,2);
             $v->sorting_price = number_format($v->sorting_price/100,2);
             $v->picture_show = img_for($v->picture,'more');
+
 
         }
         $msg['code'] = 200;
