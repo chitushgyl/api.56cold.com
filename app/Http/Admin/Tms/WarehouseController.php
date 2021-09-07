@@ -128,8 +128,6 @@ class WarehouseController extends CommonController {
             $v->property_price = number_format($v->property_price/100,2);
             $v->sorting_price = number_format($v->sorting_price/100,2);
             $v->picture_show = img_for($v->picture,'more');
-
-
         }
         $msg['code'] = 200;
         $msg['msg']  = "数据拉取成功";
@@ -273,7 +271,7 @@ class WarehouseController extends CommonController {
             $data['property_price']    = $property_price*100;
             $data['sorting_price']     = $sorting_price*100;
             $data['other_price']       = $other_price*100;
-            $data['group_code']        = $group_code;
+            $data['group_code']        = $user_info->group_code;
             $data['picture']           = img_for($picture,'in');
             $data['rent_type']         = $rent_type;
 
