@@ -832,7 +832,7 @@ class BillController extends CommonController {
         $self_id    = $request->input('self_id');
         $table_name = 'tms_common_bill';
         $select     = ['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
-            'total_user_id','group_code','delete_flag','create_time','default_flag'
+            'total_user_id','group_code','delete_flag','create_time','default_flag','special_use'
         ];
         // $self_id='address_202101111755143321983342';
         $info = $details->details($self_id,$table_name,$select);
