@@ -561,7 +561,7 @@ class BillController extends CommonController {
         $where=get_list_where($search);
 
         $select=['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
-            'total_user_id','group_code','delete_flag','create_time','default_flag'];
+            'total_user_id','group_code','delete_flag','create_time','default_flag','special_use'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsCommonBill::where($where)->count(); //总的数据量
