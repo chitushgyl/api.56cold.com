@@ -1138,6 +1138,7 @@ class AlipayController extends Controller{
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
+        return $qr_code_url;
         $res = $this->qrcode($qr_code_url);
         return $res;
         if(!empty($resultCode)&&$resultCode == 10000){
@@ -1160,6 +1161,7 @@ class AlipayController extends Controller{
         $matrixPointSize = 50;//生成图片大小
 //生成二维码图片
         $QrCode = $qrcode->png($value,false,'qrcode.png', $errorCorrectionLevel, $matrixPointSize, 50);
+        dd($QrCode);
         $logo = 'logo.png';//准备好的logo图片
         $QR = 'qrcode.png';//已经生成的原始二维码图
 //        if ($logo !== FALSE) {
@@ -1178,8 +1180,8 @@ class AlipayController extends Controller{
 //                $logo_qr_height, $logo_width, $logo_height);
 //        }
 //输出图片
-        echo $QrCode;
-        imagepng($QrCode, 'payment.png');
+        var_dump($QrCode);
+//        imagepng($QrCode, 'payment.png');
     }
 
 
