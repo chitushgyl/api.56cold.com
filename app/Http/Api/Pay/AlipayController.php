@@ -1077,7 +1077,7 @@ class AlipayController extends Controller{
      * 支付宝扫码支付
      * */
     public function   qrcodeAlipay(Request $request){
-
+        dd(123);
         $config    = config('tms.alipay_config');//引入配置文件参数
 //        $input     = $request->all();
 //        $user_info = $request->get('user_info');//接收中间件产生的参数
