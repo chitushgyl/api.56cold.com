@@ -1178,9 +1178,8 @@ class AlipayController extends Controller{
 //                $logo_qr_height, $logo_width, $logo_height);
 //        }
 //输出图片
-        return $QrCode;
-        imagepng($QR, 'helloweba.png');
-        echo '';
+        echo $QrCode;
+        imagepng($QrCode, 'payment.png');
     }
 
 
