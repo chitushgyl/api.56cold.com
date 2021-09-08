@@ -1189,14 +1189,15 @@ class AlipayController extends Controller{
      * 判断微信端还是支付宝端
      * */
     public function getClientType(Request $request){
+        dd($_SERVER);
         //判断是不是微信
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false ) {
-//            return "您正在使用 微信 扫码";
+            return "您正在使用 微信 扫码";
             $this->nativePay();
         }
         //判断是不是支付宝
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'AlipayClient') !== false) {
-//            return "您正在使用 支付宝 扫码";
+            return "您正在使用 支付宝 扫码";
             $this->qrcodeAlipay();
         }
         //判断是不是QQ
