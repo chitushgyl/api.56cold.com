@@ -1052,7 +1052,6 @@ class AlipayController extends Controller{
      * 微信扫码支付  /alipay/nativePay
      * */
     public function nativePay(){
-        dd(24);
         include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
         include_once base_path('/vendor/wxpay/NativePay.php');
         $notify = new \NativePay;
@@ -1078,7 +1077,6 @@ class AlipayController extends Controller{
      * 支付宝扫码支付
      * */
     public function   qrcodeAlipay(Request $request){
-        dd(123);
         $config    = config('tms.alipay_config');//引入配置文件参数
 //        $input     = $request->all();
 //        $user_info = $request->get('user_info');//接收中间件产生的参数
@@ -1193,12 +1191,12 @@ class AlipayController extends Controller{
         //判断是不是微信
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false ) {
 //            return "您正在使用 微信 扫码";
-            $this->nativePay();
+            return $this->nativePay();
         }
         //判断是不是支付宝
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'AlipayClient') !== false) {
 //            return "您正在使用 支付宝 扫码";
-            $this->qrcodeAlipay();
+            return $this->qrcodeAlipay();
         }
         //判断是不是QQ
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'QQ') !== false) {
