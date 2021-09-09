@@ -1130,10 +1130,10 @@ class AlipayController extends Controller{
 
         $request->setNotifyUrl($notifyurl);
         $request->setBizContent($bizcontent);
-        //这里和普通的接口调用不同，使用的是sdkExecute
-
+        //这里和普通的接口调用不同，使用的是execute
 
         $result = $aop->execute($request);
+        dd($result);
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
