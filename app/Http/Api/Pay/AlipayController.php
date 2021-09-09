@@ -1051,7 +1051,7 @@ class AlipayController extends Controller{
     /**
      * 微信扫码支付  /alipay/nativePay
      * */
-    public function nativePay(){
+    public function nativePay(Request $request){
         include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
         include_once base_path('/vendor/wxpay/NativePay.php');
         $notify = new \NativePay;
