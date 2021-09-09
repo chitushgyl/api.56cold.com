@@ -1152,12 +1152,12 @@ class AlipayController extends Controller{
     /**
      * 生成二维码
      * */
-    public function qrcode($value){
+    public function qrcode(){
          include_once base_path('/vendor/phpqrcode/phpqrcode.php');
 //        include_once base_path('/vendor/wxpay/lib/phpqrcode.php');
         $qrcode = new \QRcode();
         //二维码内容
-//        $value = 'https://api.56cold.com/alipay/getClientType';
+        $value = 'https://api.56cold.com/alipay/getClientType';
         $errorCorrectionLevel = 'H';//容错级别
         $matrixPointSize = 50;//生成图片大小
 //生成二维码图片
