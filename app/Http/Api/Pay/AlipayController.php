@@ -1058,18 +1058,19 @@ class AlipayController extends Controller{
         $input = new \WxPayUnifiedOrder;
         $input->SetBody("订单支付");//商品描述
         $input->SetAttach("123");//设置附加数据，在查询API和支付通知中原样返回
-        $input->SetOut_trade_no('order_45781225856455615');//订单ID
+        $input->SetOut_trade_no('order_4578122585645561500');//订单ID
         $input->SetTotal_fee("1");//支付金额
         $input->SetTime_start(date("YmdHis"));
         $input->SetTime_expire(date("YmdHis", time() + 600));
         $input->SetGoods_tag("test");//设置商品标记，代金券或立减优惠功能的参数 */
-        $input->SetNotify_url("https://api.56cold.com/api/pay/notify");//回调地址
+        $input->SetNotify_url("https://api.56cold.com/alipay/notify");//回调地址
         $input->SetTrade_type("NATIVE");//支付类型
         $input->SetProduct_id("932145678");//商品ID
         $result = $notify->GetPayUrl($input);
         $url = $result["code_url"];
         $res = $this->qrcode($url);
-        exit($res);
+        return $res;
+
     }
 
     /**
@@ -1094,7 +1095,7 @@ class AlipayController extends Controller{
         $user_id = 'user_15615612312454564';
         $price = 0.01;
         $type = 1;
-        $self_id = 'order_2021030909345730773784';
+        $self_id = 'order_2021030909373082733451';
 //         * */
 //        if ($user_info->type == 'user'){
 //            $user_id = $user_info->total_user_id;
@@ -1131,15 +1132,18 @@ class AlipayController extends Controller{
         $request->setBizContent($bizcontent);
         //这里和普通的接口调用不同，使用的是sdkExecute
 
+
         $result = $aop->execute($request);
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
+//        dd($qr_code_url);
         $res = $this->qrcode($qr_code_url);
-        exit($res);
-
+        return $res;
 //        if(!empty($resultCode)&&$resultCode == 10000){
+//            echo "成功";
 //        } else {
+//            echo "失败";
 //        }
     }
 
@@ -1147,38 +1151,44 @@ class AlipayController extends Controller{
      * 生成二维码
      * */
     public function qrcode($value){
-         include_once base_path('/vendor/phpqrcode/phpqrcode.php');
-//        include_once base_path('/vendor/wxpay/lib/phpqrcode.php');
+        include_once base_path('/vendor/phpqrcode/phpqrcode.php');
+//         include_once base_path('/vendor/wxpay/lib/phpqrcode.php');
         $qrcode = new \QRcode();
         //二维码内容
 //        $value = 'https://api.56cold.com/alipay/getClientType';
         $errorCorrectionLevel = 'H';//容错级别
-        $matrixPointSize = 10;//生成图片大小
-//生成二维码图片
-        $QrCode = $qrcode->png($value,false,$errorCorrectionLevel,$matrixPointSize,10,false);
-        return $QrCode;
-        $logo = 'logo.png';//准备好的logo图片
+        $matrixPointSize = 5;//生成图片大小
+        //生成二维码图片
+        $qrcode->png($value,'qrcode.png',$errorCorrectionLevel, $matrixPointSize, 5,false);
+//        return $QrCode;
+        $logo =  base_path('/uploads/logo/logo.png');//准备好的logo图片
         $QR = 'qrcode.png';//已经生成的原始二维码图
-//        if ($logo !== FALSE) {
-//            $QR = imagecreatefromstring(file_get_contents($QR));
-//            $logo = imagecreatefromstring(file_get_contents($logo));
-//            $QR_width = imagesx($QR);//二维码图片宽度
-//            $QR_height = imagesy($QR);//二维码图片高度
-//            $logo_width = imagesx($logo);//logo图片宽度
-//            $logo_height = imagesy($logo);//logo图片高度
-//            $logo_qr_width = $QR_width / 5;
-//            $scale = $logo_width/$logo_qr_width;
-//            $logo_qr_height = $logo_height/$scale;
-//            $from_width = ($QR_width - $logo_qr_width) / 2;
-//            //重新组合图片并调整大小
-//            imagecopyresampled($QR, $logo, $from_width, $from_width, 0, 0, $logo_qr_width,
-//                $logo_qr_height, $logo_width, $logo_height);
-//        }
+        if ($logo !== FALSE) {
+            $QR = imagecreatefromstring(file_get_contents($QR));
+            $logo = imagecreatefromstring(file_get_contents($logo));
+            $QR_width = imagesx($QR);//二维码图片宽度
+            $QR_height = imagesy($QR);//二维码图片高度
+            $logo_width = imagesx($logo);//logo图片宽度
+            $logo_height = imagesy($logo);//logo图片高度
+            $logo_qr_width = $QR_width / 5;
+            $scale = $logo_width/$logo_qr_width;
+            $logo_qr_height = $logo_height/$scale;
+            $from_width = ($QR_width - $logo_qr_width) / 2;
+            //重新组合图片并调整大小
+            imagecopyresampled($QR, $logo, $from_width, $from_width, 0, 0, $logo_qr_width,
+                $logo_qr_height, $logo_width, $logo_height);
+        }
 //输出图片
-        var_dump($QrCode);
-//        imagepng($QrCode, 'payment.png');
-    }
+//        $path = base_path('uploads/qrcode').'/';
+        $path = 'uploads/qrcode/';
+        $filename = $path.date('YmdHis').'.png';
+//        Header("Content-type: image/png");
+//        imagepng($QR);
+        imagepng($QR,$filename);
+//        imagedestroy($QR);
+        return $filename;
 
+    }
 
     /**
      * 判断微信端还是支付宝端
