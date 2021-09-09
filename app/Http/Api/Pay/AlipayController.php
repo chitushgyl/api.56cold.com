@@ -1052,21 +1052,34 @@ class AlipayController extends Controller{
      * 微信扫码支付  /alipay/nativePay
      * */
     public function nativePay(Request $request){
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+//        $input = $request->post();
+        $self_id = $request->input('self_id');//订单ID
+        $price = $request->input('price');//支付金额
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+        $body = '订单支付';
+        $out_trade_no = $self_id;
+        $notify_url = 'https://api.56cold.com/alipay/appWechat_notify';
         include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
         include_once base_path('/vendor/wxpay/NativePay.php');
         $notify = new \NativePay;
-        $input = new \WxPayUnifiedOrder;
-        $input->SetBody("订单支付");//商品描述
-        $input->SetAttach("123");//设置附加数据，在查询API和支付通知中原样返回
-        $input->SetOut_trade_no('order_4578122585645561500');//订单ID
-        $input->SetTotal_fee("1");//支付金额
-        $input->SetTime_start(date("YmdHis"));
-        $input->SetTime_expire(date("YmdHis", time() + 600));
-        $input->SetGoods_tag("test");//设置商品标记，代金券或立减优惠功能的参数 */
-        $input->SetNotify_url("https://api.56cold.com/alipay/notify");//回调地址
-        $input->SetTrade_type("NATIVE");//支付类型
-        $input->SetProduct_id("932145678");//商品ID
-        $result = $notify->GetPayUrl($input);
+        $params = new \WxPayUnifiedOrder;
+        $params->SetBody($body);//商品描述
+        $params->SetAttach($user_id);//设置附加数据，在查询API和支付通知中原样返回
+        $params->SetOut_trade_no($out_trade_no);//订单ID
+        $params->SetTotal_fee($price);//支付金额
+        $params->SetTime_start(date("YmdHis"));
+        $params->SetTime_expire(date("YmdHis", time() + 600));
+        $params->SetGoods_tag("test");//设置商品标记，代金券或立减优惠功能的参数 */
+        $params->SetNotify_url($notify_url);//回调地址
+        $params->SetTrade_type("NATIVE");//支付类型
+        $params->SetProduct_id($out_trade_no);//商品ID
+        $result = $notify->GetPayUrl($params);
         $url = $result["code_url"];
         $res = $this->qrcode($url);
         return 'https://api.56cold.com/'.$res;
@@ -1078,30 +1091,30 @@ class AlipayController extends Controller{
      * */
     public function   qrcodeAlipay(Request $request){
         $config    = config('tms.alipay_config');//引入配置文件参数
-//        $input     = $request->all();
-//        $user_info = $request->get('user_info');//接收中间件产生的参数
-//        $type      = $request->input('type'); // 1  2  3
-//        $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
-//        $self_id   = $request->input('self_id');// 订单ID
-//        $price     = $request->input('price');// 支付金额
-//        $price     = 0.01;
-//        $type      = 3;
-//        if (!$user_info){
-//            $msg['code'] = 401;
-//            $msg['msg']  = '未登录，请完成登录！';
-//            return $msg;
-//        }
-//        /**虚拟数据
+        $input     = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $type      = $request->input('type'); // 1  2  3
+        $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
+        $self_id   = $request->input('self_id');// 订单ID
+        $price     = $request->input('price');// 支付金额
+        $price     = 0.01;
+        $type      = 3;
+        if (!$user_info){
+            $msg['code'] = 401;
+            $msg['msg']  = '未登录，请完成登录！';
+            return $msg;
+        }
+        /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
         $type = 1;
         $self_id = 'order_2021030945673082733451';
-//         * */
-//        if ($user_info->type == 'user'){
-//            $user_id = $user_info->total_user_id;
-//        }else{
-//            $user_id = $user_info->group_code;
-//        }
+         * */
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
 
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         include_once base_path( '/vendor/alipay/aop/request/AlipayTradePrecreateRequest.php');
