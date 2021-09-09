@@ -1068,8 +1068,10 @@ class AlipayController extends Controller{
         $input->SetProduct_id("932145678");//商品ID
         $result = $notify->GetPayUrl($input);
         $url = $result["code_url"];
+        header('location:'.$url);
+//        $qrcode = $this->qrcode($url);
 //        dd($result);
-        return $url;
+//        return $qrcode;
 
     }
 
@@ -1132,16 +1134,16 @@ class AlipayController extends Controller{
         $request->setBizContent($bizcontent);
         //这里和普通的接口调用不同，使用的是sdkExecute
 
-
         $result = $aop->execute($request);
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
-        return $qr_code_url;
-        $res = $this->qrcode($qr_code_url);
-        return $res;
+//        return $qr_code_url;
+
         if(!empty($resultCode)&&$resultCode == 10000){
-            echo "成功";
+            header('location:'.$qr_code_url);
+//            $res = $this->qrcode($qr_code_url);
+//            return $res;
         } else {
             echo "失败";
         }
@@ -1150,12 +1152,12 @@ class AlipayController extends Controller{
     /**
      * 生成二维码
      * */
-    public function qrcode(){
+    public function qrcode($value){
          include_once base_path('/vendor/phpqrcode/phpqrcode.php');
 //        include_once base_path('/vendor/wxpay/lib/phpqrcode.php');
         $qrcode = new \QRcode();
         //二维码内容
-        $value = 'https://api.56cold.com/alipay/getClientType';
+//        $value = 'https://api.56cold.com/alipay/getClientType';
         $errorCorrectionLevel = 'H';//容错级别
         $matrixPointSize = 50;//生成图片大小
 //生成二维码图片
