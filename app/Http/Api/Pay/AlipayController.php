@@ -1069,7 +1069,7 @@ class AlipayController extends Controller{
         $result = $notify->GetPayUrl($input);
         $url = $result["code_url"];
         $res = $this->qrcode($url);
-        return $request->path().'/'.$res;;
+        return 'https://api.56cold.com/'.$res;
 
     }
 
@@ -1139,7 +1139,7 @@ class AlipayController extends Controller{
         $qr_code_url = $result->$responseNode->qr_code;
 //        dd($qr_code_url);
         $res = $this->qrcode($qr_code_url);
-        return $request->path().'/'.$res;
+        return 'https://api.56cold.com/'.$res;
 //        if(!empty($resultCode)&&$resultCode == 10000){
 //            echo "成功";
 //        } else {
