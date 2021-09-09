@@ -1069,7 +1069,7 @@ class AlipayController extends Controller{
         $result = $notify->GetPayUrl($input);
         $url = $result["code_url"];
         $res = $this->qrcode($url);
-        return $res;
+        return $request->path().'/'.$res;;
 
     }
 
@@ -1095,7 +1095,7 @@ class AlipayController extends Controller{
         $user_id = 'user_15615612312454564';
         $price = 0.01;
         $type = 1;
-        $self_id = 'order_2021030909373082733451';
+        $self_id = 'order_2021030945673082733451';
 //         * */
 //        if ($user_info->type == 'user'){
 //            $user_id = $user_info->total_user_id;
@@ -1139,7 +1139,7 @@ class AlipayController extends Controller{
         $qr_code_url = $result->$responseNode->qr_code;
 //        dd($qr_code_url);
         $res = $this->qrcode($qr_code_url);
-        return $res;
+        return $request->path().'/'.$res;
 //        if(!empty($resultCode)&&$resultCode == 10000){
 //            echo "成功";
 //        } else {
