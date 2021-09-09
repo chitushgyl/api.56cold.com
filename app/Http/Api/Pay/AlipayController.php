@@ -1068,6 +1068,7 @@ class AlipayController extends Controller{
         $input->SetProduct_id("932145678");//商品ID
         $result = $notify->GetPayUrl($input);
         $url = $result["code_url"];
+        return $url;
         header('location:'.$url);
 //        $qrcode = $this->qrcode($url);
 //        dd($result);
@@ -1138,7 +1139,7 @@ class AlipayController extends Controller{
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
-//        return $qr_code_url;
+        return $qr_code_url;
 
         if(!empty($resultCode)&&$resultCode == 10000){
             header('location:'.$qr_code_url);
@@ -1190,22 +1191,28 @@ class AlipayController extends Controller{
      * 判断微信端还是支付宝端
      * */
     public function getClientType(Request $request){
-        //判断是不是微信
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false ) {
+            //判断是不是微信
 //            return "您正在使用 微信 扫码";
+            $url = $this->nativePay();
+            dd($url);
             return $this->nativePay();
-        }
-        //判断是不是支付宝
-        if (strpos($_SERVER['HTTP_USER_AGENT'], 'AlipayClient') !== false) {
+        }elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'AlipayClient') !== false) {
+            //判断是不是支付宝
 //            return "您正在使用 支付宝 扫码";
-            return $this->qrcodeAlipay();
-        }
-        //判断是不是QQ
-        if (strpos($_SERVER['HTTP_USER_AGENT'], 'QQ') !== false) {
+            $url = $this->qrcodeAlipay();
+            dd($url);
+        }elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'QQ') !== false) {
+            //判断是不是QQ
 //            return "您正在使用 手机QQ 扫码";
+        }else{
+            //哪个都不是
+            $msg['code'] = 301;
+            $msg['msg']  = '请使用支付宝、QQ、微信扫码';
+            return $msg;
         }
-        //哪个都不是
-        return "请使用支付宝、QQ、微信扫码";
+
+
     }
 
 
