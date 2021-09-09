@@ -1139,6 +1139,7 @@ class AlipayController extends Controller{
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
+        dd($qr_code_url);
         return $qr_code_url;
 
         if(!empty($resultCode)&&$resultCode == 10000){
