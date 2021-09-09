@@ -396,7 +396,7 @@ class BillController extends CommonController {
                 $operationing->access_cause='修改开票信息';
                 $operationing->operation_type='update';
             }else{
-                $data['self_id']          = generate_id('car_');
+                $data['self_id']          = generate_id('bill_');
                 $data['group_code']    = $user_info->group_code;
                 $data['create_time']      = $data['update_time'] = $now_time;
                 $id = TmsBill::insert($data);

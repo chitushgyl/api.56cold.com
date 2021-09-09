@@ -1068,12 +1068,8 @@ class AlipayController extends Controller{
         $input->SetProduct_id("932145678");//商品ID
         $result = $notify->GetPayUrl($input);
         $url = $result["code_url"];
-        return $url;
-        header('location:'.$url);
-//        $qrcode = $this->qrcode($url);
-//        dd($result);
-//        return $qrcode;
-
+        $res = $this->qrcode($url);
+        exit($res);
     }
 
     /**
@@ -1098,7 +1094,7 @@ class AlipayController extends Controller{
         $user_id = 'user_15615612312454564';
         $price = 0.01;
         $type = 1;
-        $self_id = 'order_20210309093730773784';
+        $self_id = 'order_2021030909345730773784';
 //         * */
 //        if ($user_info->type == 'user'){
 //            $user_id = $user_info->total_user_id;
@@ -1139,7 +1135,8 @@ class AlipayController extends Controller{
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
-        return $qr_code_url;
+        $res = $this->qrcode($qr_code_url);
+        exit($res);
 
 //        if(!empty($resultCode)&&$resultCode == 10000){
 //        } else {
@@ -1149,17 +1146,17 @@ class AlipayController extends Controller{
     /**
      * 生成二维码
      * */
-    public function qrcode(){
+    public function qrcode($value){
          include_once base_path('/vendor/phpqrcode/phpqrcode.php');
 //        include_once base_path('/vendor/wxpay/lib/phpqrcode.php');
         $qrcode = new \QRcode();
         //二维码内容
-        $value = 'https://api.56cold.com/alipay/getClientType';
+//        $value = 'https://api.56cold.com/alipay/getClientType';
         $errorCorrectionLevel = 'H';//容错级别
-        $matrixPointSize = 50;//生成图片大小
+        $matrixPointSize = 10;//生成图片大小
 //生成二维码图片
-        $QrCode = $qrcode->png($value,false,'qrcode.png', $errorCorrectionLevel, $matrixPointSize, 50);
-        dd($QrCode);
+        $QrCode = $qrcode->png($value,false,$errorCorrectionLevel,$matrixPointSize,10,false);
+        return $QrCode;
         $logo = 'logo.png';//准备好的logo图片
         $QR = 'qrcode.png';//已经生成的原始二维码图
 //        if ($logo !== FALSE) {
