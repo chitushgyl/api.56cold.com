@@ -1098,7 +1098,7 @@ class AlipayController extends Controller{
         $user_id = 'user_15615612312454564';
         $price = 0.01;
         $type = 1;
-        $self_id = 'order_202103090937308279552773';
+        $self_id = 'order_202103090937308279552773784';
 //         * */
 //        if ($user_info->type == 'user'){
 //            $user_id = $user_info->total_user_id;
@@ -1139,7 +1139,6 @@ class AlipayController extends Controller{
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         $qr_code_url = $result->$responseNode->qr_code;
-        dd($qr_code_url);
         return $qr_code_url;
 
         if(!empty($resultCode)&&$resultCode == 10000){
@@ -1196,12 +1195,13 @@ class AlipayController extends Controller{
             //判断是不是微信
 //            return "您正在使用 微信 扫码";
             $url = $this->nativePay();
+            return $url;
             dd($url);
-            return $this->nativePay();
         }elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'AlipayClient') !== false) {
             //判断是不是支付宝
 //            return "您正在使用 支付宝 扫码";
             $url = $this->qrcodeAlipay();
+            return $url;
             dd($url);
         }elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'QQ') !== false) {
             //判断是不是QQ
