@@ -1082,7 +1082,16 @@ class AlipayController extends Controller{
         $result = $notify->GetPayUrl($params);
         $url = $result["code_url"];
         $res = $this->qrcode($url);
-        return 'https://api.56cold.com/'.$res;
+        if($res){
+            $msg['code'] = 200;
+            $msg['msg'] = '请求成功';
+            $msg['data'] = 'https://api.56cold.com/'.$res;
+            return $msg;
+        }else{
+            $msg['code'] = 301;
+            $msg['msg'] = '请求失败，请刷新重试';
+            return $msg;
+        }
 
     }
 
@@ -1150,7 +1159,16 @@ class AlipayController extends Controller{
         $qr_code_url = $result->$responseNode->qr_code;
 //        dd($qr_code_url);
         $res = $this->qrcode($qr_code_url);
-        return 'https://api.56cold.com/'.$res;
+        if($res){
+            $msg['code'] = 200;
+            $msg['msg'] = '请求成功';
+            $msg['data'] = 'https://api.56cold.com/'.$res;
+            return $msg;
+        }else{
+            $msg['code'] = 301;
+            $msg['msg'] = '请求失败，请刷新重试';
+            return $msg;
+        }
     }
 
     /**
