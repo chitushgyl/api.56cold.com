@@ -427,9 +427,9 @@ class DispatchController extends CommonController{
 //                    if ($value->receipt_flag == 'Y'){
 //                        $value->button  = $button5;
 //                    }
-                    if ($value->receipt_flag == 'Y'){
-                        $value->button  = [];
-                    }
+//                    if ($value->receipt_flag == 'Y'){
+//                        $value->button  = [];
+//                    }
 
                 }
 

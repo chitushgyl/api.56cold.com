@@ -474,9 +474,9 @@ class TakeController extends Controller{
 //                        if ($v->receipt_flag == 'Y'){
 //                            $v->button  = $button4;
 //                        }
-                        if ($v->receipt_flag == 'Y'){
-                            $v->button  = [];
-                        }
+//                        if ($v->receipt_flag == 'Y'){
+//                            $v->button  = [];
+//                        }
 
                     }
                     break;
