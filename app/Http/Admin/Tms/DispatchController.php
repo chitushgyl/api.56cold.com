@@ -362,6 +362,8 @@ class DispatchController extends CommonController{
                 $button3 = [];
                 $button4 = [];
                 $button5 = [];
+                $button6 = [];
+                $button7 = [];
                 foreach ($buttonInfo as $kk =>$vv){
                     if ($vv->id == 129){
                         $button1[] = $vv;
@@ -378,6 +380,7 @@ class DispatchController extends CommonController{
                     }
                     if ($vv->id == 127){
                         $button4[] = $vv;
+                        $button6[] = $vv;
                     }
                     if ($vv->id == 143){
                         $button5[] = $vv;
@@ -385,6 +388,12 @@ class DispatchController extends CommonController{
                     if ($vv->id == 145){
                         $button3[] = $vv;
                     }
+                    if ($vv->id == 228){
+                        $button6[] = $vv;
+                        $button7[] = $vv;
+                    }
+
+
                     if ($value->order_status == 3){
                         if ($value->order_type == 'vehicle'){
                             if ($value->group_code == $value->receiver_id || $value->receiver_id == $value->total_user_id){
@@ -403,8 +412,17 @@ class DispatchController extends CommonController{
                     if ($value->order_status == 5){
                         $value->button  = $button4;
                     }
+                    if ($value->order_status == 5 && $value->receipt_flag == 'N' && $value->pay_type == 'offline' && $value->pay_status == 'N'){
+                        $value->button = $button6;
+                    }
+                    if ($value->order_status == 5 && $value->receipt_flag == 'Y' && $value->pay_type == 'offline' && $value->pay_status == 'N'){
+                        $value->button = $button6;
+                    }
                     if ($value->order_status == 6){
                         $value->button  = $button4;
+                    }
+                    if ($value->order_status == 6  && $value->pay_type == 'offline' && $value->pay_status == 'N'){
+                        $value->button = $button7;
                     }
 //                    if ($value->receipt_flag == 'Y'){
 //                        $value->button  = $button5;

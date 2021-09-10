@@ -424,6 +424,8 @@ class TakeController extends Controller{
             $button2 = [];
             $button3 = [];
             $button4 = [];
+            $button5 = [];
+            $button6 = [];
             switch ($project_type){
                 case 'carriage':
                     foreach ($button_info as $key => $value){
@@ -436,14 +438,20 @@ class TakeController extends Controller{
                         if ($value->id == 122){
                             $button2[] = $value;
                         }
+//                        if ($value->id == 123){
+//                            $button2[] = $value;
+//                        }
                         if ($value->id == 123){
                             $button2[] = $value;
-                        }
-                        if ($value->id == 123){
                             $button3[] = $value;
+                            $button5[] = $value;
                         }
                         if ($value->id == 142){
                             $button4[] = $value;
+                        }
+                        if ($value->id == 229){
+                            $button5[] = $value;
+                            $button6[] = $value;
                         }
                         if ($v->order_status == 2 || $v->order_status == 3){
                             $v->button  = $button1;
@@ -453,6 +461,15 @@ class TakeController extends Controller{
                         }
                         if ($v->order_status == 5){
                             $v->button  = $button3;
+                        }
+                        if ($v->order_status == 5 && $v->receipt_flag == 'N' && $v->pay_type == 'offline' && $v->pay_status == 'N'){
+                            $v->button = $button5;
+                        }
+                        if ($v->order_status == 5 && $v->receipt_flag == 'Y' && $v->pay_type == 'offline' && $v->pay_status == 'N'){
+                            $v->button = $button6;
+                        }
+                        if ($v->order_status == 6  && $v->pay_type == 'offline' && $v->pay_status == 'N'){
+                            $v->button = $button6;
                         }
 //                        if ($v->receipt_flag == 'Y'){
 //                            $v->button  = $button4;
