@@ -1064,7 +1064,7 @@ class AlipayController extends Controller{
         }
         $body = '订单支付';
         $out_trade_no = $self_id;
-        $notify_url = 'https://api.56cold.com/alipay/appWechat_notify';
+        $notify_url = 'https://api.56cold.com/alipay/paymentWechatNotify';
         include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
         include_once base_path('/vendor/wxpay/NativePay.php');
         $notify = new \NativePay;
@@ -1138,7 +1138,7 @@ class AlipayController extends Controller{
         $aop->signType = $config['sign_type'];
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "https://api.56cold.com/alipay/appAlipay_notify";
+        $notifyurl = "https://api.56cold.com/alipay/paymentAlipayNotify";
 
         $aop->alipayrsaPublicKey = $config['alipay_public_key'];
         $bizcontent = json_encode([
