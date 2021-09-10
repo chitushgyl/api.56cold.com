@@ -287,6 +287,7 @@ Route::group([
     Route::any('/warehouse/warehouseUseFlag','WarehouseController@warehouseUseFlag');
     Route::any('/warehouse/warehouseDelFlag','WarehouseController@warehouseDelFlag');
     Route::any('/warehouse/details','WarehouseController@details');
+    Route::any('/warehouse/import', 'WarehouseController@import');
     Route::group([
         "middleware"=>['daily'],
     ], function(){

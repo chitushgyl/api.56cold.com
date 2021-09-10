@@ -1,13 +1,18 @@
 <?php
 namespace App\Http\Admin\Tms;
 use App\Http\Controllers\CommonController;
+use App\Models\SysAddress;
+use App\Models\Tms\TmsAddressContact;
+use App\Models\Tms\TmsGroup;
 use App\Models\Tms\TmsWarehouse;
+use App\Tools\Import;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\StatusController as Status;
 use App\Http\Controllers\DetailsController as Details;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class WarehouseController extends CommonController {
@@ -17,7 +22,12 @@ class WarehouseController extends CommonController {
     public function  warehouseList(Request $request){
         $data['page_info']      =config('page.listrows');
         $data['button_info']    =$request->get('anniu');
-
+        $abc='仓库';
+        $data['import_info']    =[
+            'import_text'=>'下载'.$abc.'导入示例文件',
+            'import_color'=>'#FC5854',
+            'import_url'=>config('aliyun.oss.url').'execl/2020-07-02/TMS仓库导入文件范本.xlsx',
+        ];
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;
@@ -439,6 +449,236 @@ class WarehouseController extends CommonController {
         }else{
             $msg['code'] = 300;
             $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
+    }
+
+    /**
+     * 导入仓库 /tms/warehouse/import
+     * */
+    public function import(Request $request){
+        $table_name         ='tms_address_contact';
+        $now_time           = date('Y-m-d H:i:s', time());
+
+        $operationing       = $request->get('operationing');//接收中间件产生的参数
+        $operationing->access_cause     ='导入创建仓库';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='import';
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+
+
+        /** 接收数据*/
+        $input              =$request->all();
+        $importurl          =$request->input('importurl');
+        $company_id         =$request->input('company_id');
+        $file_id            =$request->input('file_id');
+        //
+        /****虚拟数据
+        $input['importurl']     =$importurl="uploads/import/TMS仓库导入文件范本.xlsx";
+        $input['company_id']       =$company_id='group_202012291153523141320375';
+         ***/
+        $rules = [
+            'company_id' => 'required',
+            'importurl' => 'required',
+        ];
+        $message = [
+            'company_id.required' => '请选择业务公司',
+            'importurl.required' => '请上传文件',
+        ];
+        $validator = Validator::make($input, $rules, $message);
+        if ($validator->passes()) {
+
+            /**发起二次效验，1效验文件是不是存在， 2效验文件中是不是有数据 3,本身数据是不是重复！！！* */
+            if (!file_exists($importurl)) {
+                $msg['code'] = 301;
+                $msg['msg'] = '文件不存在';
+                return $msg;
+            }
+
+            $res = Excel::toArray((new Import),$importurl);
+            //dump($res);
+            $info_check=[];
+            if(array_key_exists('0', $res)){
+                $info_check=$res[0];
+            }
+
+            //dump($info_check);
+
+            /**  定义一个数组，需要的数据和必须填写的项目
+            键 是EXECL顶部文字，
+             * 第一个位置是不是必填项目    Y为必填，N为不必须，
+             * 第二个位置是不是允许重复，  Y为允许重复，N为不允许重复
+             * 第三个位置为长度判断
+             * 第四个位置为数据库的对应字段
+             */
+            $shuzu=[
+                '仓库名称' =>['Y','Y','64','warehouse_name'],
+                '省份' =>['Y','Y','64','pro'],
+                '城市' =>['Y','Y','64','city'],
+                '区县' =>['Y','Y','64','area'],
+                '详细地址' =>['Y','Y','64','address'],
+                '联系人' =>['Y','Y','64','contact'],
+                '联系电话' =>['Y','Y','64','tel'],
+                '面积' =>['Y','Y','64','areanumber'],
+                '仓库类型' =>['Y','Y','64','wtype'],
+                '存储费' =>['N','Y','64','store_price'],
+                '租金' =>['N','Y','64','area_price'],
+                '操作费' =>['N','Y','64','handle_price'],
+                '物业费' =>['N','Y','64','property_price'],
+                '分拣费' =>['N','Y','64','sorting_price'],
+                '仓库描述' =>['N','Y','64','describe'],
+                '备注' =>['N','Y','64','remark'],
+            ];
+            $ret=arr_check($shuzu,$info_check);
+
+
+            // dump($ret);
+            if($ret['cando'] == 'N'){
+                $msg['code'] = 304;
+                $msg['msg'] = $ret['msg'];
+                return $msg;
+            }
+
+            $info_wait=$ret['new_array'];
+            $where_check=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$company_id],
+            ];
+
+            $info= TmsGroup::where($where_check)->select('self_id','company_name','group_code','group_name')->first();
+            // dd($info->toArray());
+            if(empty($info)){
+                $msg['code'] = 305;
+                $msg['msg'] = '业务公司不存在';
+                return $msg;
+            }
+
+//            dd($info);
+            /** 二次效验结束**/
+
+            $datalist=[];       //初始化数组为空
+            $cando='Y';         //错误数据的标记
+            $strs='';           //错误提示的信息拼接  当有错误信息的时候，将$cando设定为N，就是不允许执行数据库操作
+            $abcd=0;            //初始化为0     当有错误则加1，页面显示的错误条数不能超过$errorNum 防止页面显示不全1
+            $errorNum=50;       //控制错误数据的条数
+            $a=2;
+
+            // dump($info_wait);
+            /** 现在开始处理$car***/
+            foreach($info_wait as $k => $v){
+
+//                $where_address=[
+//                    ['name','=',$v['qu_name']],
+//                    ['level','=',3],
+//                ];
+//
+//                $where_address2=[
+//                    ['name','=',$v['shi_name']],
+//                    ['level','=',2],
+//                ];
+//                $where_address3=[
+//                    ['name','=',$v['sheng_name']],
+//                    ['level','=',1],
+//                ];
+//
+//                $selectMenu=['id','name','parent_id'];
+//                $address_info=SysAddress::with(['sysAddress' => function($query)use($selectMenu,$where_address2,$where_address3) {
+//                    $query->where($where_address2);
+//                    $query->select($selectMenu);
+//                    $query->with(['sysAddress' => function($query)use($selectMenu,$where_address3) {
+//                        $query->where($where_address3);
+//                        $query->select($selectMenu);
+//                    }]);
+//                }])->where($where_address)->select($selectMenu)->first();
+//
+//                if(empty($address_info)){
+//                    if($abcd<$errorNum){
+//                        $strs .= '数据中的第'.$a."行区不存在".'</br>';
+//                        $cando='N';
+//                        $abcd++;
+//                    }
+//                }else{
+//                    if(empty($address_info->sysAddress)){
+//                        if($abcd<$errorNum){
+//                            $strs .= '数据中的第'.$a."行市不存在".'</br>';
+//                            $cando='N';
+//                            $abcd++;
+//                        }
+//                    }else{
+//                        if(empty($address_info->sysAddress->sysAddress)){
+//                            if($abcd<$errorNum){
+//                                $strs .= '数据中的第'.$a."行省不存在".'</br>';
+//                                $cando='N';
+//                                $abcd++;
+//                            }
+//                        }
+//                    }
+//                }
+//                $location = bd_location(2,$v['sheng_name'],$v['shi_name'],$v['qu_name'],$v['address']);
+                // dump($cando);
+                $list=[];
+                if($cando =='Y'){
+                    $list['self_id']            =generate_id('warehouse_');
+                    $list['pro']                = $v['pro'];
+                    $list['city']               = $v['city'];
+                    $list['area']               = $v['area'];
+                    $list['address']            = $v['address'];
+                    $list['all_address']        = $v['pro'].$v['city'].$v['area'].$v['address'];
+                    $list['contact']            = $v['contact'];
+                    $list['tel']                = $v['tel'];
+                    $list['group_code']         = $info->group_code;
+                    $list['group_name']         = $info->group_name;
+                    $list['create_time']        = $list['update_time']=$now_time;
+                    $list['areanumber']         = $v['areanumber'];
+                    $list['wtype']              = $v['wtype'];
+                    $list['store_price']        = $v['store_price'];
+                    $list['area_price']         = $v['area_price'];
+                    $list['handle_price']       = $v['handle_price'];
+                    $list['property_price']     = $v['property_price'];
+                    $list['sorting_price']      = $v['sorting_price'];
+                    $list['describe']           = $v['describe'];
+                    $list['remark']             = $v['remark'];
+                    $datalist[]=$list;
+                }
+                $a++;
+
+            }
+
+            $operationing->new_info=$datalist;
+
+            //dump($operationing);
+            // dd($datalist);
+
+            if($cando == 'N'){
+                $msg['code'] = 306;
+                $msg['msg'] = $strs;
+                return $msg;
+            }
+            $count=count($datalist);
+            $id= TmsWarehouse::insert($datalist);
+
+            if($id){
+                $msg['code']=200;
+                /** 告诉用户，你一共导入了多少条数据，其中比如插入了多少条，修改了多少条！！！*/
+                $msg['msg']='操作成功，您一共导入'.$count.'条数据';
+
+                return $msg;
+            }else{
+                $msg['code']=307;
+                $msg['msg']='操作失败';
+                return $msg;
+            }
+        }else{
+            $erro = $validator->errors()->all();
+            $msg['msg'] = null;
+            foreach ($erro as $k => $v) {
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            $msg['code'] = 300;
             return $msg;
         }
     }
