@@ -385,6 +385,7 @@ class BillController extends Controller{
             foreach ($info as $k =>$v){
                 $v->total_money = number_format($v->total_money/100,2);
                 $v->on_line_money = number_format($v->on_line_money/100,2);
+                $v->order_id_show = substr($v->self_id,15);
             }
 
             $data['info'] = $info;

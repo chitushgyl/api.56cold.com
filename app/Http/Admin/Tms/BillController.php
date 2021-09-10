@@ -506,6 +506,7 @@ class BillController extends CommonController {
             /** 如果需要对数据进行处理，请自行在下面对 $info 进行处理工作*/
             foreach ($info as $k =>$v){
                 $v->total_money = number_format($v->total_money/100,2);
+                $v->order_id_show = substr($v->self_id,15);
 //                $v->on_line_money = number_format($v->on_line_money/100,2);
             }
 
