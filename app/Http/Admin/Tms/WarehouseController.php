@@ -457,7 +457,7 @@ class WarehouseController extends CommonController {
      * 导入仓库 /tms/warehouse/import
      * */
     public function import(Request $request){
-        $table_name         ='tms_address_contact';
+        $table_name         ='tms_warehouse';
         $now_time           = date('Y-m-d H:i:s', time());
 
         $operationing       = $request->get('operationing');//接收中间件产生的参数
