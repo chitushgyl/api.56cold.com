@@ -576,7 +576,7 @@ class BillController extends CommonController {
         $where=get_list_where($search);
 
         $select=['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
-            'total_user_id','group_code','delete_flag','create_time','default_flag','special_use'];
+            'total_user_id','group_code','delete_flag','create_time','default_flag','special_use','use_flag'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsCommonBill::where($where)->count(); //总的数据量
@@ -868,9 +868,30 @@ class BillController extends CommonController {
     }
 
     /**
+     * 发票抬头专票认证头部
+     * */
+    public function billTitleList(Request $request){
+
+    }
+
+    /**
      * 发票抬头专票认证
      * */
     public function billTitlePage(Request $request){
+
+    }
+
+    /**
+     * 认证通过
+     * */
+    public function billSuccess(Request $request){
+
+    }
+
+    /**
+     * 认证失败
+     * */
+    public function billFail(Request $request){
 
     }
 
