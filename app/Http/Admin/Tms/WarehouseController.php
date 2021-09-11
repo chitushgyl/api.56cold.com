@@ -155,8 +155,8 @@ class WarehouseController extends CommonController {
             $v->property_price = number_format($v->property_price/100,2);
             $v->sorting_price = number_format($v->sorting_price/100,2);
             $v->picture_show = img_for($v->picture,'more');
-            if ($v->systemGroup){
-                $v->group_name_show = $v->systemGroup->group_name;
+            if ($v->SystemGroup){
+                $v->group_name_show = $v->SystemGroup->group_name;
             }
         }
         $msg['code'] = 200;
