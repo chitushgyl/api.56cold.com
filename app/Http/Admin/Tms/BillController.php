@@ -721,7 +721,7 @@ class BillController extends CommonController {
             $data['company_address']     = $company_address;
             $data['company_tel']         = $company_tel;
             $data['special_use']         = $special_use;
-            $data['license']             = $license;
+            $data['license']             = img_for($license,'in');
             $data['default_flag']        = $default_flag;
 
             $wheres['self_id'] = $self_id;
