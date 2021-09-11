@@ -218,7 +218,7 @@ class BillController extends CommonController {
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag','repeat_flag'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsBill::where($where)->count(); //总的数据量
@@ -255,6 +255,18 @@ class BillController extends CommonController {
                 $v->bill_flag_show = '已开票';
             }else{
                 $v->bill_flag_show = '未开票';
+            }
+
+            $button1 = [];
+            foreach ($button_info as $key => $value){
+                if ($value->id == 231 ){
+                    $button1[] = $value;
+                }
+                if ($v->repeat_flag == 'N'){
+                    $v->button = $button1;
+                }else{
+                    $v->button = [];
+                }
             }
 
         }
@@ -392,6 +404,7 @@ class BillController extends CommonController {
 
             if($old_info){
                 $data['update_time'] = $now_time;
+                $data['repeat_flag'] = 'Y';
                 $id = TmsBill::where($wheres)->update($data);
 
                 $operationing->access_cause='修改开票信息';
@@ -853,6 +866,14 @@ class BillController extends CommonController {
             return $msg;
         }
     }
+
+    /**
+     * 发票抬头专票认证
+     * */
+    public function billTitlePage(Request $request){
+
+    }
+
 
 
 

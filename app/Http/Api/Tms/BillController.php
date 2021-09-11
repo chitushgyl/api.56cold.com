@@ -136,6 +136,7 @@ class BillController extends Controller{
         /** 接收中间件参数**/
         $user_info     = $request->get('user_info');//接收中间件产生的参数
         $project_type       =$request->get('project_type');
+        $button_info =     $request->get('buttonInfo');
         $tax_type = array_column(config('tms.tax_type'),'name','key');
         $bill_type = array_column(config('tms.bill_type'),'name','key');
 //        $total_user_id = $user_info->total_user_id;
@@ -154,7 +155,7 @@ class BillController extends Controller{
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag','repeat_flag'];
         $data['info'] = TmsBill::where($where)
             ->offset($firstrow)
             ->limit($listrows)
@@ -169,6 +170,17 @@ class BillController extends Controller{
                 $value->bill_flag_show = '已开票';
             }else{
                 $value->bill_flag_show = '未开票';
+            }
+            $button1 = [];
+            foreach ($button_info as $k => $v){
+                if ($v->id == 231 ){
+                    $button1[] = $v;
+                }
+                if ($value->repeat_flag == 'N'){
+                    $value->button = $button1;
+                }else{
+                    $value->button = [];
+                }
             }
         }
         $msg['code']=200;
@@ -286,6 +298,7 @@ class BillController extends Controller{
 
             if($old_info){
                 $data['update_time'] = $now_time;
+                $data['repeat_flag'] = 'Y';
                 $id = TmsBill::where($wheres)->update($data);
 
             }else{
