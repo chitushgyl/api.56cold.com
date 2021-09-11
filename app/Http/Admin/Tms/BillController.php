@@ -952,9 +952,9 @@ class BillController extends CommonController {
         foreach ($data['items'] as $k=>$v) {
             $v->button_info=$button_info;
             $v->type_show = $tax_type[$v->type]??null;
-            if ($v->state == 'W'){
+            if ($v->special_use == 'W'){
                 $v->button_info=$button_info2;
-            }elseif($v->state == 'Y'){
+            }elseif($v->special_use == 'Y'){
                 $v->button_info=$button_info1;
             }else{
                 $v->button_info=$button_info1;
