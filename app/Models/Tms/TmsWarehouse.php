@@ -54,7 +54,7 @@ class TmsWarehouse extends Model{
     public function SystemGroup(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
-        return $this->hasOne('App\Models\Group\SystemGroup','group_code','self_id');
+        return $this->hasOne('App\Models\Group\SystemGroup','self_id','group_code');
     }
 
 
