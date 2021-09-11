@@ -616,7 +616,7 @@ class BillController extends CommonController {
             ['self_id','=',$self_id],
         ];
         $select=['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
-            'total_user_id','group_code','delete_flag','create_time','default_flag','license'];
+            'total_user_id','group_code','delete_flag','create_time','default_flag','license','use_flag','delete_flag'];
 
         $data['info']=TmsCommonBill::where($where)->select($select)->first();
 
@@ -768,10 +768,11 @@ class BillController extends CommonController {
         $operationing = $request->get('operationing');//接收中间件产生的参数
         $table_name='tms_common_bill';
         $self_id=$request->input('self_id');
+        $use_flag=$request->input('use_flag');
         $flag='use_flag';
 //        $self_id='address_202103011352018133677963';
         $old_info = TmsCommonBill::where('self_id',$self_id)->select('group_code','use_flag','delete_flag','update_time')->first();
-        $update['use_flag'] = 'N';
+        $update['use_flag'] = $use_flag;
         $update['update_time'] = $now_time;
         $id = TmsCommonBill::where('self_id',$self_id)->update($update);
 

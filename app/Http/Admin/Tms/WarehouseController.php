@@ -80,11 +80,14 @@ class WarehouseController extends CommonController {
         $where = get_list_where($search);
         $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
             'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
-
+        $select2 = ['self_id','group_name'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsWarehouse::where($where)->count(); //总的数据量
-                $data['info'] = TmsWarehouse::where($where)
+                $data['info'] = TmsWarehouse::with(['SystemGroup' => function($query) use($select2){
+                    $query->select($select2);
+                }])
+                    ->where($where)
                     ->offset($firstrow)
                     ->limit($listrows);
 
@@ -103,7 +106,10 @@ class WarehouseController extends CommonController {
             case 'one':
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=TmsWarehouse::where($where)->count(); //总的数据量
-                $data['info'] = TmsWarehouse::where($where)
+                $data['info'] = TmsWarehouse::with(['SystemGroup' => function($query) use($select2){
+                    $query->select($select2);
+                }])
+                    ->where($where)
                     ->offset($firstrow)
                     ->limit($listrows);
 
@@ -121,7 +127,10 @@ class WarehouseController extends CommonController {
 
             case 'more':
                 $data['total']=TmsWarehouse::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
-                $data['info'] = TmsWarehouse::where($where)
+                $data['info'] = TmsWarehouse::with(['SystemGroup' => function($query) use($select2){
+                    $query->select($select2);
+                }])
+                    ->where($where)
                     ->offset($firstrow)
                     ->limit($listrows);
                 if ($area_price == 1){
@@ -146,6 +155,9 @@ class WarehouseController extends CommonController {
             $v->property_price = number_format($v->property_price/100,2);
             $v->sorting_price = number_format($v->sorting_price/100,2);
             $v->picture_show = img_for($v->picture,'more');
+            if ($v->systemGroup){
+                $v->group_name_show = $v->systemGroup->group_name;
+            }
         }
         $msg['code'] = 200;
         $msg['msg']  = "数据拉取成功";
