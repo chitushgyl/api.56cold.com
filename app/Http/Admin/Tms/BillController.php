@@ -901,7 +901,7 @@ class BillController extends CommonController {
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ['type'=>'all','name'=>'use_flag','value'=>$use_flag],
             ['type'=>'=','name'=>'group_code','value'=>$group_code],
-            ['type'=>'=','name'=>'special_use','value'=>'W'],
+            ['type'=>'!=','name'=>'special_use','value'=>'N'],
         ];
         $where=get_list_where($search);
 
@@ -934,10 +934,31 @@ class BillController extends CommonController {
                 break;
         }
 
-
+        $button_info1=[];
+        $button_info2=[];
+        foreach ($button_info as $key => $value){
+//            dump($v);
+            if($value->id==738){
+                $button_info2[]=$value;
+            }
+            if($value->id==737){
+                $button_info2[]=$value;
+            }
+            if($value->id==739){
+                $button_info1[]=$value;
+                $button_info2[]=$value;
+            }
+        }
         foreach ($data['items'] as $k=>$v) {
             $v->button_info=$button_info;
             $v->type_show = $tax_type[$v->type]??null;
+            if ($v->state == 'W'){
+                $v->button_info=$button_info2;
+            }elseif($v->state == 'Y'){
+                $v->button_info=$button_info1;
+            }else{
+                $v->button_info=$button_info1;
+            }
         }
 
         $msg['code']=200;
