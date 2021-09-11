@@ -868,31 +868,117 @@ class BillController extends CommonController {
     }
 
     /**
-     * 发票抬头专票认证头部
+     * 发票抬头专票认证头部 /tms/bill/billTitleList
      * */
     public function billTitleList(Request $request){
+        $data['page_info']      =config('page.listrows');
+        $data['button_info']    =$request->get('anniu');
 
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
     }
 
     /**
-     * 发票抬头专票认证
+     * 发票抬头专票认证 /tms/bill/billTitlePage
      * */
     public function billTitlePage(Request $request){
+        /** 接收中间件参数**/
+        $group_info     = $request->get('group_info');//接收中间件产生的参数
+        $button_info    = $request->get('anniu');//接收中间件产生的参数
+        $tax_type = array_column(config('tms.tax_type'),'name','key');
 
+        /**接收数据*/
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
+        $use_flag       =$request->input('use_flag');
+        $group_code     =$request->input('group_code');
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
+
+        $search=[
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
+            ['type'=>'all','name'=>'use_flag','value'=>$use_flag],
+            ['type'=>'=','name'=>'group_code','value'=>$group_code],
+            ['type'=>'=','name'=>'special_use','value'=>'W'],
+        ];
+        $where=get_list_where($search);
+
+        $select=['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
+            'total_user_id','group_code','delete_flag','create_time','default_flag','special_use','use_flag'];
+        switch ($group_info['group_id']){
+            case 'all':
+                $data['total']=TmsCommonBill::where($where)->count(); //总的数据量
+                $data['items']=TmsCommonBill::where($where)
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='Y';
+                break;
+
+            case 'one':
+                $where[]=['group_code','=',$group_info['group_code']];
+                $data['total']=TmsCommonBill::where($where)->count(); //总的数据量
+                $data['items']=TmsCommonBill::where($where)
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='N';
+                break;
+
+            case 'more':
+                $data['total']=TmsCommonBill::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
+                $data['items']=TmsCommonBill::where($where)->whereIn('group_code',$group_info['group_code'])
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='Y';
+                break;
+        }
+
+
+        foreach ($data['items'] as $k=>$v) {
+            $v->button_info=$button_info;
+            $v->type_show = $tax_type[$v->type]??null;
+        }
+
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
     }
 
     /**
-     * 认证通过
+     * 认证通过 /tms/bill/billSuccess
      * */
     public function billSuccess(Request $request){
+        $now_time=date('Y-m-d H:i:s',time());
+        $operationing = $request->get('operationing');//接收中间件产生的参数
+        $table_name='tms_common_bill';
+        $self_id=$request->input('self_id');
+        $special_use=$request->input('special_use');
+        $flag='use_flag';
+//        $self_id='address_202103011352018133677963';
+        $old_info = TmsCommonBill::where('self_id',$self_id)->select('group_code','use_flag','delete_flag','update_time')->first();
+        $update['special_use'] = $special_use;
+        $update['update_time'] = $now_time;
+        $id = TmsCommonBill::where('self_id',$self_id)->update($update);
 
-    }
+        $operationing->access_cause='启用/禁用';
+        $operationing->table=$table_name;
+        $operationing->table_id=$self_id;
+        $operationing->now_time=$now_time;
+        $operationing->old_info=$old_info;
+        $operationing->new_info=(object)$update;
+        $operationing->operation_type=$flag;
+        if($id){
+            $msg['code']=200;
+            $msg['msg']='操作成功！';
+            $msg['data']=(object)$update;
+        }else{
+            $msg['code']=300;
+            $msg['msg']='操作失败！';
+        }
 
-    /**
-     * 认证失败
-     * */
-    public function billFail(Request $request){
-
+        return $msg;
     }
 
 

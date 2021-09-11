@@ -273,6 +273,9 @@ Route::group([
     Route::any('/bill/useCommonBill','BillController@useCommonBill');
     Route::any('/bill/delCommonBill','BillController@delCommonBill');
     Route::any('/bill/billDetails','BillController@billDetails');
+    Route::any('/bill/billTitleList','BillController@billTitleList');
+    Route::any('/bill/billTitlePage','BillController@billTitlePage');
+    Route::any('/bill/billSuccess','BillController@billSuccess');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
