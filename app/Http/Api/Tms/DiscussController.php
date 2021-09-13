@@ -35,7 +35,15 @@ class DiscussController extends CommonController{
 
         $select=['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
             'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell'];
-        $data['info'] = TmsDiscuss::where($where)
+        $select1 = ['self_id','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
+        $select2 = ['self_id','shift_number','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
+        $data['info'] = TmsDiscuss::with(['TmsOrder' => function($query) use($select1){
+            $query->select($select1);
+        }])
+            ->with(['TmsLine' => function($query) use($select2){
+                $query->select($select2);
+            }])
+            ->where($where)
             ->offset($firstrow)
             ->limit($listrows)
             ->orderBy('create_time', 'desc')
@@ -108,22 +116,22 @@ class DiscussController extends CommonController{
 
         /*** 虚拟数据
          $input['self_id']           =$self_id       ='';
-         $input['order_id']          =$order_id      ='';
+         $input['order_id']          =$order_id      ='order_';
          $input['type']              =$type          ='vehicle';
-         $input['content']           =$content       ='';
+         $input['content']           =$content       ='一点不专业';
          $input['line_id']           =$line_id       ='';
-         $input['anonymous']         =$anonymous     ='';
-         $input['score']             =$score         ='';
+         $input['anonymous']         =$anonymous     ='Y';
+         $input['score']             =$score         ='2';
          $input['follow_discuss']    =$follow_discuss='';
-         $input['follow_flag']       =$follow_flag   ='';
+         $input['follow_flag']       =$follow_flag   ='N';
          $input['images']            =$images        ='';
-         $input['total_user_id']     =$total_user_id ='';
-         $input['on_time']           =$on_time       ='';
-         $input['neat']              =$neat          ='';
-         $input['fast']              =$fast          ='';
-         $input['condition']         =$condition     ='';
-         $input['temperture']        =$temperture    ='';
-         $input['car_smell']         =$car_smell     ='';
+         $input['total_user_id']     =$total_user_id ='user_';
+         $input['on_time']           =$on_time       ='N';
+         $input['neat']              =$neat          ='N';
+         $input['fast']              =$fast          ='N';
+         $input['condition']         =$condition     ='N';
+         $input['temperture']        =$temperture    ='N';
+         $input['car_smell']         =$car_smell     ='N';
 
          **/
          $rules = [
