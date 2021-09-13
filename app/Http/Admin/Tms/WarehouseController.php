@@ -535,13 +535,13 @@ class WarehouseController extends CommonController {
                 '详细地址' =>['Y','Y','64','address'],
                 '联系人' =>['Y','Y','64','contact'],
                 '联系电话' =>['Y','Y','64','tel'],
-                '面积' =>['Y','Y','64','areanumber'],
+                '面积(m²)' =>['Y','Y','64','areanumber'],
                 '仓库类型' =>['Y','Y','64','wtype'],
-                '存储费' =>['N','Y','64','store_price'],
-                '租金' =>['N','Y','64','area_price'],
-                '操作费' =>['N','Y','64','handle_price'],
-                '物业费' =>['N','Y','64','property_price'],
-                '分拣费' =>['N','Y','64','sorting_price'],
+                '存储费(元/吨)' =>['N','Y','64','store_price'],
+                '租金(元/m²/天)' =>['N','Y','64','area_price'],
+                '操作费(元/m²)' =>['N','Y','64','handle_price'],
+                '物业费(元/吨)' =>['N','Y','64','property_price'],
+                '分拣费(元/件)' =>['N','Y','64','sorting_price'],
                 '仓库描述' =>['N','Y','64','describe'],
                 '备注' =>['N','Y','64','remark'],
             ];
@@ -565,7 +565,7 @@ class WarehouseController extends CommonController {
             // dd($info->toArray());
             if(empty($info)){
                 $msg['code'] = 305;
-                $msg['msg'] = '业务公司不存在';
+                $msg['msg'] = '请选择公司';
                 return $msg;
             }
 
