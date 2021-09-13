@@ -188,6 +188,13 @@ Route::group([
         Route::any('/bill/delCommonBill','BillController@delCommonBill');
         Route::any('/bill/billDetails','BillController@billDetails');
 
+        /** TMS评论 ***/
+        Route::any('/discuss/discussPage','DiscussController@discussPage');
+        Route::any('/discuss/createDiscuss','DiscussController@createDiscuss');
+        Route::any('/discuss/addDiscuss','DiscussController@addDiscuss');
+        Route::any('/discuss/delFlag','DiscussController@delFlag');
+        Route::any('/discuss/billDetails','DiscussController@billDetails');
+
     });
     Route::group([
         'prefix' => 'api','namespace'  => 'Tms',
