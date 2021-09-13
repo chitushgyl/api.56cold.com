@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Admin\Tms;
 use App\Http\Controllers\CommonController;
+use App\Models\Group\SystemGroup;
 use App\Models\SysAddress;
 use App\Models\Tms\TmsAddressContact;
 use App\Models\Tms\TmsGroup;
@@ -560,7 +561,7 @@ class WarehouseController extends CommonController {
                 ['self_id','=',$company_id],
             ];
 
-            $info= TmsGroup::where($where_check)->select('self_id','company_name','group_code','group_name')->first();
+            $info= SystemGroup::where($where_check)->select('self_id','group_code','group_name')->first();
             // dd($info->toArray());
             if(empty($info)){
                 $msg['code'] = 305;
@@ -581,56 +582,6 @@ class WarehouseController extends CommonController {
             // dump($info_wait);
             /** 现在开始处理$car***/
             foreach($info_wait as $k => $v){
-
-//                $where_address=[
-//                    ['name','=',$v['qu_name']],
-//                    ['level','=',3],
-//                ];
-//
-//                $where_address2=[
-//                    ['name','=',$v['shi_name']],
-//                    ['level','=',2],
-//                ];
-//                $where_address3=[
-//                    ['name','=',$v['sheng_name']],
-//                    ['level','=',1],
-//                ];
-//
-//                $selectMenu=['id','name','parent_id'];
-//                $address_info=SysAddress::with(['sysAddress' => function($query)use($selectMenu,$where_address2,$where_address3) {
-//                    $query->where($where_address2);
-//                    $query->select($selectMenu);
-//                    $query->with(['sysAddress' => function($query)use($selectMenu,$where_address3) {
-//                        $query->where($where_address3);
-//                        $query->select($selectMenu);
-//                    }]);
-//                }])->where($where_address)->select($selectMenu)->first();
-//
-//                if(empty($address_info)){
-//                    if($abcd<$errorNum){
-//                        $strs .= '数据中的第'.$a."行区不存在".'</br>';
-//                        $cando='N';
-//                        $abcd++;
-//                    }
-//                }else{
-//                    if(empty($address_info->sysAddress)){
-//                        if($abcd<$errorNum){
-//                            $strs .= '数据中的第'.$a."行市不存在".'</br>';
-//                            $cando='N';
-//                            $abcd++;
-//                        }
-//                    }else{
-//                        if(empty($address_info->sysAddress->sysAddress)){
-//                            if($abcd<$errorNum){
-//                                $strs .= '数据中的第'.$a."行省不存在".'</br>';
-//                                $cando='N';
-//                                $abcd++;
-//                            }
-//                        }
-//                    }
-//                }
-//                $location = bd_location(2,$v['sheng_name'],$v['shi_name'],$v['qu_name'],$v['address']);
-                // dump($cando);
                 $list=[];
                 if($cando =='Y'){
                     $list['self_id']            =generate_id('warehouse_');
