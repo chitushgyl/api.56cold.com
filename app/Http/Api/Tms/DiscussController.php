@@ -33,34 +33,17 @@ class DiscussController extends CommonController{
 
         $where=get_list_where($search);
 
-        $select=['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag','repeat_flag'];
-        $data['info'] = TmsBill::where($where)
+        $select=['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
+            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell'];
+        $data['info'] = TmsDiscuss::where($where)
             ->offset($firstrow)
             ->limit($listrows)
             ->orderBy('create_time', 'desc')
             ->select($select)
             ->get();
-        $data['total'] = TmsBill::where($where)->count();
+        $data['total'] = TmsDiscuss::where($where)->count();
         foreach ($data['info'] as $key => $value){
-            $value->tax_type_show =  $tax_type[$value->type] ?? null;
-            $value->bill_type_show =  $bill_type[$value->bill_type] ?? null;
-            if ($value->bill_flag == 'Y'){
-                $value->bill_flag_show = '已开票';
-            }else{
-                $value->bill_flag_show = '未开票';
-            }
-            $button1 = [];
-            foreach ($button_info as $k => $v){
-                if ($v->id == 231 ){
-                    $button1[] = $v;
-                }
-                if ($value->repeat_flag == 'N'){
-                    $value->button = $button1;
-                }else{
-                    $value->button = [];
-                }
-            }
+
         }
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
@@ -82,7 +65,8 @@ class DiscussController extends CommonController{
             ['delete_flag','=','Y'],
             ['self_id','=',$self_id],
         ];
-        $select = ['self_id'];
+        $select = ['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
+            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell'];
         $data['info'] = TmsDiscuss::where($where)->select($select)->first();
         if ($data['info']){
 
@@ -106,87 +90,82 @@ class DiscussController extends CommonController{
         /** 接收数据*/
         $self_id               = $request->input('self_id');
         $order_id              = $request->input('order_id'); //订单ID
-        $type                  = $request->input('type'); //发票类型：普票normal  增值税专票special
-        $bill_type             = $request->input('bill_type'); //发票抬头类型
-        $company_title         = $request->input('company_title');
-        $company_tax_number    = $request->input('company_tax_number');
-        $bank_name             = $request->input('bank_name');
-        $bank_num              = $request->input('bank_num');
-        $company_address       = $request->input('company_address');
-        $company_tel           = $request->input('company_tel');
-        $name                  = $request->input('name');
-        $tel                   = $request->input('tel');
-        $contact_address       = $request->input('contact_address');
-        $remark                = $request->input('remark');
-        $tax_price             = $request->input('tax_price');
+        $type                  = $request->input('type'); //评论类型：整车vehicle  线路line
+        $content               = $request->input('content'); //评论内容
+        $line_id               = $request->input('line_id');//线路ID
+        $anonymous             = $request->input('anonymous');// 是否匿名 是'Y' 否 'N'
+        $score                 = $request->input('score');//评分/星级
+        $follow_discuss        = $request->input('follow_discuss');//追评内容
+        $follow_flag           = $request->input('follow_flag');//是否追评
+        $images                = $request->input('images');//图片
+        $total_user_id         = $request->input('total_user_id');
+        $on_time               = $request->input('on_time');//时效准时
+        $neat                  = $request->input('neat');//车内整洁
+        $fast                  = $request->input('fast');//快速高效
+        $condition             = $request->input('condition');//货品完好
+        $temperture            = $request->input('temperture');//温度达标
+        $car_smell             = $request->input('car_smell');//车内无异味
 
         /*** 虚拟数据
-        //      $input['self_id']           =$self_id='good_202007011336328472133661';
+         $input['self_id']           =$self_id       ='';
+         $input['order_id']          =$order_id      ='';
+         $input['type']              =$type          ='vehicle';
+         $input['content']           =$content       ='';
+         $input['line_id']           =$line_id       ='';
+         $input['anonymous']         =$anonymous     ='';
+         $input['score']             =$score         ='';
+         $input['follow_discuss']    =$follow_discuss='';
+         $input['follow_flag']       =$follow_flag   ='';
+         $input['images']            =$images        ='';
+         $input['total_user_id']     =$total_user_id ='';
+         $input['on_time']           =$on_time       ='';
+         $input['neat']              =$neat          ='';
+         $input['fast']              =$fast          ='';
+         $input['condition']         =$condition     ='';
+         $input['temperture']        =$temperture    ='';
+         $input['car_smell']         =$car_smell     ='';
 
          **/
-        if ($type == 'company'){
-            $rules = [
-                'company_title'=>'required',
-                'company_tax_number'=>'required',
-                'bank_name'=>'required',
-                'bank_num'=>'required',
-                'company_address'=>'required',
-                'company_tel'=>'required',
-                'bill_type'=>'required',
-            ];
-            $message = [
-                'company_title.required'=>'请填写公司抬头',
-                'company_tax_number.required'=>'请填写税号',
-                'bank_name.required'=>'请填写开户行名称',
-                'bank_num.required'=>'请填写开户行账号',
-                'company_address.required'=>'请填写企业注册地址',
-                'company_tel.required'=>'请填写企业联系电话',
-                'bill_type.required'=>'请选择发票类型',
-            ];
-        }else{
-            $rules = [
-                'company_title'=>'required',
-            ];
-            $message = [
-                'company_title.required'=>'请填写公司抬头',
-            ];
-        }
-
+         $rules = [
+//             'company_title'=>'required',
+         ];
+         $message = [
+//             'company_title.required'=>'请填写公司抬头',
+         ];
 
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {
             $data['order_id']            = $order_id;
             $data['type']                = $type;
-            $data['bill_type']           = $bill_type;
-            $data['company_title']       = $company_title;
-            $data['company_tax_number']  = $company_tax_number;
-            $data['bank_name']           = $bank_name;
-            $data['bank_num']            = $bank_num;
-            $data['company_address']     = $company_address;
-            $data['company_tel']         = $company_tel;
-            $data['name']                = $name;
-            $data['tel']                 = $tel;
-            $data['contact_address']     = $contact_address;
-            $data['remark']              = $remark;
-            $data['tax_price']           = $tax_price*100;
+            $data['content']             = $content;
+            $data['line_id']             = $line_id;
+            $data['anonymous']           = $anonymous;
+            $data['score']               = $score;
+            $data['follow_discuss']      = $follow_discuss;
+            $data['follow_flag']         = $follow_flag;
+            $data['images']              = $images;
+            $data['total_user_id']       = $total_user_id;
+            $data['on_time']             = $on_time;
+            $data['neat']                = $neat;
+            $data['fast']                = $fast;
+            $data['condition']           = $condition;
+            $data['temperture']          = $temperture;
+            $data['car_smell']           = $car_smell;
 
             $wheres['self_id'] = $self_id;
-            $old_info = TmsBill::where($wheres)->first();
+            $old_info = TmsDiscuss::where($wheres)->first();
 
             if($old_info){
                 $data['update_time'] = $now_time;
                 $data['repeat_flag'] = 'Y';
-                $id = TmsBill::where($wheres)->update($data);
+                $id = TmsDiscuss::where($wheres)->update($data);
 
             }else{
-                $data['self_id']          = generate_id('car_');
+                $data['self_id']          = generate_id('view_');
                 $data['total_user_id']    = $total_user_id;
-//                $data['create_user_id']   = $total_user_id;
-//                $data['create_user_name'] = $token_name;
                 $data['create_time']      = $data['update_time'] = $now_time;
-                $id = TmsBill::insert($data);
-                $update['tax_flag'] ='Y';
-                $order_info = TmsOrder::whereIn('self_id',json_decode($order_id,true))->update($update);
+                $id = TmsDiscuss::insert($data);
+
             }
 
             if($id){

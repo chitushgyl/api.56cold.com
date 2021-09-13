@@ -480,7 +480,7 @@ class WarehouseController extends CommonController {
         $operationing->operation_type   ='create';
         $operationing->now_time         =$now_time;
         $operationing->type             ='import';
-        
+
         /** 接收数据*/
         $input              =$request->all();
         $importurl          =$request->input('importurl');
