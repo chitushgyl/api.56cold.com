@@ -1,14 +1,11 @@
 <?php
 namespace App\Http\Admin\Tms;
+
 use App\Http\Controllers\CommonController;
 use App\Models\Group\SystemGroup;
-use App\Models\SysAddress;
-use App\Models\Tms\TmsAddressContact;
-use App\Models\Tms\TmsGroup;
 use App\Models\Tms\TmsWarehouse;
 use App\Tools\Import;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\StatusController as Status;
@@ -594,7 +591,11 @@ class WarehouseController extends CommonController {
                     $list['group_name']         = $info->group_name;
                     $list['create_time']        = $list['update_time']=$now_time;
                     $list['areanumber']         = $v['areanumber'];
-                    $list['wtype']              = $v['wtype'];
+                    if($v['wtype'] == '中转型'){
+                        $list['wtype']              = 'transfer';
+                    }else{
+                        $list['wtype']              = 'storage';
+                    }
                     $list['store_price']        = $v['store_price'];
                     $list['area_price']         = $v['area_price'];
                     $list['handle_price']       = $v['handle_price'];

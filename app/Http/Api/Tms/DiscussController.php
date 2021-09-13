@@ -16,8 +16,7 @@ class DiscussController extends CommonController{
         $user_info     = $request->get('user_info');//接收中间件产生的参数
         $project_type       =$request->get('project_type');
         $button_info =     $request->get('buttonInfo');
-        $tax_type = array_column(config('tms.tax_type'),'name','key');
-        $bill_type = array_column(config('tms.bill_type'),'name','key');
+        $tms_order_type        = array_column(config('tms.tms_order_type'),'name','key');
 //        $total_user_id = $user_info->total_user_id;
         /**接收数据*/
         $num           = $request->input('num')??10;
@@ -50,8 +49,8 @@ class DiscussController extends CommonController{
             ->select($select)
             ->get();
         $data['total'] = TmsDiscuss::where($where)->count();
-        foreach ($data['info'] as $key => $value){
-
+        foreach ($data['info'] as $k => $v){
+            $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
         }
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
