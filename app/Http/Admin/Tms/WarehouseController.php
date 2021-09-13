@@ -474,15 +474,13 @@ class WarehouseController extends CommonController {
         $now_time           = date('Y-m-d H:i:s', time());
 
         $operationing       = $request->get('operationing');//接收中间件产生的参数
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
         $operationing->access_cause     ='导入创建仓库';
         $operationing->table            =$table_name;
         $operationing->operation_type   ='create';
         $operationing->now_time         =$now_time;
         $operationing->type             ='import';
-
-        $user_info          = $request->get('user_info');//接收中间件产生的参数
-
-
+        
         /** 接收数据*/
         $input              =$request->all();
         $importurl          =$request->input('importurl');
