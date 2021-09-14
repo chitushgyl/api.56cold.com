@@ -629,7 +629,7 @@ class BillController extends CommonController {
             ['self_id','=',$self_id],
         ];
         $select=['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
-            'total_user_id','group_code','delete_flag','create_time','default_flag','license','use_flag','delete_flag','special_use '];
+            'total_user_id','group_code','delete_flag','create_time','default_flag','license','use_flag','delete_flag','special_use'];
 
         $data['info']=TmsCommonBill::where($where)->select($select)->first();
 
