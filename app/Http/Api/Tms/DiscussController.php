@@ -22,6 +22,7 @@ class DiscussController extends CommonController{
         $num           = $request->input('num')??10;
         $page          = $request->input('page')??1;
         $type          = $request->input('type');
+        $line_id       = $request->input('line_id');
         $listrows      = $num;
         $firstrow      = ($page-1)*$listrows;
         $search = [];
@@ -30,6 +31,7 @@ class DiscussController extends CommonController{
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ['type'=>'=','name'=>'carriage_id','value'=>$user_info->total_user_id],
             ['type'=>'=','name'=>'type','value'=>$type],
+            ['type'=>'=','name'=>'line_id','value'=>$line_id],
 
         ];
 

@@ -629,13 +629,13 @@ class BillController extends CommonController {
             ['self_id','=',$self_id],
         ];
         $select=['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
-            'total_user_id','group_code','delete_flag','create_time','default_flag','license','use_flag','delete_flag'];
+            'total_user_id','group_code','delete_flag','create_time','default_flag','license','use_flag','delete_flag','special_use '];
 
         $data['info']=TmsCommonBill::where($where)->select($select)->first();
 
         if ($data['info']){
             $data['info']->type_show = $tax_type[$data['info']->type] ??null;
-            $data['info']->license = img_for($data['info']->license,'one');
+            $data['info']->license = img_for($data['info']->license,'more');
         }
 
         $msg['code']=200;
