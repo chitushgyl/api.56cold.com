@@ -1062,6 +1062,7 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
+        $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
         $notify_url = 'https://api.56cold.com/alipay/paymentWechatNotify';

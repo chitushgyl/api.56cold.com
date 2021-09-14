@@ -21,19 +21,22 @@ class DiscussController extends CommonController{
         /**接收数据*/
         $num           = $request->input('num')??10;
         $page          = $request->input('page')??1;
+        $type          = $request->input('type');
         $listrows      = $num;
         $firstrow      = ($page-1)*$listrows;
         $search = [];
 
         $search = [
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-            ['type'=>'=','name'=>'total_user_id','value'=>$user_info->total_user_id],
+            ['type'=>'=','name'=>'carriage_id','value'=>$user_info->total_user_id],
+            ['type'=>'=','name'=>'type','value'=>$type],
+
         ];
 
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
-            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell'];
+            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id'];
         $select1 = ['self_id','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
         $select2 = ['self_id','shift_number','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
         $data['info'] = TmsDiscuss::with(['TmsOrder' => function($query) use($select1){
@@ -112,6 +115,7 @@ class DiscussController extends CommonController{
         $condition             = $request->input('condition');//货品完好
         $temperture            = $request->input('temperture');//温度达标
         $car_smell             = $request->input('car_smell');//车内无异味
+        $carriage_id           = $request->input('carriage_id');//承运人ID
 
         /*** 虚拟数据
          $input['self_id']           =$self_id       ='';
@@ -131,6 +135,7 @@ class DiscussController extends CommonController{
          $input['condition']         =$condition     ='N';
          $input['temperture']        =$temperture    ='N';
          $input['car_smell']         =$car_smell     ='N';
+         $input['carriage_id']       =$carriage_id   ='N';
 
          **/
          $rules = [
@@ -158,6 +163,7 @@ class DiscussController extends CommonController{
             $data['condition']           = $condition;
             $data['temperture']          = $temperture;
             $data['car_smell']           = $car_smell;
+            $data['carriage_id']         = $carriage_id;
 
             $wheres['self_id'] = $self_id;
             $old_info = TmsDiscuss::where($wheres)->first();
