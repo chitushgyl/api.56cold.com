@@ -207,6 +207,7 @@ class OrderController extends Controller{
             $button2 = [];
             $button3 = [];
             $button4 = [];
+            $button5 = [];
             switch ($project_type){
                 case 'user':
                     foreach ($button_info as $key => $value){
@@ -221,6 +222,9 @@ class OrderController extends Controller{
                             $button2[] = $value;
                             $button3[] = $value;
                         }
+                        if ($value->id == 234){
+                            $button5 = $value;
+                        }
                         if ($v->order_status == 2){
                             $v->button  = $button1;
                         }
@@ -229,6 +233,9 @@ class OrderController extends Controller{
                         }
                         if ($v->order_status  == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
                             $v->button  = $button3;
+                        }
+                        if($v->order_status == 6){
+                            $v->button = $button5;
                         }
                         if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
                             $v->button  = $button4;

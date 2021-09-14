@@ -507,7 +507,7 @@ class WarehouseController extends CommonController {
             }
 
             $res = Excel::toArray((new Import),$importurl);
-            //dump($res);
+            dd($res);
             $info_check=[];
             if(array_key_exists('0', $res)){
                 $info_check=$res[0];
