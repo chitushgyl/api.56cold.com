@@ -507,13 +507,13 @@ class WarehouseController extends CommonController {
             }
 
             $res = Excel::toArray((new Import),$importurl);
-            dump($res);
+//            dump($res);
             $info_check=[];
             if(array_key_exists('0', $res)){
                 $info_check=$res[0];
             }
 
-            dd($info_check);
+//            dd($info_check);
 
             /**  定义一个数组，需要的数据和必须填写的项目
             键 是EXECL顶部文字，
