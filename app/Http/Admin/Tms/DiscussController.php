@@ -234,7 +234,7 @@ class DiscussController extends CommonController{
                 $data['create_time']      = $data['update_time'] = $now_time;
                 $id = TmsDiscuss::insert($data);
                 $update['discuss_flag'] ='Y';
-                $order_info = TmsOrder::whereIn('self_id',$order_id)->update($update);
+                $order_info = TmsOrder::where('self_id',$order_id)->update($update);
                 $operationing->access_cause='新增开票';
                 $operationing->operation_type='create';
 
