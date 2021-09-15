@@ -578,6 +578,7 @@ class WarehouseController extends CommonController {
                 $list=[];
                 if($cando =='Y'){
                     $list['self_id']            =generate_id('warehouse_');
+                    $list['warehouse_name']     = $v['warehouse_name'];
                     $list['pro']                = $v['pro'];
                     $list['city']               = $v['city'];
                     $list['area']               = $v['area'];
@@ -594,11 +595,11 @@ class WarehouseController extends CommonController {
                     }else{
                         $list['wtype']              = 'storage';
                     }
-                    $list['store_price']        = $v['store_price'];
-                    $list['area_price']         = $v['area_price'];
-                    $list['handle_price']       = $v['handle_price'];
-                    $list['property_price']     = $v['property_price'];
-                    $list['sorting_price']      = $v['sorting_price'];
+                    $list['store_price']        = $v['store_price']*100;
+                    $list['area_price']         = $v['area_price']*100;
+                    $list['handle_price']       = $v['handle_price']*100;
+                    $list['property_price']     = $v['property_price']*100;
+                    $list['sorting_price']      = $v['sorting_price']*100;
                     $list['describe']           = $v['describe'];
                     $list['remark']             = $v['remark'];
                     $datalist[]=$list;
