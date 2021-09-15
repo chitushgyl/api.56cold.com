@@ -513,7 +513,7 @@ class WarehouseController extends CommonController {
                 $info_check=$res[0];
             }
 
-//            dd($info_check);
+            dump($info_check);
 
             /**  定义一个数组，需要的数据和必须填写的项目
             键 是EXECL顶部文字，
@@ -537,8 +537,8 @@ class WarehouseController extends CommonController {
                 '操作费(元/m²)' =>['N','Y','64','handle_price'],
                 '物业费(元/吨)' =>['N','Y','64','property_price'],
                 '分拣费(元/件)' =>['N','Y','64','sorting_price'],
-                '仓库描述' =>['N','Y','64','describe'],
-                '备注' =>['N','Y','64','remark'],
+                '仓库描述' =>['N','Y','200','describe'],
+                '备注' =>['N','Y','200','remark'],
             ];
             $ret=arr_check($shuzu,$info_check);
 
