@@ -208,7 +208,7 @@ class DiscussController extends CommonController{
     }
 
     /**
-     *删除评论
+     *删除评论  /api/discuss/delFlag
      * */
     public function delFlag(Request $request,Status $status){
         $now_time     = date('Y-m-d H:i:s',time());
@@ -223,6 +223,44 @@ class DiscussController extends CommonController{
         $msg['msg']=$status_info['msg'];
         $msg['data']=$status_info['new_info'];
         return $msg;
+    }
+
+    /**
+     * 评论详情 /api/discuss/discussDetails
+     * */
+    public function discussDetails(Request $request,Details $details){
+        $self_id    = $request->input('self_id');
+        $table_name = 'tms_discuss';
+        $select     = ['self_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel',
+            'total_user_id','group_code','delete_flag','create_time','default_flag','special_use','license'
+        ];
+        // $self_id='address_202101111755143321983342';
+//        $info = $details->details($self_id,$table_name,$select);
+        $select=['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
+            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id'];
+        $select1 = ['self_id','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
+        $select2 = ['self_id','shift_number','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
+        $info = TmsDiscuss::with(['TmsOrder' => function($query) use($select1){
+            $query->select($select1);
+        }])
+            ->with(['TmsLine' => function($query) use($select2){
+                $query->select($select2);
+            }])
+            ->where('self_id',$self_id)
+            ->select($select)
+            ->first();
+        if($info) {
+            /** 如果需要对数据进行处理，请自行在下面对 $info 进行处理工作*/
+            $data['info'] = $info;
+            $msg['code']  = 200;
+            $msg['msg']   = "数据拉取成功";
+            $msg['data']  = $data;
+            return $msg;
+        }else{
+            $msg['code'] = 300;
+            $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
     }
 
 
