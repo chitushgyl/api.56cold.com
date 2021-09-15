@@ -77,7 +77,7 @@ class WarehouseController extends CommonController {
         }
         $where = get_list_where($search);
         $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
-            'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name','total_user_id'];
+            'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
         $select2 = ['self_id','group_name'];
         $select3 = ['self_id','tel'];
         switch ($group_info['group_id']){
@@ -86,9 +86,6 @@ class WarehouseController extends CommonController {
                 $data['info'] = TmsWarehouse::with(['SystemGroup' => function($query) use($select2){
                     $query->select($select2);
                 }])
-                    ->with(['UserTotal' => function($query) use($select3){
-                        $query->select($select3);
-                    }])
                     ->where($where)
                     ->offset($firstrow)
                     ->limit($listrows);
@@ -111,9 +108,6 @@ class WarehouseController extends CommonController {
                 $data['info'] = TmsWarehouse::with(['SystemGroup' => function($query) use($select2){
                     $query->select($select2);
                 }])
-                    ->with(['UserTotal' => function($query) use($select3){
-                        $query->select($select3);
-                    }])
                     ->where($where)
                     ->offset($firstrow)
                     ->limit($listrows);
@@ -135,9 +129,6 @@ class WarehouseController extends CommonController {
                 $data['info'] = TmsWarehouse::with(['SystemGroup' => function($query) use($select2){
                     $query->select($select2);
                 }])
-                    ->with(['UserTotal' => function($query) use($select3){
-                        $query->select($select3);
-                    }])
                     ->where($where)
                     ->offset($firstrow)
                     ->limit($listrows);
@@ -165,9 +156,6 @@ class WarehouseController extends CommonController {
             $v->picture_show = img_for($v->picture,'more');
             if ($v->SystemGroup){
                 $v->group_name_show = $v->SystemGroup->group_name;
-            }
-            if ($v->UserTotal){
-                $v->group_name_show = $v->UserTotal->tel;
             }
         }
         $msg['code'] = 200;
