@@ -112,7 +112,7 @@ class OrderController extends CommonController{
         $select=['self_id','group_name','company_name','create_user_name','create_time','use_flag','order_type','order_status','pay_type','pay_state','app_flag','gather_address_id',
             'gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address','send_address_id','send_contacts_id', 'send_name',
             'send_tel','send_sheng','send_shi','send_qu','send_address','total_money','total_user_id','good_name','good_number', 'good_weight', 'good_volume', 'gather_shi_name',
-            'send_shi_name','send_qu_name','car_type','clod','send_time','gather_time','discuss_flag','follow_flag'];
+            'send_shi_name','send_qu_name','car_type','clod','send_time','gather_time','discuss_flag','follow_flag','line_id'];
         $select2 = ['self_id','parame_name'];
         $select3 = ['self_id','total_user_id','tel'];
         switch ($group_info['group_id']){
