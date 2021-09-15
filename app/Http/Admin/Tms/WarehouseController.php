@@ -77,7 +77,7 @@ class WarehouseController extends CommonController {
         }
         $where = get_list_where($search);
         $select = ['self_id','warehouse_name','pro','city','area','address','all_address','areanumber','price','company_name','contact','tel','create_time','update_time','delete_flag','use_flag',
-            'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name'];
+            'wtype','picture','remark','license','rent_type','store_price','area_price','handle_price','property_price','sorting_price','describe','group_code','group_name','total_user_id'];
         $select2 = ['self_id','group_name'];
         $select3 = ['self_id','tel'];
         switch ($group_info['group_id']){
