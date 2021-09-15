@@ -3,6 +3,7 @@ namespace App\Http\Api\Tms;
 
 use App\Http\Controllers\CommonController;
 use App\Models\Tms\TmsDiscuss;
+use App\Models\Tms\TmsOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\StatusController as Status;
 use App\Http\Controllers\DetailsController as Details;
