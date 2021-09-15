@@ -3,6 +3,7 @@ namespace App\Http\Admin\Tms;
 
 use App\Http\Controllers\CommonController;
 use App\Models\Tms\TmsDiscuss;
+use App\Models\Tms\TmsOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\StatusController as Status;
 
@@ -142,7 +143,7 @@ class DiscussController extends CommonController{
         $now_time       =date('Y-m-d H:i:s',time());
         $table_name     ='tms_group';
 
-        $operationing->access_cause     ='创建/修改司机';
+        $operationing->access_cause     ='创建/修改评价';
         $operationing->table            =$table_name;
         $operationing->operation_type   ='create';
         $operationing->now_time         =$now_time;
@@ -225,8 +226,12 @@ class DiscussController extends CommonController{
                 $data['update_time'] = $now_time;
                 $data['repeat_flag'] = 'Y';
                 $id = TmsDiscuss::where($wheres)->update($data);
-
-                $operationing->access_cause='修改开票信息';
+                if ($follow_flag == 'Y'){
+                    $update['update_time'] = $now_time;
+                    $update['follow_discuss'] = 'Y';
+                    $order_info = TmsOrder::where('self_id',$order_id)->update($update);
+                }
+                $operationing->access_cause='修改评价信息';
                 $operationing->operation_type='update';
             }else{
                 $data['self_id']          = generate_id('view_');
@@ -235,7 +240,7 @@ class DiscussController extends CommonController{
                 $id = TmsDiscuss::insert($data);
                 $update['discuss_flag'] ='Y';
                 $order_info = TmsOrder::where('self_id',$order_id)->update($update);
-                $operationing->access_cause='新增开票';
+                $operationing->access_cause='新增评价';
                 $operationing->operation_type='create';
 
             }

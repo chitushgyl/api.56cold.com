@@ -174,7 +174,12 @@ class DiscussController extends CommonController{
 
             if($old_info){
                 $data['update_time'] = $now_time;
-                $data['repeat_flag'] = 'Y';
+                if ($follow_flag == 'Y'){
+                    $update['update_time'] = $now_time;
+                    $update['follow_discuss'] = 'Y';
+                    $order_info = TmsOrder::where('self_id',$order_id)->update($update);
+                }
+
                 $id = TmsDiscuss::where($wheres)->update($data);
 
             }else{
