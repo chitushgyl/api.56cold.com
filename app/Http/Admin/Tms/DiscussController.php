@@ -161,7 +161,7 @@ class DiscussController extends CommonController{
         $follow_discuss        = $request->input('follow_discuss');//追评内容
         $follow_flag           = $request->input('follow_flag');//是否追评
         $images                = $request->input('images');//图片
-        $total_user_id         = $request->input('total_user_id');
+        $group_code            = $request->input('group_code');
         $on_time               = $request->input('on_time');//时效准时
         $neat                  = $request->input('neat');//车内整洁
         $fast                  = $request->input('fast');//快速高效
@@ -210,7 +210,6 @@ class DiscussController extends CommonController{
             $data['follow_discuss']      = $follow_discuss;
             $data['follow_flag']         = $follow_flag;
             $data['images']              = $images;
-            $data['total_user_id']       = $total_user_id;
             $data['on_time']             = $on_time;
             $data['neat']                = $neat;
             $data['fast']                = $fast;
@@ -235,7 +234,7 @@ class DiscussController extends CommonController{
                 $operationing->operation_type='update';
             }else{
                 $data['self_id']          = generate_id('view_');
-                $data['total_user_id']    = $total_user_id;
+                $data['group_code']       = $group_code;
                 $data['create_time']      = $data['update_time'] = $now_time;
                 $id = TmsDiscuss::insert($data);
                 $update['discuss_flag'] ='Y';

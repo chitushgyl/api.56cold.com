@@ -160,7 +160,7 @@ class DiscussController extends CommonController{
             $data['follow_discuss']      = $follow_discuss;
             $data['follow_flag']         = $follow_flag;
             $data['images']              = $images;
-            $data['total_user_id']       = $total_user_id;
+            $data['total_user_id']       = $user_info->total_user_id;
             $data['on_time']             = $on_time;
             $data['neat']                = $neat;
             $data['fast']                = $fast;
