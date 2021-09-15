@@ -170,7 +170,6 @@ function arr_check($shuzu,$arr){
                 $a++;
             }
         }
-        dd($new_array);
         /**  重复性的效验**/
 //        dump($cando);
         if($cando == 'Y'){
