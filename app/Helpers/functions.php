@@ -146,7 +146,6 @@ function arr_check($shuzu,$arr){
                                 }
                             }
                         }
-                        dd($msg);
                         //判断重复性
                         if($new[$kk]['repetition'] == 'N'){
                             $list[$kk][]=$v[$kk];
@@ -171,7 +170,7 @@ function arr_check($shuzu,$arr){
                 $a++;
             }
         }
-
+        dd($new_array);
         /**  重复性的效验**/
 //        dump($cando);
         if($cando == 'Y'){
