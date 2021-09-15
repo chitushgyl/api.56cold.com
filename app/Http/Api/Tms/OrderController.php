@@ -223,7 +223,7 @@ class OrderController extends Controller{
                             $button3[] = $value;
                         }
                         if ($value->id == 234){
-                            $button5 = $value;
+                            $button5[] = $value;
                         }
                         if ($v->order_status == 2){
                             $v->button  = $button1;
