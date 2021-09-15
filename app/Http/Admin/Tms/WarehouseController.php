@@ -577,7 +577,7 @@ class WarehouseController extends CommonController {
             foreach($info_wait as $k => $v){
                 $list=[];
                 if($cando =='Y'){
-                    $list['self_id']            =generate_id('warehouse_');
+                    $list['self_id']            =generate_id('ware_');
                     $list['warehouse_name']     = $v['warehouse_name'];
                     $list['pro']                = $v['pro'];
                     $list['city']               = $v['city'];

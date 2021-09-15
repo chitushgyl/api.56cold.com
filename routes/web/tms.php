@@ -296,6 +296,19 @@ Route::group([
     ], function(){
 
     });
+
+    /** TMS评论 ***/
+    Route::any('/discuss/discussList','DiscussController@discussList');
+    Route::any('/discuss/discussPage','DiscussController@discussPage');
+    Route::any('/discuss/createDiscuss','DiscussController@createDiscuss');
+    Route::any('/discuss/addDiscuss','DiscussController@addDiscuss');
+    Route::any('/discuss/delFlag','DiscussController@delFlag');
+    Route::any('/discuss/billDetails','DiscussController@billDetails');
+    Route::group([
+        "middleware"=>['daily'],
+    ], function(){
+
+    });
 });
 
 

@@ -181,7 +181,8 @@ class DiscussController extends CommonController{
                 $data['total_user_id']    = $total_user_id;
                 $data['create_time']      = $data['update_time'] = $now_time;
                 $id = TmsDiscuss::insert($data);
-
+                $update['discuss_flag'] ='Y';
+                $order_info = TmsOrder::whereIn('self_id',$order_id)->update($update);
             }
 
             if($id){
