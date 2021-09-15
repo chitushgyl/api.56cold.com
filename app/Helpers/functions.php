@@ -123,7 +123,7 @@ function arr_check($shuzu,$arr){
                 $msg .='数据中未包含'.$k.'</br>';
             }
         }
-
+        dump($new);
         /**  效验数据的必填以及重复，以及长度***/
         if($cando == 'Y'){
             $a=2;
@@ -137,7 +137,7 @@ function arr_check($shuzu,$arr){
                          //判断数据的必填
                         if($new[$kk]['must'] == 'Y'){
                             dump($v[$kk]);
-                            dd($new[$kk]);
+                            dump($new[$kk]);
                             if(empty($v[$kk])){
                                 if($abcd<$errorNum){
                                     $msg .= '数据中的第'.$a."行数据不完整".'</br>';
@@ -146,6 +146,7 @@ function arr_check($shuzu,$arr){
                                 }
                             }
                         }
+                        dd($msg);
                         //判断重复性
                         if($new[$kk]['repetition'] == 'N'){
                             $list[$kk][]=$v[$kk];
