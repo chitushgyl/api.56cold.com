@@ -255,6 +255,9 @@ class OrderController extends Controller{
                             $button2[] = $value;
                             $button3[] = $value;
                         }
+                        if ($value->id == 235){
+                            $button5[] = $value;
+                        }
                         if ($v->order_status == 2){
                             $v->button  = $button1;
                         }
@@ -266,6 +269,9 @@ class OrderController extends Controller{
                         }
                         if ($v->order_status  == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
                             $v->button  = $button3;
+                        }
+                        if($v->order_status == 6 && $v->discuss_flag == 'N'){
+                            $v->button = $button5;
                         }
                         if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
                             $v->button  = $button4;

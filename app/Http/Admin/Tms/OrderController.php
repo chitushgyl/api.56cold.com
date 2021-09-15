@@ -292,7 +292,9 @@ class OrderController extends CommonController{
                 if ($value->id == 162){
                     $button6[] = $value;
                 }
-
+                if ($value->id == 236){
+                    $button7[] = $value;
+                }
                 if ($v->order_status == 3 && $v->order_type == 'line'){
                     $v->button  = $button1;
                 }
@@ -310,6 +312,12 @@ class OrderController extends CommonController{
                 }
                 if ($v->order_status == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
                     $v->button  = $button5;
+                }
+                if($v->order_status == 6 && $v->discuss_flag == 'N'){
+                    $v->button = $button7;
+                }
+                if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+                    $v->button  = $button4;
                 }
 
 
