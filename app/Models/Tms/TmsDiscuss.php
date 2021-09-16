@@ -51,13 +51,13 @@ class TmsDiscuss extends Model{
     ];
 
     //一对一
-    public function tmsOrder(){
+    public function TmsOrder(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
         return $this->hasOne('App\Models\Tms\tmsOrder','self_id','order_id');
     }
 
-    public function tmsLine(){
+    public function TmsLine(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
         return $this->hasOne('App\Models\Tms\tmsLine','self_id','line_id');
