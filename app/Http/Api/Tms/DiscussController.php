@@ -27,8 +27,8 @@ class DiscussController extends CommonController{
         $line_id       = $request->input('line_id');
         $total_user_id       = $request->input('total_user_id');
         $score         = $request->input('score'); //H 好评  M 中评 L 差评
-        $images        = $request->input('images');//筛选有图片的评论
-        $follow_discuss= $request->input('follow_discuss');//筛选有追评的评论
+        $images        = $request->input('images');//筛选有图片的评论 有 Y
+        $follow_discuss= $request->input('follow_discuss');//筛选有追评的评论 有 Y
         $listrows      = $num;
         $firstrow      = ($page-1)*$listrows;
         $search = [];
