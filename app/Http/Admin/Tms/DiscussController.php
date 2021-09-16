@@ -105,7 +105,7 @@ class DiscussController extends CommonController{
         // dd($data['items']->toArray());
 
         foreach ($data['items'] as $k=>$v) {
-
+            $v->images   = img_for($v->images,'more');
 
         }
 

@@ -59,6 +59,7 @@ class DiscussController extends CommonController{
         $data['total'] = TmsDiscuss::where($where)->count();
         foreach ($data['info'] as $k => $v){
             $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
+            $v->images   = img_for($v->images,'more');
         }
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
