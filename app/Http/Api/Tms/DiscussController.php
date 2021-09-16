@@ -57,6 +57,8 @@ class DiscussController extends CommonController{
             ->select($select)
             ->get();
         $data['total'] = TmsDiscuss::where($where)->count();
+
+//        $data['info']['score'] = TmsDiscuss::where('type',$type)->a
         foreach ($data['info'] as $k => $v){
             $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
             $v->images   = img_for($v->images,'more');
@@ -161,7 +163,7 @@ class DiscussController extends CommonController{
             $data['score']               = $score;
             $data['follow_discuss']      = $follow_discuss;
             $data['follow_flag']         = $follow_flag;
-            $data['images']              = $images;
+            $data['images']              = img_for($images,'in');
             $data['total_user_id']       = $user_info->total_user_id;
             $data['on_time']             = $on_time;
             $data['neat']                = $neat;

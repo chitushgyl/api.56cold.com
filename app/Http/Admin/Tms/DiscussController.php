@@ -214,7 +214,7 @@ class DiscussController extends CommonController{
             $data['score']               = $score;
             $data['follow_discuss']      = $follow_discuss;
             $data['follow_flag']         = $follow_flag;
-            $data['images']              = $images;
+            $data['images']              = img_for($images,'in');
             $data['on_time']             = $on_time;
             $data['neat']                = $neat;
             $data['fast']                = $fast;
