@@ -41,12 +41,13 @@ class DiscussController extends CommonController{
         $score         = $request->input('score'); //H 好评  M 中评 L 差评
         $images        = $request->input('images');//筛选有图片的评论 有 Y
         $follow_discuss= $request->input('follow_discuss');//筛选有追评的评论 有 Y
+        $carriage_id   = $request->input('carriage_id');//
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
 
         $search=[
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
-            ['type'=>'=','name'=>'carriage_id','value'=>$group_code],
+            ['type'=>'=','name'=>'carriage_id','value'=>$carriage_id],
             ['type'=>'=','name'=>'type','value'=>$type],
             ['type'=>'=','name'=>'line_id','value'=>$line_id],
         ];
