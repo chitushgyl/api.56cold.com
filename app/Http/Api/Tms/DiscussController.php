@@ -194,6 +194,9 @@ class DiscussController extends CommonController{
             $wheres['self_id'] = $self_id;
             $old_info = TmsDiscuss::where($wheres)->first();
 
+            if ($type == 'vehicle'){
+
+            }
             if($old_info){
                 $data['update_time'] = $now_time;
                 if ($follow_flag == 'Y'){
