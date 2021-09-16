@@ -211,7 +211,14 @@ class DiscussController extends CommonController{
                 $data['self_id']          = generate_id('view_');
                 $data['total_user_id']    = $total_user_id;
                 $data['create_time']      = $data['update_time'] = $now_time;
-                $id = TmsDiscuss::insert($data);
+                if ($type == 'vehicle'){
+                    foreach(json_decode($carriage_id,true) as $key => $value){
+                        $data['carriage_id']    = $value;
+                        $id = TmsDiscuss::insert($data);
+                    }
+                }else{
+                    $id = TmsDiscuss::insert($data);
+                }
                 $update['discuss_flag'] ='Y';
                 $order_info = TmsOrder::where('self_id',$order_id)->update($update);
             }

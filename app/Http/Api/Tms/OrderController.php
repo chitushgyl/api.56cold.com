@@ -87,9 +87,34 @@ class OrderController extends Controller{
             'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
             'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time','discuss_flag','follow_flag','line_id'];
         $select2 = ['self_id','parame_name'];
+        $select1 = ['self_id','carriage_id','order_dispatch_id'];
+        $select3 = ['self_id','company_id','company_name','carriage_flag','total_money'];
+        $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
+        $list_select=['self_id','order_type','order_status','company_name','dispatch_flag','group_code','group_name','use_flag','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_sheng_name','send_shi_name'
+            ,'send_qu_name','send_address','total_money','good_info','good_number','good_weight','good_volume','carriage_group_name','on_line_money','line_gather_address_id','line_gather_contacts_id','line_gather_name','line_gather_tel',
+            'line_gather_sheng','line_gather_shi','line_gather_qu','line_gather_sheng_name','line_gather_shi_name','line_gather_qu_name' , 'line_gather_address','remark',
+            'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi',
+            'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','clod','pick_flag','send_flag',
+            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag'
+        ];
         $data['info'] = TmsOrder::with(['TmsCarType' => function($query) use($select2){
             $query->select($select2);
         }])
+            ->with(['TmsOrderDispatch' => function($query) use($list_select,$select1,$select3,$select4){
+                $query->select($list_select);
+                $query->with(['tmsCarriageDispatch'=>function($query)use($select1,$select3,$select4){
+                    $query->where('delete_flag','=','Y');
+                    $query->select($select1);
+                    $query->with(['tmsCarriage'=>function($query)use($select3){
+                        $query->where('delete_flag','=','Y');
+                        $query->select($select3);
+                    }]);
+                    $query->with(['tmsCarriageDriver'=>function($query)use($select4){
+                        $query->where('delete_flag','=','Y');
+                        $query->select($select4);
+                    }]);
+                }]);
+            }])
             ->where($where);
 
         switch ($project_type){
@@ -148,6 +173,21 @@ class OrderController extends Controller{
             ->get();
 
         foreach ($data['info'] as $k=>$v) {
+            foreach ($v->TmsOrderDispatch as $kkk =>$vvv){
+                $car_list = [];
+                if ($vvv->tmsCarriageDispatch){
+                    if ($vvv->tmsCarriageDispatch->tmsCarriageDriver){
+                        foreach ($vvv->tmsCarriageDispatch->tmsCarriageDriver as $kk => $vv){
+                            $carList['car_id']    = $vv->car_id;
+                            $carList['car_number'] = $vv->car_number;
+                            $carList['tel'] = $vv->tel;
+                            $carList['contacts'] = $vv->contacts;
+                            $car_list[] = $carList;
+                        }
+                        $v->car_info = $car_list;
+                    }
+                }
+            }
             $v->total_money       = number_format($v->total_money/100, 2);
             $v->good_weight       = floor($v->good_weight);
             $v->good_volume       = floor($v->good_volume);
@@ -2177,6 +2217,7 @@ class OrderController extends Controller{
                 if ($v->tmsCarriageDispatch){
                     if ($v->tmsCarriageDispatch->tmsCarriageDriver){
                         foreach ($v->tmsCarriageDispatch->tmsCarriageDriver as $kk => $vv){
+                            $carList['car_id']     = $vv->car_id;
                             $carList['car_number'] = $vv->car_number;
                             $carList['tel'] = $vv->tel;
                             $carList['contacts'] = $vv->contacts;
