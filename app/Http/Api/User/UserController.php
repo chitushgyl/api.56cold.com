@@ -611,7 +611,7 @@ class UserController extends Controller{
                         }elseif($user_info->type == 'driver'){
                             $v->title_show = '承运企业认证,免费开放更多使用权限.';
                         }else{
-                            $v->title_show = '承运企业认证,免费开放更多使用权限.';
+                            $v->title_show = '企业客户认证,免费开放更多使用权限.';
                         }
                     }else{
                         $v->title_show = '企业客户认证,免费开放更多使用权限.';
