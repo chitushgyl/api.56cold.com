@@ -26,6 +26,9 @@ class DiscussController extends CommonController{
         $type          = $request->input('type');
         $line_id       = $request->input('line_id');
         $total_user_id       = $request->input('total_user_id');
+        $score         = $request->input('score'); //H 好评  M 中评 L 差评
+        $images        = $request->input('images');//筛选有图片的评论
+        $follow_discuss= $request->input('follow_discuss');//筛选有追评的评论
         $listrows      = $num;
         $firstrow      = ($page-1)*$listrows;
         $search = [];
@@ -49,7 +52,17 @@ class DiscussController extends CommonController{
         }])
             ->with(['TmsLine' => function($query) use($select2){
                 $query->select($select2);
-            }])
+            }]);
+        if ($score == 'H'){
+            $data['info'] = $data['info']->where('score','>=',3);
+        }
+        if ($images == 'Y'){
+            $data['info'] = $data['info']->where('images','!=',null);
+        }
+        if ($follow_discuss == 'Y'){
+            $data['info'] = $data['info']->where('follow_discuss','=','Y');
+        }
+        $data['info'] = $data['info']
             ->where($where)
             ->offset($firstrow)
             ->limit($listrows)
@@ -57,8 +70,13 @@ class DiscussController extends CommonController{
             ->select($select)
             ->get();
         $data['total'] = TmsDiscuss::where($where)->count();
-
-//        $data['info']['score'] = TmsDiscuss::where('type',$type)->a
+        $data['score'] = round(TmsDiscuss::where($where)->avg('score'),1);
+        $data['neat'] = TmsDiscuss::where($where)->where('neat','Y')->count();
+        $data['fast'] = TmsDiscuss::where($where)->where('fast','Y')->count();
+        $data['condition'] = TmsDiscuss::where($where)->where('condition','Y')->count();
+        $data['temperture'] = TmsDiscuss::where($where)->where('temperture','Y')->count();
+        $data['car_smell'] = TmsDiscuss::where($where)->where('car_smell','Y')->count();
+        $data['on_time'] = TmsDiscuss::where($where)->where('on_time','Y')->count();
         foreach ($data['info'] as $k => $v){
             $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
             $v->images   = img_for($v->images,'more');
