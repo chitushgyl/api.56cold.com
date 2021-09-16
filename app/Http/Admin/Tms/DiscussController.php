@@ -70,7 +70,11 @@ class DiscussController extends CommonController{
                 break;
 
             case 'one':
-                $where[]=['group_code','=',$group_info['group_code']];
+                if ($type == 'line'){
+
+                }else{
+                    $where[]=['group_code','=',$group_info['group_code']];
+                }
                 $data['total']=TmsDiscuss::where($where)->count(); //总的数据量
                 $data['items']=TmsDiscuss::with(['TmsOrder' => function($query) use($select1){
                     $query->select($select1);
