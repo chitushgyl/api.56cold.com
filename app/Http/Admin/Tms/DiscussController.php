@@ -6,6 +6,7 @@ use App\Models\Tms\TmsDiscuss;
 use App\Models\Tms\TmsOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\StatusController as Status;
+use Illuminate\Support\Facades\Validator;
 
 class DiscussController extends CommonController{
     /**
