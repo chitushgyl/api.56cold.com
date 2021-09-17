@@ -40,6 +40,7 @@ class DiscussController extends CommonController{
             ['type'=>'=','name'=>'carriage_id','value'=>$carriage_id],
             ['type'=>'=','name'=>'type','value'=>$type],
             ['type'=>'=','name'=>'line_id','value'=>$line_id],
+            ['type'=>'=','name'=>'carriage_user','value'=>$carriage_user],
 
         ];
 
