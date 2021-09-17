@@ -258,7 +258,7 @@ class DiscussController extends CommonController{
                 $data['line_id']             = $line_id;
                 $data['anonymous']           = $anonymous;
                 $data['score']               = $score;
-                $data['images']              = $images;
+                $data['images']              = img_for($images,'more');
                 $data['on_time']             = $on_time;
                 $data['neat']                = $neat;
                 $data['fast']                = $fast;
