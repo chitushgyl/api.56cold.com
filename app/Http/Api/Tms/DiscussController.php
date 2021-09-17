@@ -206,7 +206,7 @@ class DiscussController extends CommonController{
                 $data['update_time'] = $now_time;
                 if ($follow_flag == 'Y'){
                     $update['update_time'] = $now_time;
-                    $update['follow_discuss'] = 'Y';
+                    $update['follow_flag'] = 'Y';
                     $order_info = TmsOrder::where('self_id',$order_id)->update($update);
                 }
 
