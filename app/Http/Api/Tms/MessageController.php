@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Admin\Api;
+namespace App\Http\Api\Tms;
 
 
 use App\Http\Controllers\Controller;
