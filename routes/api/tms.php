@@ -195,6 +195,7 @@ Route::group([
         Route::any('/discuss/delFlag','DiscussController@delFlag');
         Route::any('/discuss/billDetails','DiscussController@billDetails');
 
+        Route::any('/message/messagePage','MessageController@messagePage');
     });
     Route::group([
         'prefix' => 'api','namespace'  => 'Tms',
