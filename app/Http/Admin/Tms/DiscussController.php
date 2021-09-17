@@ -42,6 +42,7 @@ class DiscussController extends CommonController{
         $images        = $request->input('images');//筛选有图片的评论 有 Y
         $follow_discuss= $request->input('follow_discuss');//筛选有追评的评论 有 Y
         $carriage_id   = $request->input('carriage_id');//
+        $carriage_user   = $request->input('carriage_user');//
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
 
@@ -50,12 +51,13 @@ class DiscussController extends CommonController{
             ['type'=>'=','name'=>'carriage_id','value'=>$carriage_id],
             ['type'=>'=','name'=>'type','value'=>$type],
             ['type'=>'=','name'=>'line_id','value'=>$line_id],
+            ['type'=>'=','name'=>'carriage_user','value'=>$carriage_user],
         ];
 
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
-            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id'];
+            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id','carriage_user'];
         $select1 = ['self_id','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
         $select2 = ['self_id','shift_number','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
         switch ($group_info['group_id']){
@@ -169,7 +171,7 @@ class DiscussController extends CommonController{
             ['self_id','=',$self_id],
         ];
         $select=['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
-            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id'];
+            'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id','carriage_user'];
         $data['info'] = TmsBill::where($where)->select($select)->first();
         if ($data['info']){
 
@@ -214,6 +216,7 @@ class DiscussController extends CommonController{
         $temperture            = $request->input('temperture');//温度达标
         $car_smell             = $request->input('car_smell');//车内无异味
         $carriage_id           = $request->input('carriage_id');//承运人ID
+        $carriage_user           = $request->input('carriage_user');//承运人ID
 
         /*** 虚拟数据
         $input['self_id']           =$self_id       ='';
@@ -262,6 +265,7 @@ class DiscussController extends CommonController{
             $data['temperture']          = $temperture;
             $data['car_smell']           = $car_smell;
             $data['carriage_id']         = $carriage_id;
+            $data['carriage_user']         = $carriage_user;
 
             $wheres['self_id'] = $self_id;
             $old_info = TmsDiscuss::where($wheres)->first();
