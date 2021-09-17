@@ -313,9 +313,9 @@ Route::group([
 
     /** TMS滚动消息 ***/
     Route::any('/message/messageList','MessageController@messageList');
-    Route::any('/message/messagePage','MessageController@discussPage');
-    Route::any('/message/createMessage','MessageController@createDiscuss');
-    Route::any('/message/addMessage','MessageController@addDiscuss');
+    Route::any('/message/messagePage','MessageController@messagePage');
+    Route::any('/message/createMessage','MessageController@createMessage');
+    Route::any('/message/addMessage','MessageController@addMessage');
     Route::any('/message/messageUseFlag','MessageController@messageUseFlag');
     Route::any('/message/messageDelFlag','MessageController@messageDelFlag');
     Route::any('/message/messageDetails','MessageController@messageDetails');
