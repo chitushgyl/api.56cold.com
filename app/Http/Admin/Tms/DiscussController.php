@@ -249,23 +249,24 @@ class DiscussController extends CommonController{
 
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()){
-            $data['order_id']            = $order_id;
             $data['type']                = $type;
-            $data['content']             = $content;
-            $data['line_id']             = $line_id;
-            $data['anonymous']           = $anonymous;
-            $data['score']               = $score;
             $data['follow_discuss']      = $follow_discuss;
             $data['follow_flag']         = $follow_flag;
-            $data['images']              = img_for($images,'in');
-            $data['on_time']             = $on_time;
-            $data['neat']                = $neat;
-            $data['fast']                = $fast;
-            $data['condition']           = $condition;
-            $data['temperture']          = $temperture;
-            $data['car_smell']           = $car_smell;
-            $data['carriage_id']         = $carriage_id;
-            $data['carriage_user']         = $carriage_user;
+            if ($follow_flag == 'N'){
+                $data['order_id']            = $order_id;
+                $data['content']             = $content;
+                $data['line_id']             = $line_id;
+                $data['anonymous']           = $anonymous;
+                $data['score']               = $score;
+                $data['images']              = $images;
+                $data['on_time']             = $on_time;
+                $data['neat']                = $neat;
+                $data['fast']                = $fast;
+                $data['condition']           = $condition;
+                $data['temperture']          = $temperture;
+                $data['car_smell']           = $car_smell;
+                $data['carriage_id']         = $carriage_id;
+            }
 
             $wheres['self_id'] = $self_id;
             $old_info = TmsDiscuss::where($wheres)->first();
