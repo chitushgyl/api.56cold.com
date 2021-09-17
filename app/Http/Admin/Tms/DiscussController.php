@@ -174,7 +174,7 @@ class DiscussController extends CommonController{
             'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id','carriage_user'];
         $data['info'] = TmsBill::where($where)->select($select)->first();
         if ($data['info']){
-
+            $data['info']->images = img_for($data['info']->images,'more');
         }
         $msg['code'] = 200;
         $msg['msg']  = "数据拉取成功";
@@ -258,7 +258,7 @@ class DiscussController extends CommonController{
                 $data['line_id']             = $line_id;
                 $data['anonymous']           = $anonymous;
                 $data['score']               = $score;
-                $data['images']              = img_for($images,'more');
+                $data['images']              = img_for($images,'in');
                 $data['on_time']             = $on_time;
                 $data['neat']                = $neat;
                 $data['fast']                = $fast;
