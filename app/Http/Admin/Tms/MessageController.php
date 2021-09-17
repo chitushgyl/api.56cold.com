@@ -171,7 +171,7 @@ class MessageController extends CommonController{
                 $operationing->access_cause='新建滚动消息';
                 $operationing->operation_type='create';
             }
-            $operationing->table_id=$data['self_id'];
+            $operationing->table_id=$self_id;
             $operationing->old_info=null;
             $operationing->new_info=$data;
 
