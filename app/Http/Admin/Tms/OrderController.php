@@ -123,7 +123,7 @@ class OrderController extends CommonController{
             'line_gather_sheng','line_gather_shi','line_gather_qu','line_gather_sheng_name','line_gather_shi_name','line_gather_qu_name' , 'line_gather_address','remark',
             'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi',
             'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','clod','pick_flag','send_flag',
-            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag'
+            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag','receiver_id'
         ];
         switch ($group_info['group_id']){
             case 'all':
