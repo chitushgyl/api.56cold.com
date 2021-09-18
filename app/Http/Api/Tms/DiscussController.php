@@ -97,13 +97,19 @@ class DiscussController extends CommonController{
         /** 接收数据*/
         $self_id = $request->input('self_id');
 //        $self_id = 'car_20210313180835367958101';
-        $tax_type = array_column(config('tms.tax_type'),'name','key');
-        $bill_type = array_column(config('tms.bill_type'),'name','key');
+        $order_id = $request->input('order_id');
+        if ($self_id){
+            $where = [
+                ['delete_flag','=','Y'],
+                ['self_id','=',$self_id],
+            ];
+        }else{
+            $where = [
+                ['delete_flag','=','Y'],
+                ['order_id','=',$order_id],
+            ];
+        }
 
-        $where = [
-            ['delete_flag','=','Y'],
-            ['self_id','=',$self_id],
-        ];
         $select = ['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
             'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id','carriage_user'];
         $data['info'] = TmsDiscuss::where($where)->select($select)->first();
@@ -199,9 +205,6 @@ class DiscussController extends CommonController{
             $wheres['self_id'] = $self_id;
             $old_info = TmsDiscuss::where($wheres)->first();
 
-            if ($type == 'vehicle'){
-
-            }
             if($old_info){
                 $data['update_time'] = $now_time;
                 if ($follow_flag == 'Y'){
