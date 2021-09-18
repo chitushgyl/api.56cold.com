@@ -1409,6 +1409,28 @@ class AlipayController extends Controller{
     }
 
 
+    /**
+     * 微信查询订单是否支付  alipay/queryWechat
+     * */
+    public function queryWechat(Request $request){
+        $self_id = $request->input('self_id');//订单ID
+//        $self_id = 'order_202109151834352525376788';
+        include_once base_path('/vendor/wxpay/lib/WxPay.Api.php');
+        $input = new \WxPayOrderQuery();
+        $input->SetOut_trade_no($self_id);
+        $result = WxPayQ::orderQuery($input);
+        if($result['result_code'] == 'SUCCESS' && $result['return_code']=='SUCCESS' && $result['return_msg'] == 'OK'){
+            $msg['code'] = 200;
+            $msg['msg']  = '支付成功';
+            return $msg;
+        }else{
+            $msg['code'] = 301;
+            $msg['msg']  = $result['err_code_des'];
+            return $msg;
+        }
+    }
+
+
 
 
 
