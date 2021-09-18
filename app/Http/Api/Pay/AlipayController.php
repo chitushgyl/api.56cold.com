@@ -1121,7 +1121,7 @@ class AlipayController extends Controller{
                 echo 'fail';
                 return false;
             }
-            if (substr($_POST['passback_params'],3) == 'user'){
+            if (substr($array_data['attach'],3) == 'user'){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
                 $where = [
@@ -1282,7 +1282,7 @@ class AlipayController extends Controller{
                 echo 'success';
                 return false;
             }
-            if ($order->total_user_id){
+            if (substr($_POST['passback_params'],3) == 'user'){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
                 $where = [
