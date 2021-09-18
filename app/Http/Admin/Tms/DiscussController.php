@@ -60,12 +60,20 @@ class DiscussController extends CommonController{
             'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id','carriage_user'];
         $select1 = ['self_id','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
         $select2 = ['self_id','shift_number','gather_sheng_name','gather_shi_name','gather_qu_name','send_sheng_name','send_shi_name','send_qu_name'];
+        $select3 = ['self_id','group_name'];
+        $select4 = ['self_id','tel'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsDiscuss::where($where)->count(); //总的数据量
                 $data['items']=TmsDiscuss::with(['TmsOrder' => function($query) use($select1){
                     $query->select($select1);
                 }])
+                    ->with(['SystemGroup' => function($query) use($select3){
+                        $query->select($select3);
+                    }])
+                    ->with(['UserTotal' => function($query) use($select4){
+                        $query->select($select4);
+                    }])
                     ->with(['TmsLine' => function($query) use($select2){
                         $query->select($select2);
                     }]);
@@ -95,6 +103,12 @@ class DiscussController extends CommonController{
                 $data['items']=TmsDiscuss::with(['TmsOrder' => function($query) use($select1){
                     $query->select($select1);
                 }])
+                    ->with(['SystemGroup' => function($query) use($select3){
+                        $query->select($select3);
+                    }])
+                    ->with(['UserTotal' => function($query) use($select4){
+                        $query->select($select4);
+                    }])
                     ->with(['TmsLine' => function($query) use($select2){
                         $query->select($select2);
                     }]);
@@ -119,6 +133,12 @@ class DiscussController extends CommonController{
                 $data['items']=TmsDiscuss::with(['TmsOrder' => function($query) use($select1){
                     $query->select($select1);
                 }])
+                    ->with(['SystemGroup' => function($query) use($select3){
+                        $query->select($select3);
+                    }])
+                    ->with(['UserTotal' => function($query) use($select4){
+                        $query->select($select4);
+                    }])
                     ->with(['TmsLine' => function($query) use($select2){
                         $query->select($select2);
                     }]);
