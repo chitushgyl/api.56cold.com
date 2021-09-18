@@ -1316,7 +1316,7 @@ class AlipayController extends Controller{
 
             $order_update['pay_state'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
-            TmsOrder:where('self_id',$order->order_id)->update($order_update);
+            TmsOrder::where('self_id',$order->order_id)->update($order_update);
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
