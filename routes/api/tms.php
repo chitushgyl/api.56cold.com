@@ -104,6 +104,8 @@ Route::any('/alipay/onlineApipay_notity', 'Pay\AlipayController@onlineApipay_not
 Route::any('/alipay/onlineWechat_notify', 'Pay\AlipayController@onlineWechat_notify');
 Route::any('/alipay/paymentAlipayNotify', 'Pay\AlipayController@paymentAlipayNotify');
 Route::any('/alipay/paymentWechatNotify', 'Pay\AlipayController@paymentWechatNotify');
+Route::any('/alipay/nativeNotify', 'Pay\AlipayController@nativeNotify');
+Route::any('/alipay/qrcode_notify', 'Pay\AlipayController@qrcode_notify');
 
 Route::group([
     "middleware"=>['frontCheck','userCheck','holdCheck'],

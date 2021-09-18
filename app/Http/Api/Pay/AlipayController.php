@@ -1065,7 +1065,7 @@ class AlipayController extends Controller{
         $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
-        $notify_url = 'https://api.56cold.com/alipay/paymentWechatNotify';
+        $notify_url = 'https://api.56cold.com/alipay/nativeNotify';
         include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
         include_once base_path('/vendor/wxpay/NativePay.php');
         $notify = new \NativePay;
@@ -1097,7 +1097,7 @@ class AlipayController extends Controller{
     }
 
     /**
-     * 微信扫码支付
+     * 微信扫码支付回调
      * */
     public function nativeNotify(Request $request){
         ini_set('date.timezone','Asia/Shanghai');
@@ -1219,7 +1219,7 @@ class AlipayController extends Controller{
         $aop->signType = $config['sign_type'];
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "https://api.56cold.com/alipay/paymentAlipayNotify";
+        $notifyurl = "https://api.56cold.com/alipay/qrcode_notify";
 
         $aop->alipayrsaPublicKey = $config['alipay_public_key'];
         $bizcontent = json_encode([
@@ -1262,7 +1262,7 @@ class AlipayController extends Controller{
         $flag = $aop->rsaCheckV1($_POST, NULL, "RSA2");
         if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
             $now_time = date('Y-m-d H:i:s',time());
-            $pay['order_id'] = $_POST['out_trade_no'];
+            $pay['dispatch_id'] = $_POST['out_trade_no'];
             $pay['pay_number'] = $_POST['total_amount'] * 100;
             $pay['platformorderid'] = $_POST['trade_no'];
             $pay['create_time'] = $pay['update_time'] = $now_time;
