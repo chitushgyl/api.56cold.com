@@ -70,13 +70,13 @@ class DiscussController extends CommonController{
                         $query->select($select2);
                     }]);
                 if ($score == 'H'){
-                    $data['info'] = $data['info']->where('score','>=',3);
+                    $data['items'] = $data['items']->where('score','>=',3);
                 }
                 if ($images == 'Y'){
-                    $data['info'] = $data['info']->where('images','!=',null);
+                    $data['items'] = $data['items']->where('images','!=',null);
                 }
                 if ($follow_discuss == 'Y'){
-                    $data['info'] = $data['info']->where('follow_discuss','=','Y');
+                    $data['items'] = $data['items']->where('follow_discuss','=','Y');
                 }
                 $data['items'] = $data['items']
                     ->where($where)
@@ -99,13 +99,13 @@ class DiscussController extends CommonController{
                         $query->select($select2);
                     }]);
                 if ($score == 'H'){
-                    $data['info'] = $data['info']->where('score','>=',3);
+                    $data['items'] = $data['items']->where('score','>=',3);
                 }
                 if ($images == 'Y'){
-                    $data['info'] = $data['info']->where('images','!=',null);
+                    $data['items'] = $data['items']->where('images','!=',null);
                 }
                 if ($follow_discuss == 'Y'){
-                    $data['info'] = $data['info']->where('follow_discuss','=','Y');
+                    $data['items'] = $data['items']->where('follow_discuss','=','Y');
                 }
                 $data['items'] = $data['items']
                     ->where($where)
@@ -123,13 +123,13 @@ class DiscussController extends CommonController{
                         $query->select($select2);
                     }]);
                 if ($score == 'H'){
-                    $data['info'] = $data['info']->where('score','>=',3);
+                    $data['items'] = $data['items']->where('score','>=',3);
                 }
                 if ($images == 'Y'){
-                    $data['info'] = $data['info']->where('images','!=',null);
+                    $data['items'] = $data['items']->where('images','!=',null);
                 }
                 if ($follow_discuss == 'Y'){
-                    $data['info'] = $data['info']->where('follow_discuss','=','Y');
+                    $data['items'] = $data['items']->where('follow_discuss','=','Y');
                 }
                 $data['items'] = $data['items']
                     ->where($where)->whereIn('group_code',$group_info['group_code'])
