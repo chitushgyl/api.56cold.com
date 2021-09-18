@@ -1073,7 +1073,7 @@ class AlipayController extends Controller{
         $params->SetBody($body);//商品描述
         $params->SetAttach($user_id);//设置附加数据，在查询API和支付通知中原样返回
         $params->SetOut_trade_no($out_trade_no);//订单ID
-        $params->SetTotal_fee($price);//支付金额
+        $params->SetTotal_fee($price*100);//支付金额
         $params->SetTime_start(date("YmdHis"));
         $params->SetTime_expire(date("YmdHis", time() + 600));
         $params->SetGoods_tag("test");//设置商品标记，代金券或立减优惠功能的参数 */
