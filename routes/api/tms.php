@@ -94,6 +94,7 @@ Route::group([
     Route::any('/alipay/qrcode', 'Pay\AlipayController@qrcode');
     Route::any('/alipay/getClientType', 'Pay\AlipayController@getClientType');
     Route::any('/alipay/queryWechat', 'Pay\AlipayController@queryWechat');
+    Route::any('/alipay/queryPayment', 'Pay\AlipayController@queryPayment');
 });
 Route::any('/alipay/notify', 'Pay\AlipayController@notify');
 Route::any('/alipay/wxpaynotify', 'Pay\AlipayController@wxpaynotify');
