@@ -1430,6 +1430,15 @@ class AlipayController extends Controller{
         }
     }
 
+    /**
+     * 查询订单是否支付  /alipay/queryPayment
+     * */
+    public function queryPayment(Request $request){
+        $order_id = $request->input('order_id');
+        $dispatch_id = $request->input('dispatch_id');
+        TmsPayment::where('order_id',$order_id)->orWhere('dispatch_id',$dispatch_id)->first();
+    }
+
 
 
 

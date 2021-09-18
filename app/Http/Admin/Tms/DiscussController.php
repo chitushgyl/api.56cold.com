@@ -179,7 +179,7 @@ class DiscussController extends CommonController{
         }
         $select=['self_id','order_id','type','content','line_id','anonymous','score','follow_discuss','follow_flag','images','delete_flag','create_time','on_time',
             'total_user_id','group_name','group_code','neat','fast','condition','temperture','car_smell','carriage_id','carriage_user'];
-        $data['info'] = TmsBill::where($where)->select($select)->first();
+        $data['info'] = TmsDiscuss::where($where)->select($select)->first();
         if ($data['info']){
             $data['info']->images = img_for($data['info']->images,'more');
         }
