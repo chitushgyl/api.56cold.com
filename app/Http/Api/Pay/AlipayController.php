@@ -1436,7 +1436,23 @@ class AlipayController extends Controller{
     public function queryPayment(Request $request){
         $order_id = $request->input('order_id');
         $dispatch_id = $request->input('dispatch_id');
-        TmsPayment::where('order_id',$order_id)->orWhere('dispatch_id',$dispatch_id)->first();
+        $order_id = 'order_202109080956400191126933';
+        $info = TmsPayment::where('order_id',$order_id)->orWhere('dispatch_id',$dispatch_id)->first();
+        if ($info){
+            if ($info->pay_result == 'SU'){
+                $msg['code'] = 200;
+                $msg['msg']  = '支付成功';
+                return $msg;
+            }else{
+                $msg['code'] = 301;
+                $msg['msg']  = '该未支付成功';
+                return $msg;
+            }
+        }else{
+            $msg['code'] = 301;
+            $msg['msg']  = '该未支付成功';
+            return $msg;
+        }
     }
 
 
