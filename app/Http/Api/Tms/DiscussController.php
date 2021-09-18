@@ -91,6 +91,12 @@ class DiscussController extends CommonController{
         foreach ($data['info'] as $k => $v){
             $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
             $v->images   = img_for($v->images,'more');
+            if ($v->SystemGroup){
+                $v->user_name = $v->SystemGroup->group_name;
+            }
+            if ($v->UserTotal){
+                $v->user_name = $v->UserTotal->tel;
+            }
         }
         $msg['code']=200;
         $msg['msg']="数据拉取成功";

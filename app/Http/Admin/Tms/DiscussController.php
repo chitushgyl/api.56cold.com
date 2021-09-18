@@ -168,7 +168,12 @@ class DiscussController extends CommonController{
         $data['on_time'] = TmsDiscuss::where($where)->where('on_time','Y')->count();
         foreach ($data['items'] as $k=>$v) {
             $v->images   = img_for($v->images,'more');
-
+            if ($v->SystemGroup){
+                $v->user_name = $v->SystemGroup->group_name;
+            }
+            if ($v->UserTotal){
+                $v->user_name = $v->UserTotal->tel;
+            }
         }
 
         $msg['code']=200;
