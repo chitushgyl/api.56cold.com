@@ -339,13 +339,14 @@ class CarController extends Controller{
         $data['info']=TmsCarType::where($where)->select($select)->get();
         if ($data['info']){
             foreach ($data['info'] as $key =>$value){
+                $data['info'][$key]['weight'] = $value['allweight']/1000;
+                $data['info'][$key]['volume'] = $value['allvolume'];
                 $data['info'][$key]['img'] = img_for($value['img'],'no_json');
                 $data['info'][$key]['select_show'] = $value['parame_name'].'*核载：'.($value['allweight']/100).'吨/'.$value['allvolume'].'方';
                 $data['info'][$key]['allweight'] = ($value['allweight']/1000).'吨';
                 $data['info'][$key]['allvolume'] = $value['allvolume'].'方';
                 $data['info'][$key]['dimensions'] = $value['dimensions'].'米';
-                $data['info'][$key]['weight'] = $value['allweight']/1000;
-                $data['info'][$key]['volume'] = $value['allvolume'];
+
             }
         }
 //        dd($data['info']->toArray());
