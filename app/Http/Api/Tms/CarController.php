@@ -344,6 +344,8 @@ class CarController extends Controller{
                 $data['info'][$key]['allweight'] = ($value['allweight']/1000).'吨';
                 $data['info'][$key]['allvolume'] = $value['allvolume'].'方';
                 $data['info'][$key]['dimensions'] = $value['dimensions'].'米';
+                $data['info'][$key]['weight'] = $value['allweight']/1000;
+                $data['info'][$key]['volume'] = $value['allvolume'];
             }
         }
 //        dd($data['info']->toArray());
