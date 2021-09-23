@@ -1206,7 +1206,10 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-
+        $msg['code'] = 401;
+        $msg['msg']  = '未登录，请完成登录！';
+        $msg['data'] = $user_id;
+        return $msg;
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         include_once base_path( '/vendor/alipay/aop/request/AlipayTradePrecreateRequest.php');
         $aop = new \AopClient();
@@ -1272,7 +1275,7 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
-            file_put_contents(base_path('/vendor/alipay_tt.txt'),$pay);
+            file_put_contents(base_path('/vendor/alipay_tt.txt'),$_POST);
             $order = TmsOrderDispatch::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_status','order_id'])->first();
             if ($order->pay_status == 'Y'){
                 echo 'success';
