@@ -1057,7 +1057,7 @@ class AlipayController extends Controller{
 //        $input = $request->post();
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
-        if ($user_info->type == 'user'){
+        if ($user_info->type == 'user'|| $user_info->type == 'carriage'){
             $user_id = $user_info->total_user_id;
         }else{
             $user_id = $user_info->group_code;
@@ -1201,15 +1201,11 @@ class AlipayController extends Controller{
         $type = 1;
         $self_id = 'order_2021030945673082733451';
          * */
-        if ($user_info->type == 'user'){
+        if ($user_info->type == 'user' || $user_info->type == 'carriage'){
             $user_id = $user_info->total_user_id;
         }else{
             $user_id = $user_info->group_code;
         }
-        $msg['code'] = 401;
-        $msg['msg']  = '未登录，请完成登录！';
-        $msg['data'] = $user_info;
-        return $msg;
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         include_once base_path( '/vendor/alipay/aop/request/AlipayTradePrecreateRequest.php');
         $aop = new \AopClient();
