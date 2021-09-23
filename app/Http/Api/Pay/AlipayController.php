@@ -508,7 +508,7 @@ class AlipayController extends Controller{
                 echo 'fail';
                 return false;
             }
-            if (substr($_POST['passback_params'],3) == 'user'){
+            if (substr($_POST['passback_params'],0,4) == 'user'){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
                 $where = [
@@ -835,7 +835,7 @@ class AlipayController extends Controller{
                 echo 'fail';
                 return false;
             }
-            if (substr($_POST['passback_params'],3) == 'user'){
+            if (substr($_POST['passback_params'],0,4) == 'user'){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
                 $where = [
@@ -1121,7 +1121,7 @@ class AlipayController extends Controller{
                 echo 'fail';
                 return false;
             }
-            if (substr($array_data['attach'],3) == 'user'){
+            if (substr($array_data['attach'],0,4) == 'user'){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
                 $where = [
@@ -1283,7 +1283,8 @@ class AlipayController extends Controller{
                 echo 'success';
                 return false;
             }
-            if (substr($_POST['passback_params'],3) == 'user'){
+            file_put_contents(base_path('/vendor/text.txt'),substr($_POST['passback_params'],3));
+            if (substr($_POST['passback_params'],0,4) == 'user'){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
                 $where = [
