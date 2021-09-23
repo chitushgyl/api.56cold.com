@@ -561,7 +561,7 @@ class BillController extends Controller{
              $data['company_address']     = $company_address;
              $data['company_tel']         = $company_tel;
              $data['special_use']         = $special_use;
-             $data['license']             = $license;
+             $data['license']             = img_for($license,'in');
              $data['default_flag']        = $default_flag;
 
              $wheres['self_id'] = $self_id;
@@ -651,6 +651,7 @@ class BillController extends Controller{
 
         if($info) {
             /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
+            $info->license = img_for($info->license,'more');
             $data['info'] = $info;
             $msg['code']  = 200;
             $msg['msg']   = "数据拉取成功";

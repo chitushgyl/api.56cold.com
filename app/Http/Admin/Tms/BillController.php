@@ -855,6 +855,7 @@ class BillController extends CommonController {
 
         if($info) {
             /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
+            $info->license = img_for($info->license,'more');
             $data['info'] = $info;
             $msg['code']  = 200;
             $msg['msg']   = "数据拉取成功";
