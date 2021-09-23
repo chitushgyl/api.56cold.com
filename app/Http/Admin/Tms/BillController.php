@@ -200,6 +200,7 @@ class BillController extends CommonController {
         /** 接收中间件参数**/
         $group_info     = $request->get('group_info');//接收中间件产生的参数
         $button_info    = $request->get('anniu');//接收中间件产生的参数
+        $buttonInfo     = $request->get('buttonInfo');
         $tax_type = array_column(config('tms.tax_type'),'name','key');
         $bill_type = array_column(config('tms.bill_type'),'name','key');
         /**接收数据*/
@@ -258,8 +259,8 @@ class BillController extends CommonController {
             }
 
             $button1 = [];
-            foreach ($button_info as $key => $value){
-                if ($value->id == 231 ){
+            foreach ($buttonInfo as $key => $value){
+                if ($value->id == 232 ){
                     $button1[] = $value;
                 }
                 if ($v->repeat_flag == 'N'){
