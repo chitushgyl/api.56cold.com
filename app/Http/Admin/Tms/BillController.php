@@ -218,7 +218,7 @@ class BillController extends CommonController {
         $where=get_list_where($search);
 
         $select=['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag','repeat_flag'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','bill_flag','repeat_flag','email'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=TmsBill::where($where)->count(); //总的数据量
@@ -293,7 +293,7 @@ class BillController extends CommonController {
             ['self_id','=',$self_id],
         ];
         $select = ['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','email'];
         $data['info'] = TmsBill::where($where)->select($select)->first();
         if ($data['info']){
             $data['info']->tax_type_show =  $tax_type[$data['info']->type] ?? null;
@@ -334,6 +334,7 @@ class BillController extends CommonController {
         $name                  = $request->input('name');
         $tel                   = $request->input('tel');
         $contact_address       = $request->input('contact_address');
+        $email                 = $request->input('email');
         $remark                = $request->input('remark');
         $tax_price             = $request->input('tax_price');
 
@@ -396,6 +397,7 @@ class BillController extends CommonController {
             $data['name']                = $name;
             $data['tel']                 = $tel;
             $data['contact_address']     = $contact_address;
+            $data['email']               = $email;
             $data['remark']              = $remark;
             $data['tax_price']           = $tax_price*100;
 
@@ -481,7 +483,7 @@ class BillController extends CommonController {
         $self_id    = $request->input('self_id');
         $table_name = 'tms_bill';
         $select = ['self_id','order_id','type','company_title','company_tax_number','bank_name','bank_num','company_address','company_tel','name','tel','remark','tax_price',
-            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','contact_address'];
+            'total_user_id','group_name','group_code','delete_flag','create_time','bill_type','contact_address','email'];
         $select1 = ['self_id','send_shi_name','gather_shi_name','total_money'];
         // $self_id = 'car_202101111749191839630920';
         $info = $details->details($self_id,$table_name,$select);
