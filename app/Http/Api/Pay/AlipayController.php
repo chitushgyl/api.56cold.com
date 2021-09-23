@@ -1208,7 +1208,7 @@ class AlipayController extends Controller{
         }
         $msg['code'] = 401;
         $msg['msg']  = '未登录，请完成登录！';
-        $msg['data'] = $user_id;
+        $msg['data'] = $user_info;
         return $msg;
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         include_once base_path( '/vendor/alipay/aop/request/AlipayTradePrecreateRequest.php');
