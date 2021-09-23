@@ -1115,7 +1115,7 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//微信账号
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
-            $order = TmsOrderDispatch::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name','pay_type','pay_status'])->first();
+            $order = TmsOrderDispatch::where('self_id',$array_data['out_trade_no'])->select(['order_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name','pay_type','pay_status'])->first();
             $payment_info = TmsPayment::where('dispatch_id',$array_data['out_trade_no'])->select(['pay_result','state','dispatch_id'])->first();
             if ($payment_info){
                 echo 'fail';
@@ -1273,7 +1273,7 @@ class AlipayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
 //            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
-            $order = TmsOrderDispatch::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_status'])->first();
+            $order = TmsOrderDispatch::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_status','order_id'])->first();
             if ($order->pay_status == 'Y'){
                 echo 'success';
                 return false;
@@ -1318,7 +1318,7 @@ class AlipayController extends Controller{
             $order_update['pay_state'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $order_su = TmsOrder::where('self_id',$order->order_id)->update($order_update);
-            file_put_contents(base_path('/vendor/qrcodeAlipay.txt'),$wallet_su.$order_su);
+            file_put_contents(base_path('/vendor/qrcodeAlipay.txt'),$id.$wallet_su.$order_su);
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
