@@ -1138,7 +1138,7 @@ class AlipayController extends Controller{
             }
             TmsPayment::insert($pay);
 
-            $capital = UserCapital::where($where)->first();
+            $capital = UserCapital::where($where)->select(['self_id','money','group_code','total_user_id'])->first();
             $wallet['self_id'] = generate_id('wallet_');
             $wallet['produce_type'] = 'out';
             $wallet['capital_type'] = 'wallet';
@@ -1149,14 +1149,15 @@ class AlipayController extends Controller{
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
 
-
+            $wallet_su = UserWallet::insert($wallet);
             $dispatch_update['update_time'] = date('Y-m-d H:i:s',time());
             $dispatch_update['pay_status'] = 'Y';
             $id = TmsOrderDispatch::where('self_id',$array_data['out_trade_no'])->update($dispatch_update);
 
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $order_update['pay_state'] = 'Y';
-            TmsOrder::where('self_id',$order->order_id)->update($order_update);
+            $order_su = TmsOrder::where('self_id',$order->order_id)->update($order_update);
+            file_put_contents(base_path('/vendor/qrcodeAlipay.txt'),$wallet_su.$order_su);
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
@@ -1298,7 +1299,7 @@ class AlipayController extends Controller{
                 ];
             }
             TmsPayment::insert($pay);
-            $capital = UserCapital::where($where)->first();
+            $capital = UserCapital::where($where)->select(['money','self_id','group_code','total_user_id'])->first();
             $wallet['self_id'] = generate_id('wallet_');
             $wallet['produce_type'] = 'out';
             $wallet['capital_type'] = 'wallet';
@@ -1308,7 +1309,7 @@ class AlipayController extends Controller{
             $wallet['now_money'] = $capital->money;
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
-            UserWallet::insert($wallet);
+            $wallet_su = UserWallet::insert($wallet);
 //            $order_update['order_status'] = 6;
             $dispatch_update['pay_status'] = 'Y';
             $dispatch_update['update_time'] = date('Y-m-d H:i:s',time());
@@ -1316,7 +1317,8 @@ class AlipayController extends Controller{
 
             $order_update['pay_state'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
-            TmsOrder::where('self_id',$order->order_id)->update($order_update);
+            $order_su = TmsOrder::where('self_id',$order->order_id)->update($order_update);
+            file_put_contents(base_path('/vendor/qrcodeAlipay.txt'),$wallet_su.$order_su);
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
