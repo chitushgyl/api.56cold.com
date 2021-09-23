@@ -1272,7 +1272,7 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
-            file_put_contents(base_path('/vendor/alipay_test.txt'),$pay);
+            file_put_contents(base_path('/vendor/alipay_tt.txt'),$pay);
             $order = TmsOrderDispatch::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_status','order_id'])->first();
             if ($order->pay_status == 'Y'){
                 echo 'success';
@@ -1283,7 +1283,7 @@ class AlipayController extends Controller{
                 echo 'success';
                 return false;
             }
-            file_put_contents(base_path('/vendor/text.txt'),substr($_POST['passback_params'],3));
+            file_put_contents(base_path('/vendor/text.txt'),substr($_POST['passback_params'],0,4));
             if (substr($_POST['passback_params'],0,4) == 'user'){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
