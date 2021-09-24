@@ -304,7 +304,7 @@ class BillController extends Controller{
                 $id = TmsBill::where($wheres)->update($data);
 
             }else{
-                $data['self_id']          = generate_id('car_');
+                $data['self_id']          = generate_id('bill_');
                 $data['total_user_id']    = $total_user_id;
 //                $data['create_user_id']   = $total_user_id;
 //                $data['create_user_name'] = $token_name;
