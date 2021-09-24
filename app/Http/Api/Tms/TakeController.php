@@ -459,7 +459,7 @@ class TakeController extends Controller{
                         if ($v->order_status == 4 ){
                             $v->button  = $button2;
                         }
-                        if ($v->order_status == 5){
+                        if ($v->order_status == 5 && $v->receipt_flag == 'N'){
                             $v->button  = $button3;
                         }
                         if ($v->order_status == 5 && $v->receipt_flag == 'N' && $v->pay_type == 'offline' && $v->pay_status == 'N'){
