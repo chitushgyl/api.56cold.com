@@ -418,7 +418,7 @@ class DispatchController extends CommonController{
                     if ($value->order_status == 5 && $value->receipt_flag == 'Y' && $value->pay_type == 'offline' && $value->pay_status == 'N'){
                         $value->button = $button7;
                     }
-                    if ($value->order_status == 6){
+                    if ($value->order_status == 6 && $value->receipt_flag == 'N'){
                         $value->button  = $button4;
                     }
                     if ($value->order_status == 6  && $value->pay_type == 'offline' && $value->pay_status == 'N' && $value->receipt_flag == 'N'){
