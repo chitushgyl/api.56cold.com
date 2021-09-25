@@ -71,7 +71,7 @@ class DiscussController extends CommonController{
             $data['info'] = $data['info']->where('images','!=',null);
         }
         if ($follow_discuss == 'Y'){
-            $data['info'] = $data['info']->where('follow_discuss','=','Y');
+            $data['info'] = $data['info']->where('follow_flag','=','Y');
         }
         $data['info'] = $data['info']
             ->where($where)

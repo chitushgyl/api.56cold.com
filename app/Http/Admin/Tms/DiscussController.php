@@ -84,7 +84,7 @@ class DiscussController extends CommonController{
                     $data['items'] = $data['items']->where('images','!=',null);
                 }
                 if ($follow_discuss == 'Y'){
-                    $data['items'] = $data['items']->where('follow_discuss','=','Y');
+                    $data['items'] = $data['items']->where('follow_flag','=','Y');
                 }
                 $data['items'] = $data['items']
                     ->where($where)
@@ -119,7 +119,7 @@ class DiscussController extends CommonController{
                     $data['items'] = $data['items']->where('images','!=',null);
                 }
                 if ($follow_discuss == 'Y'){
-                    $data['items'] = $data['items']->where('follow_discuss','=','Y');
+                    $data['items'] = $data['items']->where('follow_flag','=','Y');
                 }
                 $data['items'] = $data['items']
                     ->where($where)
@@ -149,7 +149,7 @@ class DiscussController extends CommonController{
                     $data['items'] = $data['items']->where('images','!=',null);
                 }
                 if ($follow_discuss == 'Y'){
-                    $data['items'] = $data['items']->where('follow_discuss','=','Y');
+                    $data['items'] = $data['items']->where('follow_flag','=','Y');
                 }
                 $data['items'] = $data['items']
                     ->where($where)->whereIn('group_code',$group_info['group_code'])
