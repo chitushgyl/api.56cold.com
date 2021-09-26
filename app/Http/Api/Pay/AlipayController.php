@@ -1096,7 +1096,7 @@ class AlipayController extends Controller{
         if($res){
             $msg['code'] = 200;
             $msg['msg'] = '请求成功';
-            $msg['data'] = 'https://api.56cold.com/'.$res;
+            $msg['data'] = 'https://ytapi.56cold.com/'.$res;
             return $msg;
         }else{
             $msg['code'] = 301;
@@ -1253,7 +1253,7 @@ class AlipayController extends Controller{
         if($res){
             $msg['code'] = 200;
             $msg['msg'] = '请求成功';
-            $msg['data'] = 'https://api.56cold.com/'.$res;
+            $msg['data'] = 'https://ytapi.56cold.com/'.$res;
             return $msg;
         }else{
             $msg['code'] = 301;
