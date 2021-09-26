@@ -24,7 +24,7 @@ class CrondtabController extends Controller {
         $where = [
             ['order_status','=',5]
         ];
-        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type'];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','create_time'];
         $order_list = TmsOrder::where($where)->select($select)->get();
 //        dump($order_list->toArray());
         foreach ($order_list as $k => $v) {
