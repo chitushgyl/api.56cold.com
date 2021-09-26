@@ -150,7 +150,7 @@ class CrondtabController extends Controller {
     /**
      * 查询订单是否支付宝支付
      * */
-    public function queryAliapy(){
+    public function queryAlipay(){
         include_once base_path('/vendor/alipay/pagepay/service/AlipayTradeService.php');
         include_once base_path('/vendor/alipay/pagepay/buildermodel/AlipayTradeQueryContentBuilder.php');
         $config    = config('tms.alipay_config');//引入配置文件参数
@@ -194,7 +194,6 @@ class CrondtabController extends Controller {
                 $pay['pay_result'] = 'SU';//
                 $pay['state'] = 'in';//支付状态
                 $pay['self_id'] = generate_id('pay_');
-                file_put_contents(base_path('/vendor/alipay.txt'),$pay);
                 $order = TmsOrder::where('self_id',$response->out_trade_no)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
                 if ($order->order_status == 2 || $order->order_status == 3){
                     echo 'success';

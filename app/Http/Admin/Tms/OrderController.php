@@ -394,7 +394,7 @@ class OrderController extends CommonController{
                     $v->button = $button8;
                 }
                 if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
-                    $v->button  = $button4;
+                    $v->button  = $button5;
                 }
 
 

@@ -1085,7 +1085,7 @@ class AlipayController extends Controller{
         $params->SetOut_trade_no($out_trade_no);//订单ID
         $params->SetTotal_fee($price*100);//支付金额
         $params->SetTime_start(date("YmdHis"));
-        $params->SetTime_expire(date("YmdHis", time() + 600));
+        $params->SetTime_expire(date("YmdHis", time() + 15*60));
         $params->SetGoods_tag("test");//设置商品标记，代金券或立减优惠功能的参数 */
         $params->SetNotify_url($notify_url);//回调地址
         $params->SetTrade_type("NATIVE");//支付类型
