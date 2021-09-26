@@ -10,6 +10,7 @@ use App\Models\User\UserCapital;
 use App\Models\User\UserWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use EasyWeChat\Foundation\Application;
 
 class CrondtabController extends Controller {
 
@@ -199,23 +200,96 @@ class CrondtabController extends Controller {
     }
 
     /**
-     * 微信查询订单是否支付  alipay/queryWechat
+     * 查询订单是否微信支付
      * */
-    public function queryWechat(Request $request){
-        $self_id = $request->input('self_id');//订单ID
-//        $self_id = 'order_202109151834352525376788';
+    public function queryWechat(){
         include_once base_path('/vendor/wxpay/lib/WxPay.Api.php');
-        $input = new \WxPayOrderQuery();
-        $input->SetOut_trade_no($self_id);
-        $result = WxPayQ::orderQuery($input);
-        if($result['result_code'] == 'SUCCESS' && $result['return_code']=='SUCCESS' && $result['return_msg'] == 'OK'){
-            $msg['code'] = 200;
-            $msg['msg']  = '支付成功';
-            return $msg;
-        }else{
-            $msg['code'] = 301;
-            $msg['msg']  = $result['err_code_des'];
-            return $msg;
+        $config    = config('tms.alipay_config');//引入配置文件参数
+        $now_time  = time();
+        $where = [
+            ['order_status','=',1],
+            ['pay_type','=','online'],
+            ['pay_state','=','N']
+        ];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type'];
+        $order_list = TmsOrder::where($where)->select($select)->get();
+        foreach ($order_list as $k => $v) {
+            $input = new \WxPayOrderQuery();
+            $input->SetOut_trade_no($v->self_id);
+            $result = WxPayQ::orderQuery($input);
+            if($result['result_code'] == 'SUCCESS' && $result['return_code']=='SUCCESS' && $result['return_msg'] == 'OK'){
+                $now_time = date('Y-m-d H:i:s',time());
+                $pay['order_id'] = $result['out_trade_no'];//订单号
+                $pay['pay_number'] = $result['total_fee'];//价格
+                $pay['platformorderid'] = $result['transaction_id'];//微信交易号
+                $pay['create_time']  = $pay['update_time'] = $now_time;
+                $pay['payname'] = $result['openid'];//微信账号
+                $pay['paytype'] = 'WECHAT';//微信账号
+                $pay['pay_result'] = 'SU';//微信账号
+                $pay['state'] = 'in';//支付状态
+                $pay['self_id'] = generate_id('pay_');//微信账号
+                $order = TmsOrder::where('self_id',$result['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+                if ($order->order_status == 2 || $order->order_status == 3){
+                    echo 'success';
+                    return false;
+                }
+                $payment_info = TmsPayment::where('order_id',$result['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+                if ($payment_info){
+                    echo 'success';
+                    return false;
+                }
+                if ($order->total_user_id){
+                    $pay['total_user_id'] = $result['attach'];
+                    $wallet['total_user_id'] = $result['attach'];
+                    $where = [
+                        ['total_user_id','=',$result['attach']]
+                    ];
+                }else{
+                    $pay['group_code'] = $result['attach'];
+                    $pay['group_name'] = $order->group_name;
+                    $wallet['group_code'] = $result['attach'];
+                    $wallet['group_name'] = $order->group_name;
+                    $where = [
+                        ['group_code','=',$result['attach']]
+                    ];
+                }
+                TmsPayment::insert($pay);
+                $capital = UserCapital::where($where)->first();
+                $wallet['self_id'] = generate_id('wallet_');
+                $wallet['produce_type'] = 'out';
+                $wallet['capital_type'] = 'wallet';
+                $wallet['money'] = $result['total_fee'];
+                $wallet['create_time'] = $now_time;
+                $wallet['update_time'] = $now_time;
+                $wallet['now_money'] = $capital->money;
+                $wallet['now_money_md'] = get_md5($capital->money);
+                $wallet['wallet_status'] = 'SU';
+                UserWallet::insert($wallet);
+                if ($order->order_type == 'line'){
+                    $order_update['order_status'] = 3;
+                }else{
+                    $order_update['order_status'] = 2;
+                }
+                $order_update['update_time'] = date('Y-m-d H:i:s',time());
+                $id = TmsOrder::where('self_id',$result['out_trade_no'])->update($order_update);
+                /**修改费用数据为可用**/
+                $money['delete_flag']                = 'Y';
+                $money['settle_flag']                = 'W';
+                $tmsOrderCost = TmsOrderCost::where('order_id',$result['out_trade_no'])->select('self_id')->get();
+                if ($tmsOrderCost){
+                    $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+                    TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+                }
+                $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$result['out_trade_no'])->select('self_id')->get();
+                if ($tmsOrderDispatch){
+                    $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+                    $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
+                }
+            }else{
+                $msg['code'] = 301;
+                $msg['msg']  = $result['err_code_des'];
+                return $msg;
+            }
         }
     }
 
