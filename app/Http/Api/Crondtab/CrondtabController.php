@@ -11,6 +11,7 @@ use App\Models\User\UserWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use EasyWeChat\Foundation\Application;
+use WxPayApi as WxPayQ;
 
 class CrondtabController extends Controller {
 
@@ -153,49 +154,107 @@ class CrondtabController extends Controller {
         include_once base_path('/vendor/alipay/pagepay/service/AlipayTradeService.php');
         include_once base_path('/vendor/alipay/pagepay/buildermodel/AlipayTradeQueryContentBuilder.php');
         $config    = config('tms.alipay_config');//引入配置文件参数
-        $now_time  = time();
+        $now_time  = date('Y-m-d H:i:s',time());
         $where = [
             ['order_status','=',1],
-            ['pay_type','=','online']
+            ['pay_type','=','online'],
+            ['create_time','>',$now_time]
         ];
-        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type'];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','create_time'];
         $order_list = TmsOrder::where($where)->select($select)->get();
-        $self_id = 'order_202109251115091435951796';
-//        foreach ($order_list as $k => $v) {
-//            $aop                        = new \AopClient ();
-//            $aop->appId                 = $config['app_id'];
-//            $aop->rsaPrivateKeyFilePath = $config['merchant_private_key'];//RSA私钥
-//            $aop->alipayPublicKey       = $config['alipay_public_key'];//支付宝公钥
-//            $request                    = new AlipayTradeQueryRequest ();
-//            $paramArray                 = array();
-//            $paramArray['out_trade_no'] = $v->self_id;
-////        $paramArray['trade_no']     ='2016031421007864720242676619';
-//            $request->biz_content       =json_encode($paramArray);
-//            $result                     = $aop->execute ($request, NULL );
-//            dd($result);
-//        }
 
-        //商户订单号，商户网站订单系统中唯一订单号
-        $out_trade_no = trim($self_id);
+        foreach ($order_list as $k => $v) {
+            //商户订单号，商户网站订单系统中唯一订单号
+            $out_trade_no = trim($v->self_id);
 
-        //支付宝交易号
+            //支付宝交易号
 //        $trade_no = trim($_POST['WIDTQtrade_no']);
-        //请二选一设置
-        //构造参数
-        $RequestBuilder = new \AlipayTradeQueryContentBuilder();
-        $RequestBuilder->setOutTradeNo($out_trade_no);
+            //请二选一设置
+            //构造参数
+            $RequestBuilder = new \AlipayTradeQueryContentBuilder();
+            $RequestBuilder->setOutTradeNo($out_trade_no);
 //        $RequestBuilder->setTradeNo($trade_no);
 
-        $aop = new \AlipayTradeService($config);
+            $aop = new \AlipayTradeService($config);
 
-        /**
-         * alipay.trade.query (统一收单线下交易查询)
-         * @param $builder 业务参数，使用buildmodel中的对象生成。
-         * @return $response 支付宝返回的信息
-         */
-        $response = $aop->Query($RequestBuilder);
-        var_dump($response);
+            /**
+             * alipay.trade.query (统一收单线下交易查询)
+             * @param $builder 业务参数，使用buildmodel中的对象生成。
+             * @return $response 支付宝返回的信息
+             */
+            $response = $aop->Query($RequestBuilder);
+            if ($response->code == 10000 && $response->msg == 'Success' && $response->trade_status == 'TRADE_SUCCESS'){
+                $now_time = date('Y-m-d H:i:s',time());
+                $pay['order_id'] = $response->out_trade_no;
+                $pay['pay_number'] = $response->total_amount;
+                $pay['platformorderid'] = $response->trade_no;
+                $pay['create_time'] = $pay['update_time'] = $now_time;
+                $pay['payname'] = $response->buyer_logon_id;
+                $pay['paytype'] = 'ALIPAY';//
+                $pay['pay_result'] = 'SU';//
+                $pay['state'] = 'in';//支付状态
+                $pay['self_id'] = generate_id('pay_');
+                file_put_contents(base_path('/vendor/alipay.txt'),$pay);
+                $order = TmsOrder::where('self_id',$response->out_trade_no)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+                if ($order->order_status == 2 || $order->order_status == 3){
+                    echo 'success';
+                    return false;
+                }
+                if ($order->total_user_id){
+                    $pay['total_user_id'] = $order->total_user_id;
+                    $wallet['total_user_id'] = $order->total_user_id;
+                    $where = [
+                        ['total_user_id','=',$order->total_user_id]
+                    ];
+                }else{
+                    $pay['group_code'] = $order->group_code;
+                    $pay['group_code'] = $order->group_code;
+                    $wallet['group_code'] = $order->group_code;
+//                $wallet['group_name'] = $order->group_name;
+                    $where = [
+                        ['group_code','=',$order->group_code]
+                    ];
+                }
+                TmsPayment::insert($pay);
+                $capital = UserCapital::where($where)->first();
+                $wallet['self_id'] = generate_id('wallet_');
+                $wallet['produce_type'] = 'out';
+                $wallet['capital_type'] = 'wallet';
+                $wallet['money'] = $response->total_amount;
+                $wallet['create_time'] = $now_time;
+                $wallet['update_time'] = $now_time;
+                $wallet['now_money'] = $capital->money;
+                $wallet['now_money_md'] = get_md5($capital->money);
+                $wallet['wallet_status'] = 'SU';
+                UserWallet::insert($wallet);
 
+                if ($order->order_type == 'line'){
+                    $order_update['order_status'] = 3;
+                }else{
+                    $order_update['order_status'] = 2;
+                }
+                $order_update['update_time'] = date('Y-m-d H:i:s',time());
+                $id = TmsOrder::where('self_id',$response->out_trade_no)->update($order_update);
+                /**修改费用数据为可用**/
+                $money['delete_flag']                = 'Y';
+                $money['settle_flag']                = 'W';
+                $tmsOrderCost = TmsOrderCost::where('order_id',$response->out_trade_no)->select('self_id')->get();
+                if ($tmsOrderCost){
+                    $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+                    TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+                }
+                $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$response->out_trade_no)->select('self_id','dispatch_flag')->get();
+                if ($tmsOrderDispatch){
+//                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+                    foreach ($tmsOrderDispatch as $key =>$value){
+                        if ($value->dispatch_flag != 'N'){
+                            $orderStatus = TmsOrderDispatch::where('self_id',$value->self_id)->update($order_update);
+                        }
+                    }
+
+                }
+            }
+        }
 
     }
 
@@ -205,11 +264,12 @@ class CrondtabController extends Controller {
     public function queryWechat(){
         include_once base_path('/vendor/wxpay/lib/WxPay.Api.php');
         $config    = config('tms.alipay_config');//引入配置文件参数
-        $now_time  = time();
+        $now_time  = date('Y-m-d H:i:s',time());
         $where = [
             ['order_status','=',1],
             ['pay_type','=','online'],
-            ['pay_state','=','N']
+            ['pay_state','=','N'],
+            ['create_time','>',$now_time]
         ];
         $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type'];
         $order_list = TmsOrder::where($where)->select($select)->get();
