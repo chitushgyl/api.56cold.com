@@ -158,7 +158,7 @@ class CrondtabController extends Controller {
         $where = [
             ['order_status','=',1],
             ['pay_type','=','online'],
-            ['create_time','>',$now_time]
+            ['create_time','>','2021-09-26 12:00:00']
         ];
         $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','create_time'];
         $order_list = TmsOrder::where($where)->select($select)->get();
@@ -269,9 +269,9 @@ class CrondtabController extends Controller {
             ['order_status','=',1],
             ['pay_type','=','online'],
             ['pay_state','=','N'],
-            ['create_time','>',$now_time]
+            ['create_time','>','2021-09-26 12:00:00']
         ];
-        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type'];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','create_time'];
         $order_list = TmsOrder::where($where)->select($select)->get();
         foreach ($order_list as $k => $v) {
             $input = new \WxPayOrderQuery();
