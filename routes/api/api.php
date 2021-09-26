@@ -33,6 +33,7 @@ Route::any('/anniu', 'Login\LoginController@anniu');
 /**** 定时任务 ***/
 Route::any('/crondtab/order_unline', 'Crondtab\CrondtabController@order_unline'); //定时下线订单
 Route::any('/crondtab/order_done', 'Crondtab\CrondtabController@order_done'); //定时完成订单
+Route::any('/crondtab/queryAliapy', 'Crondtab\CrondtabController@queryAliapy'); //定时完成订单
 
 /******支付板块模块*******/
 Route::any('/pay/wx_pay', 'Pay\PayController@wx_pay');

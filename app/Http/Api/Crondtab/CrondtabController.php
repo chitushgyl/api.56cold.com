@@ -8,6 +8,7 @@ use App\Models\Tms\TmsOrderDispatch;
 use App\Models\Tms\TmsPayment;
 use App\Models\User\UserCapital;
 use App\Models\User\UserWallet;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CrondtabController extends Controller {
@@ -141,6 +142,80 @@ class CrondtabController extends Controller {
 
                 }
             }
+        }
+    }
+
+    /**
+     * 查询订单是否支付宝支付
+     * */
+    public function queryAliapy(){
+        include_once base_path('/vendor/alipay/pagepay/service/AlipayTradeService.php');
+        include_once base_path('/vendor/alipay/pagepay/buildermodel/AlipayTradeQueryContentBuilder.php');
+        $config    = config('tms.alipay_config');//引入配置文件参数
+        $now_time  = time();
+        $where = [
+            ['order_status','=',1],
+            ['pay_type','=','online']
+        ];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type'];
+        $order_list = TmsOrder::where($where)->select($select)->get();
+        $self_id = 'order_202109251115091435951796';
+//        foreach ($order_list as $k => $v) {
+//            $aop                        = new \AopClient ();
+//            $aop->appId                 = $config['app_id'];
+//            $aop->rsaPrivateKeyFilePath = $config['merchant_private_key'];//RSA私钥
+//            $aop->alipayPublicKey       = $config['alipay_public_key'];//支付宝公钥
+//            $request                    = new AlipayTradeQueryRequest ();
+//            $paramArray                 = array();
+//            $paramArray['out_trade_no'] = $v->self_id;
+////        $paramArray['trade_no']     ='2016031421007864720242676619';
+//            $request->biz_content       =json_encode($paramArray);
+//            $result                     = $aop->execute ($request, NULL );
+//            dd($result);
+//        }
+
+        //商户订单号，商户网站订单系统中唯一订单号
+        $out_trade_no = trim($self_id);
+
+        //支付宝交易号
+//        $trade_no = trim($_POST['WIDTQtrade_no']);
+        //请二选一设置
+        //构造参数
+        $RequestBuilder = new \AlipayTradeQueryContentBuilder();
+        $RequestBuilder->setOutTradeNo($out_trade_no);
+//        $RequestBuilder->setTradeNo($trade_no);
+
+        $aop = new \AlipayTradeService($config);
+
+        /**
+         * alipay.trade.query (统一收单线下交易查询)
+         * @param $builder 业务参数，使用buildmodel中的对象生成。
+         * @return $response 支付宝返回的信息
+         */
+        $response = $aop->Query($RequestBuilder);
+        var_dump($response);
+
+
+    }
+
+    /**
+     * 微信查询订单是否支付  alipay/queryWechat
+     * */
+    public function queryWechat(Request $request){
+        $self_id = $request->input('self_id');//订单ID
+//        $self_id = 'order_202109151834352525376788';
+        include_once base_path('/vendor/wxpay/lib/WxPay.Api.php');
+        $input = new \WxPayOrderQuery();
+        $input->SetOut_trade_no($self_id);
+        $result = WxPayQ::orderQuery($input);
+        if($result['result_code'] == 'SUCCESS' && $result['return_code']=='SUCCESS' && $result['return_msg'] == 'OK'){
+            $msg['code'] = 200;
+            $msg['msg']  = '支付成功';
+            return $msg;
+        }else{
+            $msg['code'] = 301;
+            $msg['msg']  = $result['err_code_des'];
+            return $msg;
         }
     }
 
