@@ -214,6 +214,7 @@ class DiscussController extends CommonController{
                 $data['temperture']          = $temperture;
                 $data['car_smell']           = $car_smell;
                 $data['carriage_id']         = $carriage_id;
+                $data['carriage_user']       = $carriage_user;
             }
 
             $wheres['self_id'] = $self_id;

@@ -314,7 +314,7 @@ class AlipayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
             file_put_contents(base_path('/vendor/alipay.txt'),$pay);
-            $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+            $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
             if ($order->order_status == 2 || $order->order_status == 3){
                 echo 'success';
                 return false;
