@@ -74,6 +74,7 @@ Route::group([
     Route::any('/order/count_klio','OrderController@count_klio');
     Route::any('/order/cityVehical','OrderController@cityVehical');
     Route::any('/order/discount_price','OrderController@discount_price');
+    Route::any('/message/messagePage','MessageController@messagePage');
 });
 
 Route::group([
@@ -199,7 +200,7 @@ Route::group([
         Route::any('/discuss/delFlag','DiscussController@delFlag');
         Route::any('/discuss/billDetails','DiscussController@billDetails');
 
-        Route::any('/message/messagePage','MessageController@messagePage');
+
     });
     Route::group([
         'prefix' => 'api','namespace'  => 'Tms',

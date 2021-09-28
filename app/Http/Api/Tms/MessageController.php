@@ -17,7 +17,6 @@ class MessageController extends Controller {
         /** 接收中间件参数**/
         $user_info     = $request->get('user_info');//接收中间件产生的参数
         $project_type       =$request->get('project_type');
-        $total_user_id = $user_info->total_user_id;
         $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
         /**接收数据*/
         $num      = $request->input('num')??10;

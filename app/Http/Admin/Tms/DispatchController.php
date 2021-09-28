@@ -195,7 +195,7 @@ class DispatchController extends CommonController{
 
             if($v->dispatch_flag =='N' && $v->on_line_flag =='Y' && $v->order_status != 2){
                 $v->button_info=$button_info1;
-            }elseif($v->dispatch_flag =='Y' && $v->on_line_flag =='N'){
+            }elseif($v->dispatch_flag =='Y' && $v->on_line_flag =='N' && ($v->order_status == 2 || $v->order_status == 1)){
                 $v->button_info=$button_info2;
             }elseif($v->dispatch_flag =='N' && $v->on_line_flag =='N'){
                 $v->button_info=$button_info3;
