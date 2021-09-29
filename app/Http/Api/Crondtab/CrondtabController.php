@@ -196,8 +196,7 @@ class CrondtabController extends Controller {
                 $pay['self_id'] = generate_id('pay_');
                 $order = TmsOrder::where('self_id',$response->out_trade_no)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
                 if ($order->order_status == 2 || $order->order_status == 3){
-                    echo 'success';
-                    return false;
+                    continue;
                 }
                 if ($order->total_user_id){
                     $pay['total_user_id'] = $order->total_user_id;
@@ -289,13 +288,11 @@ class CrondtabController extends Controller {
                 $pay['self_id'] = generate_id('pay_');//微信账号
                 $order = TmsOrder::where('self_id',$result['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
                 if ($order->order_status == 2 || $order->order_status == 3){
-                    echo 'success';
-                    return false;
+                    continue;
                 }
                 $payment_info = TmsPayment::where('order_id',$result['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
                 if ($payment_info){
-                    echo 'success';
-                    return false;
+                    continue;
                 }
                 if ($order->total_user_id){
                     $pay['total_user_id'] = $result['attach'];
@@ -344,10 +341,6 @@ class CrondtabController extends Controller {
                     $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
                     $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
                 }
-            }else{
-                $msg['code'] = 301;
-                $msg['msg']  = $result['err_code_des'];
-                return $msg;
             }
         }
     }

@@ -1023,10 +1023,10 @@ class AlipayController extends Controller{
     public function routinePay(Request $request){
         $input = $request->all();
         $user_info = $request->get('user_info');//接收中间件产生的参数
-//        $input = $request->post();
         $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         $openid = $request->input('openid');//小程序用户唯一标识
+        $type = $request->input('type');//1下单支付 2货到付款支付
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         if ($user_info->type == 'user'){
             $user_id = $user_info->total_user_id;
@@ -1036,7 +1036,12 @@ class AlipayController extends Controller{
 //        $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
-        $notify = 'https://ytapi.56cold.com/alipay/appWechat_notify';
+        if ($type == 1){
+            $notify = 'https://ytapi.56cold.com/alipay/appWechat_notify';
+        }else{
+            $notify = 'https://ytapi.56cold.com/alipay/paymentWechatNotify';
+        }
+
         $config    = config('tms.routine_config_user');//引入配置文件参数
         $appid  = $config['appid'];
         $mch_id = $config['mch_id'];
