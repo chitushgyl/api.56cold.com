@@ -9,6 +9,7 @@ use App\Models\Tms\TmsPayment;
 use App\Models\User\UserCapital;
 use App\Models\User\UserWallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use EasyWeChat\Foundation\Application;
 use WxPayApi as WxPayQ;
@@ -184,72 +185,79 @@ class CrondtabController extends Controller {
              */
             $response = $aop->Query($RequestBuilder);
             if ($response->code == 10000 && $response->msg == 'Success' && $response->trade_status == 'TRADE_SUCCESS'){
-                $now_time = date('Y-m-d H:i:s',time());
-                $pay['order_id'] = $response->out_trade_no;
-                $pay['pay_number'] = $response->total_amount;
-                $pay['platformorderid'] = $response->trade_no;
-                $pay['create_time'] = $pay['update_time'] = $now_time;
-                $pay['payname'] = $response->buyer_logon_id;
-                $pay['paytype'] = 'ALIPAY';//
-                $pay['pay_result'] = 'SU';//
-                $pay['state'] = 'in';//支付状态
-                $pay['self_id'] = generate_id('pay_');
-                $order = TmsOrder::where('self_id',$response->out_trade_no)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
-                if ($order->order_status == 2 || $order->order_status == 3){
-                    continue;
-                }
-                if ($order->total_user_id){
-                    $pay['total_user_id'] = $order->total_user_id;
-                    $wallet['total_user_id'] = $order->total_user_id;
-                    $where = [
-                        ['total_user_id','=',$order->total_user_id]
-                    ];
-                }else{
-                    $pay['group_code'] = $order->group_code;
-                    $pay['group_code'] = $order->group_code;
-                    $wallet['group_code'] = $order->group_code;
-//                $wallet['group_name'] = $order->group_name;
-                    $where = [
-                        ['group_code','=',$order->group_code]
-                    ];
-                }
-                TmsPayment::insert($pay);
-                $capital = UserCapital::where($where)->first();
-                $wallet['self_id'] = generate_id('wallet_');
-                $wallet['produce_type'] = 'out';
-                $wallet['capital_type'] = 'wallet';
-                $wallet['money'] = $response->total_amount;
-                $wallet['create_time'] = $now_time;
-                $wallet['update_time'] = $now_time;
-                $wallet['now_money'] = $capital->money;
-                $wallet['now_money_md'] = get_md5($capital->money);
-                $wallet['wallet_status'] = 'SU';
-                UserWallet::insert($wallet);
-
-                if ($order->order_type == 'line'){
-                    $order_update['order_status'] = 3;
-                }else{
-                    $order_update['order_status'] = 2;
-                }
-                $order_update['update_time'] = date('Y-m-d H:i:s',time());
-                $id = TmsOrder::where('self_id',$response->out_trade_no)->update($order_update);
-                /**修改费用数据为可用**/
-                $money['delete_flag']                = 'Y';
-                $money['settle_flag']                = 'W';
-                $tmsOrderCost = TmsOrderCost::where('order_id',$response->out_trade_no)->select('self_id')->get();
-                if ($tmsOrderCost){
-                    $money_list = array_column($tmsOrderCost->toArray(),'self_id');
-                    TmsOrderCost::whereIn('self_id',$money_list)->update($money);
-                }
-                $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$response->out_trade_no)->select('self_id','dispatch_flag')->get();
-                if ($tmsOrderDispatch){
-//                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
-                    foreach ($tmsOrderDispatch as $key =>$value){
-                        if ($value->dispatch_flag != 'N'){
-                            $orderStatus = TmsOrderDispatch::where('self_id',$value->self_id)->update($order_update);
-                        }
+                DB::beginTransaction();
+                try {
+                    $now_time = date('Y-m-d H:i:s', time());
+                    $pay['order_id'] = $response->out_trade_no;
+                    $pay['pay_number'] = $response->total_amount;
+                    $pay['platformorderid'] = $response->trade_no;
+                    $pay['create_time'] = $pay['update_time'] = $now_time;
+                    $pay['payname'] = $response->buyer_logon_id;
+                    $pay['paytype'] = 'ALIPAY';//
+                    $pay['pay_result'] = 'SU';//
+                    $pay['state'] = 'in';//支付状态
+                    $pay['self_id'] = generate_id('pay_');
+                    $order = TmsOrder::where('self_id', $response->out_trade_no)->select(['total_user_id', 'group_code', 'order_status', 'group_name', 'order_type', 'send_shi_name', 'gather_shi_name'])->first();
+                    if ($order->order_status == 2 || $order->order_status == 3) {
+                        continue;
                     }
+                    if ($order->total_user_id) {
+                        $pay['total_user_id'] = $order->total_user_id;
+                        $wallet['total_user_id'] = $order->total_user_id;
+                        $where = [
+                            ['total_user_id', '=', $order->total_user_id]
+                        ];
+                    } else {
+                        $pay['group_code'] = $order->group_code;
+                        $pay['group_code'] = $order->group_code;
+                        $wallet['group_code'] = $order->group_code;
+//                $wallet['group_name'] = $order->group_name;
+                        $where = [
+                            ['group_code', '=', $order->group_code]
+                        ];
+                    }
+                    TmsPayment::insert($pay);
+                    $capital = UserCapital::where($where)->first();
+                    $wallet['self_id'] = generate_id('wallet_');
+                    $wallet['produce_type'] = 'out';
+                    $wallet['capital_type'] = 'wallet';
+                    $wallet['money'] = $response->total_amount;
+                    $wallet['create_time'] = $now_time;
+                    $wallet['update_time'] = $now_time;
+                    $wallet['now_money'] = $capital->money;
+                    $wallet['now_money_md'] = get_md5($capital->money);
+                    $wallet['wallet_status'] = 'SU';
+                    UserWallet::insert($wallet);
 
+                    if ($order->order_type == 'line') {
+                        $order_update['order_status'] = 3;
+                    } else {
+                        $order_update['order_status'] = 2;
+                    }
+                    $order_update['update_time'] = date('Y-m-d H:i:s', time());
+                    $id = TmsOrder::where('self_id', $response->out_trade_no)->update($order_update);
+                    /**修改费用数据为可用**/
+                    $money['delete_flag'] = 'Y';
+                    $money['settle_flag'] = 'W';
+                    $tmsOrderCost = TmsOrderCost::where('order_id', $response->out_trade_no)->select('self_id')->get();
+                    if ($tmsOrderCost) {
+                        $money_list = array_column($tmsOrderCost->toArray(), 'self_id');
+                        TmsOrderCost::whereIn('self_id', $money_list)->update($money);
+                    }
+                    $tmsOrderDispatch = TmsOrderDispatch::where('order_id', $response->out_trade_no)->select('self_id', 'dispatch_flag')->get();
+                    if ($tmsOrderDispatch) {
+//                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+                        foreach ($tmsOrderDispatch as $key => $value) {
+                            if ($value->dispatch_flag != 'N') {
+                                $orderStatus = TmsOrderDispatch::where('self_id', $value->self_id)->update($order_update);
+                            }
+                        }
+
+                    }
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollBack();
+                    return $e;
                 }
             }
         }
@@ -276,70 +284,77 @@ class CrondtabController extends Controller {
             $input->SetOut_trade_no($v->self_id);
             $result = WxPayQ::orderQuery($input);
             if($result['result_code'] == 'SUCCESS' && $result['return_code']=='SUCCESS' && $result['return_msg'] == 'OK'){
-                $now_time = date('Y-m-d H:i:s',time());
-                $pay['order_id'] = $result['out_trade_no'];//订单号
-                $pay['pay_number'] = $result['total_fee'];//价格
-                $pay['platformorderid'] = $result['transaction_id'];//微信交易号
-                $pay['create_time']  = $pay['update_time'] = $now_time;
-                $pay['payname'] = $result['openid'];//微信账号
-                $pay['paytype'] = 'WECHAT';//微信账号
-                $pay['pay_result'] = 'SU';//微信账号
-                $pay['state'] = 'in';//支付状态
-                $pay['self_id'] = generate_id('pay_');//微信账号
-                $order = TmsOrder::where('self_id',$result['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
-                if ($order->order_status == 2 || $order->order_status == 3){
-                    continue;
-                }
-                $payment_info = TmsPayment::where('order_id',$result['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
-                if ($payment_info){
-                    continue;
-                }
-                if ($order->total_user_id){
-                    $pay['total_user_id'] = $result['attach'];
-                    $wallet['total_user_id'] = $result['attach'];
-                    $where = [
-                        ['total_user_id','=',$result['attach']]
-                    ];
-                }else{
-                    $pay['group_code'] = $result['attach'];
-                    $pay['group_name'] = $order->group_name;
-                    $wallet['group_code'] = $result['attach'];
-                    $wallet['group_name'] = $order->group_name;
-                    $where = [
-                        ['group_code','=',$result['attach']]
-                    ];
-                }
-                TmsPayment::insert($pay);
-                $capital = UserCapital::where($where)->first();
-                $wallet['self_id'] = generate_id('wallet_');
-                $wallet['produce_type'] = 'out';
-                $wallet['capital_type'] = 'wallet';
-                $wallet['money'] = $result['total_fee'];
-                $wallet['create_time'] = $now_time;
-                $wallet['update_time'] = $now_time;
-                $wallet['now_money'] = $capital->money;
-                $wallet['now_money_md'] = get_md5($capital->money);
-                $wallet['wallet_status'] = 'SU';
-                UserWallet::insert($wallet);
-                if ($order->order_type == 'line'){
-                    $order_update['order_status'] = 3;
-                }else{
-                    $order_update['order_status'] = 2;
-                }
-                $order_update['update_time'] = date('Y-m-d H:i:s',time());
-                $id = TmsOrder::where('self_id',$result['out_trade_no'])->update($order_update);
-                /**修改费用数据为可用**/
-                $money['delete_flag']                = 'Y';
-                $money['settle_flag']                = 'W';
-                $tmsOrderCost = TmsOrderCost::where('order_id',$result['out_trade_no'])->select('self_id')->get();
-                if ($tmsOrderCost){
-                    $money_list = array_column($tmsOrderCost->toArray(),'self_id');
-                    TmsOrderCost::whereIn('self_id',$money_list)->update($money);
-                }
-                $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$result['out_trade_no'])->select('self_id')->get();
-                if ($tmsOrderDispatch){
-                    $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
-                    $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
+                DB::beginTransaction();
+                try {
+                    $now_time = date('Y-m-d H:i:s', time());
+                    $pay['order_id'] = $result['out_trade_no'];//订单号
+                    $pay['pay_number'] = $result['total_fee'];//价格
+                    $pay['platformorderid'] = $result['transaction_id'];//微信交易号
+                    $pay['create_time'] = $pay['update_time'] = $now_time;
+                    $pay['payname'] = $result['openid'];//微信账号
+                    $pay['paytype'] = 'WECHAT';//微信账号
+                    $pay['pay_result'] = 'SU';//微信账号
+                    $pay['state'] = 'in';//支付状态
+                    $pay['self_id'] = generate_id('pay_');//微信账号
+                    $order = TmsOrder::where('self_id', $result['out_trade_no'])->select(['total_user_id', 'group_code', 'order_status', 'group_name', 'order_type', 'send_shi_name', 'gather_shi_name'])->first();
+                    if ($order->order_status == 2 || $order->order_status == 3) {
+                        continue;
+                    }
+                    $payment_info = TmsPayment::where('order_id', $result['out_trade_no'])->select(['pay_result', 'state', 'order_id', 'dispatch_id'])->first();
+                    if ($payment_info) {
+                        continue;
+                    }
+                    if ($order->total_user_id) {
+                        $pay['total_user_id'] = $result['attach'];
+                        $wallet['total_user_id'] = $result['attach'];
+                        $where = [
+                            ['total_user_id', '=', $result['attach']]
+                        ];
+                    } else {
+                        $pay['group_code'] = $result['attach'];
+                        $pay['group_name'] = $order->group_name;
+                        $wallet['group_code'] = $result['attach'];
+                        $wallet['group_name'] = $order->group_name;
+                        $where = [
+                            ['group_code', '=', $result['attach']]
+                        ];
+                    }
+                    TmsPayment::insert($pay);
+                    $capital = UserCapital::where($where)->first();
+                    $wallet['self_id'] = generate_id('wallet_');
+                    $wallet['produce_type'] = 'out';
+                    $wallet['capital_type'] = 'wallet';
+                    $wallet['money'] = $result['total_fee'];
+                    $wallet['create_time'] = $now_time;
+                    $wallet['update_time'] = $now_time;
+                    $wallet['now_money'] = $capital->money;
+                    $wallet['now_money_md'] = get_md5($capital->money);
+                    $wallet['wallet_status'] = 'SU';
+                    UserWallet::insert($wallet);
+                    if ($order->order_type == 'line') {
+                        $order_update['order_status'] = 3;
+                    } else {
+                        $order_update['order_status'] = 2;
+                    }
+                    $order_update['update_time'] = date('Y-m-d H:i:s', time());
+                    $id = TmsOrder::where('self_id', $result['out_trade_no'])->update($order_update);
+                    /**修改费用数据为可用**/
+                    $money['delete_flag'] = 'Y';
+                    $money['settle_flag'] = 'W';
+                    $tmsOrderCost = TmsOrderCost::where('order_id', $result['out_trade_no'])->select('self_id')->get();
+                    if ($tmsOrderCost) {
+                        $money_list = array_column($tmsOrderCost->toArray(), 'self_id');
+                        TmsOrderCost::whereIn('self_id', $money_list)->update($money);
+                    }
+                    $tmsOrderDispatch = TmsOrderDispatch::where('order_id', $result['out_trade_no'])->select('self_id')->get();
+                    if ($tmsOrderDispatch) {
+                        $dispatch_list = array_column($tmsOrderDispatch->toArray(), 'self_id');
+                        $orderStatus = TmsOrderDispatch::whereIn('self_id', $dispatch_list)->update($order_update);
+                    }
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollBack();
+                    return $e;
                 }
             }
         }
