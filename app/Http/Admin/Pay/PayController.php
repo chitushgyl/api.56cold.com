@@ -32,8 +32,8 @@ class PayController extends CommonController{
         $total_amount = trim($price); //付款金额，必填
         $body = trim('余额充值');//商品描述，可空
         $timeExpress = '15m';
-        $notify_url = 'http://ytapi.56cold.com/pay/pay/deposit_notify';//异步通知地址
-        $return_url = "http://bms.56cold.com/tms/balance";//同步跳转
+        $notify_url = 'https://ytapi.56cold.com/pay/pay/deposit_notify';//异步通知地址
+        $return_url = "https://bms.56cold.com/tms/balance";//同步跳转
         //构造参数
         $payRequestBuilder = new \AlipayTradePagePayContentBuilder;
         $payRequestBuilder->setBody($body);
@@ -115,7 +115,6 @@ class PayController extends CommonController{
     public function onlineAlipay(Request $request){
         $user_info     = $request->get('user_info');//接收中间件产生的参数
         $group_info     = $request->get('group_info');//接收中间件产生的参数
-        dd($group_info);
         $now_time      = date('Y-m-d H:i:s',time());
         $input         = $request->all();
         $price         = $request->input('price');
@@ -135,8 +134,8 @@ class PayController extends CommonController{
         $total_amount = trim($price); //付款金额，必填
         $body = trim('订单支付');//商品描述，可空
         $timeExpress = '15m';
-        $notify_url = 'http://ytapi.56cold.com/onlineAlipay_notify';//异步通知地址
-        $return_url = "http://bms.56cold.com/tms/balance";//同步跳转
+        $notify_url = 'https://ytapi.56cold.com/onlineAlipay_notify';//异步通知地址
+        $return_url = "https://bms.56cold.com/tms/balance";//同步跳转
         //构造参数
         $payRequestBuilder = new \AlipayTradePagePayContentBuilder;
         $payRequestBuilder->setBody($body);
@@ -240,8 +239,8 @@ class PayController extends CommonController{
         $total_amount = trim($price); //付款金额，必填
         $body = trim('支付宝订单支付');//商品描述，可空
         $timeExpress = '15m';
-        $notify_url = 'http://ytapi.56cold.com/pay/pay/bulkAlipay_notify';//异步通知地址
-        $return_url = "http://bms.56cold.com/tms/order";//同步跳转
+        $notify_url = 'https://ytapi.56cold.com/pay/pay/bulkAlipay_notify';//异步通知地址
+        $return_url = "https://bms.56cold.com/tms/order";//同步跳转
         //构造参数
         $payRequestBuilder = new \AlipayTradePagePayContentBuilder;
         $payRequestBuilder->setBody($body);
