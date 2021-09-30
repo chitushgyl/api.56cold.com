@@ -260,7 +260,26 @@ class OrderController extends CommonController{
 
 //        dd($data['items']->toArray());
 //        dd($tms_order_status_type);
-
+        $button_info1=[];
+        $button_info2=[];
+        $button_info3 = [];
+        $button_info4 = [];
+        $button_info5 = [];
+        foreach ($button_info as $k => $v){
+            if($v->id == 647){
+                $button_info1[]=$v;
+                $button_info4[]=$v;
+                $button_info5[]=$v;
+            }
+            if($v->id == 272){
+                $button_info2[] = $v;
+                $button_info5[] = $v;
+            }
+            if($v->id == 745){
+                $button_info3[]=$v;
+                $button_info4[]=$v;
+            }
+        }
         foreach ($data['items'] as $k=>$v) {
             foreach ($v->TmsOrderDispatch as $kkk =>$vvv){
                 $car_list = [];
@@ -282,6 +301,13 @@ class OrderController extends CommonController{
             $v->order_type_show=$tms_order_type[$v->order_type]??null;
             $v->type_inco = img_for($tms_order_inco_type[$v->order_type],'no_json')??null;
             $v->button_info=$button_info;
+            if ($order_status == 1 || $order_status==2){
+                $v->button_info=$button_info5;
+            }else if($v->order_status == 5){
+                $v->button_info=$button_info4;
+            }else{
+                $v->button_info=$button_info1;
+            }
             $v->self_id_show = substr($v->self_id,15);
             $v->send_time    = date('m-d H:i',strtotime($v->send_time));
             if ($v->order_type == 'vehicle'){

@@ -253,6 +253,7 @@ class BillController extends CommonController {
             $v->button_info=$button_info;
             $v->tax_type_show =  $tax_type[$v->type] ?? null;
             $v->bill_type_show =  $bill_type[$v->bill_type] ?? null;
+            $v->tax_price  = number_format($v->tax_price/100,2);
             if ($v->bill_flag == 'Y'){
                 $v->bill_flag_show = '已开票';
             }else{
