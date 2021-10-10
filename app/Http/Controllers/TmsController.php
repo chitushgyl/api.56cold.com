@@ -245,32 +245,27 @@ class TmsController extends Controller{
 //        $abcd=0;            //初始化为0     当有错误则加1，页面显示的错误条数不能超过$errorNum 防止页面显示不全1
         $errorNum=50;       //控制错误数据的条数
 //        $a=2;
-        if(empty($address_info)){
-            if($abcd<$errorNum){
-                $strs .= '数据中的第'.$a."行".$type."省不存在".'</br>';
+        if($address_info == null){
+            $strs .= '数据中的第'.$a."行".$type."省不存在".'</br>';
+            $cando='N';
+            $abcd++;
+        }else{
+            if($address_info->address == null){
+                $strs .= '数据中的第'.$a."行".$type."市不存在".'</br>';
                 $cando='N';
                 $abcd++;
-            }
-        }else{
-            if(empty($address_info->address)){
-                if($abcd<$errorNum){
-                    $strs .= '数据中的第'.$a."行".$type."市不存在".'</br>';
+            }else{
+                if($address_info->address->address ==null){
+                    $strs .= '数据中的第'.$a."行".$type."区不存在".'</br>';
                     $cando='N';
                     $abcd++;
-                }
-            }else{
-                if(empty($address_info->address->address)){
-                    if($abcd<$errorNum){
-                        $strs .= '数据中的第'.$a."行".$type."区不存在".'</br>';
-                        $cando='N';
-                        $abcd++;
-                    }
                 }
             }
         }
         if ($cando == 'Y'){
-            $result =  bd_location(2,$pro,$city,$area,$address);
-            $data['self_id']            =generate_id('address_');
+//            $result =  bd_location(2,$pro,$city,$area,$address);
+//            $data['self_id']            =generate_id('address_');
+            $data['self_id']            ='';
             $data['sheng']              =$address_info->id;
             $data['sheng_name']         =$address_info->name;
             $data['shi']                =$address_info->address->id;
@@ -280,14 +275,14 @@ class TmsController extends Controller{
             $data['address']            =$address;
             $data['contacts']           =$contacts;
             $data['tel']                =$tel;
-            $data['longitude']          =$result['lng'];
-            $data['dimensionality']     =$result['lat'];
-            $data['group_code']         =$group_info->group_code;
-            $data['group_name']         =$group_info->group_name;
-            $data['create_user_id']     =$user_info->admin_id;
-            $data['create_user_name']   =$user_info->name;
-            $data['create_time']     = $data['update_time'] = $now_time;
-            TmsAddressContact::insert($data);
+//            $data['longitude']          =$result['lng'];
+//            $data['dimensionality']     =$result['lat'];
+//            $data['group_code']         =$group_info->group_code;
+//            $data['group_name']         =$group_info->group_name;
+//            $data['create_user_id']     =$user_info->admin_id;
+//            $data['create_user_name']   =$user_info->name;
+//            $data['create_time']     = $data['update_time'] = $now_time;
+//            TmsAddressContact::insert($data);
             $info=(object)$data;
             $info->code = 200;
         }else{

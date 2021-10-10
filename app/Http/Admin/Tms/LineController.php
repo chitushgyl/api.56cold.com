@@ -1046,7 +1046,7 @@ class LineController extends CommonController{
             'use_flag'=>$line->use_flag,
             'update_time'=>$now_time
         ];
-        $order_info = TmsOrder::where('line_id',$self_id)->whereIn('order_status',[2,3,4,5])->select('self_id')->get()->toArray();
+        $order_info = TmsOrder::whereIn('line_id',$self_id)->whereIn('order_status',[2,3,4,5])->select('self_id')->get()->toArray();
         if ($order_info){
             $msg['code'] = 301;
             $msg['msg']  = '该线路有未完成订单不能删除';
@@ -1236,6 +1236,11 @@ class LineController extends CommonController{
             $info_check=[];
             if(array_key_exists('0', $res)){
                 $info_check=$res[0];
+                if(count($info_check) >1000){
+                    $msg['code'] = 305;
+                    $msg['msg'] = '最大导入999条数据';
+                    return $msg;
+                }
             }
 
 //            dump($info_check);
