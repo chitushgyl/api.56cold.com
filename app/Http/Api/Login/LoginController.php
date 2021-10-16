@@ -903,7 +903,7 @@ class LoginController extends Controller{
         $project_type       ='user';
         /**初始化一下数据**/
         $info          =null;
-        $select=['name','type','path','active_img','inactive_img','app_path','app_url'];
+        $select=['name','type','path','active_img','inactive_img','app_path','app_url','routine_path'];
         $user_foot_where=[
             ['use_flag','=','Y'],
             ['delete_flag','=','Y'],
