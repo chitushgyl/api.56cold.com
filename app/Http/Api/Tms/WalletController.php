@@ -458,15 +458,27 @@ class WalletController extends Controller{
         $input['default_flag']     = $default_flag   = 'Y'; //是否默认 'Y' 是   'N' 否
          ***/
 
-        $rules=[
-            'card_number'=>['required','regex:/^([1-9]{1})(\d{14}|\d{18})$/'],
-            'card_holder'=>'required',
-        ];
-        $message=[
-            'card_number.required'=>'请填写账号',
-            'card_number.regex'   =>'请填写正确的银行卡号',
-            'card_holder.required'=>'请填写户主名称',
-        ];
+        if($type == 'Alipay'){
+            $rules=[
+                'card_number'=>'required',
+                'card_holder'=>'required',
+            ];
+            $message=[
+                'card_number.required'=>'请填写账号',
+                'card_holder.required'=>'请填写账户姓名',
+            ];
+        }else{
+            $rules=[
+                'card_number'=>['required','regex:/^([1-9]{1})(\d{14}|\d{18})$/'],
+                'card_holder'=>'required',
+            ];
+            $message=[
+                'card_number.required'=>'请填写账号',
+                'card_number.regex'   =>'请填写正确的银行卡号',
+                'card_holder.required'=>'请填写户主名称',
+            ];
+        }
+
 
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {

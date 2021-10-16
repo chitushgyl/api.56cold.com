@@ -411,6 +411,7 @@ class OrderController extends Controller{
         $app_flag      = $request->input('app_flag');
         $depart_time   = $request->input('depart_time')??null; //干线发车时间
         $reduce_price  = $request->input('reduce_price');//立减金额
+        $payer         = $request->input('payer');//付款方：发货人 consignor  收货人receiver
        /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
@@ -992,6 +993,7 @@ class OrderController extends Controller{
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
                             }
+                            $list['payer']                   = $payer;
                             $inserttt[]=$list;
 
                             /** 存储费用 **/
@@ -1191,6 +1193,7 @@ class OrderController extends Controller{
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
                             }
+                            $list['payer']                   = $payer;
                             $inserttt[]=$list;
                             /** 存储费用 **/
                             if ($pay_type == 'offline'){
@@ -1379,6 +1382,7 @@ class OrderController extends Controller{
                         if ($project_type == 'customer'){
                             $list['order_status'] = 3;
                         }
+                        $list['payer']                   = $payer;
                         $inserttt[]=$list;
 
                         /** 存储费用 **/
@@ -1564,6 +1568,7 @@ class OrderController extends Controller{
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
                             }
+                            $list['payer']                   = $payer;
                             $inserttt[]=$list;
                             $dispatch[]=$list['self_id'];
 
@@ -1745,6 +1750,7 @@ class OrderController extends Controller{
                     $data['app_flag']                   = $app_flag;
                     $data['send_time']   = $send_time;
                     $data['reduce_price'] = $reduce_price;
+                    $data['payer']       = $payer;
                     $wheres['self_id'] = $self_id;
 
 //                    dd(123);
@@ -1905,6 +1911,7 @@ class OrderController extends Controller{
                     $data['remark']                     = $remark;
                     $data['app_flag']                   = $app_flag;
                     $data['reduce_price']               = $reduce_price;
+                    $data['payer']                      = $payer;
                     /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
                     $inserttt=[];
 
@@ -1989,6 +1996,7 @@ class OrderController extends Controller{
                     if ($pay_type == 'offline'){
                         $list['order_status'] = 2;
                     }
+                    $list['payer']                      = $payer;
 //                    if ($project_type == 'customer'){
 //                        $list['order_status'] = 3;
 //                    }
@@ -3211,6 +3219,10 @@ class OrderController extends Controller{
         $msg['all_money'] = $lineprice+$pickprice+$sendprice+$moreprice-$discount_price;
         $msg['total_money'] = $total_price;
         return $msg;
+    }
+
+    public function test(){
+        $tel = '';
     }
 
 

@@ -265,11 +265,15 @@ class OrderController extends CommonController{
         $button_info3 = [];
         $button_info4 = [];
         $button_info5 = [];
+        $button_info6 = [];
+        $button_info7 = [];
         foreach ($button_info as $k => $v){
             if($v->id == 647){
                 $button_info1[]=$v;
                 $button_info4[]=$v;
                 $button_info5[]=$v;
+                $button_info6[]=$v;
+                $button_info7[]=$v;
             }
             if($v->id == 272){
                 $button_info2[] = $v;
@@ -278,6 +282,12 @@ class OrderController extends CommonController{
             if($v->id == 745){
                 $button_info3[]=$v;
                 $button_info4[]=$v;
+            }
+            if($v->id == 757){
+                $button_info6[]=$v;
+            }
+            if($v->id == 758){
+                $button_info7[]=$v;
             }
         }
         foreach ($data['items'] as $k=>$v) {
@@ -305,6 +315,10 @@ class OrderController extends CommonController{
                 $v->button_info=$button_info5;
             }else if($v->order_status == 5){
                 $v->button_info=$button_info4;
+            }else if($v->order_status == 6 && $v->discuss_flag == 'N'){
+                $v->button_info=$button_info6;
+            }else if($v->order_status == 6 && $v->follow_flag =='N'){
+                $v->button_info=$button_info7;
             }else{
                 $v->button_info=$button_info1;
             }

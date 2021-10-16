@@ -166,6 +166,12 @@ class DiscussController extends CommonController{
         $data['temperture'] = TmsDiscuss::where($where)->where('temperture','Y')->count();
         $data['car_smell'] = TmsDiscuss::where($where)->where('car_smell','Y')->count();
         $data['on_time'] = TmsDiscuss::where($where)->where('on_time','Y')->count();
+        $button_info1 = [];
+        foreach ($button_info as $key =>$value){
+            if ($value->id == 760){
+                $button_info1[] = $value;
+            }
+        }
         foreach ($data['items'] as $k=>$v) {
             $v->images   = img_for($v->images,'more');
             if ($v->SystemGroup){
@@ -174,6 +180,7 @@ class DiscussController extends CommonController{
             if ($v->UserTotal){
                 $v->user_name = $v->UserTotal->tel;
             }
+            $v->button_info = $button_info1;
         }
 
         $msg['code']=200;

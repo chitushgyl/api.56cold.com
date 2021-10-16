@@ -1014,6 +1014,41 @@ class BillController extends CommonController {
         return $msg;
     }
 
+    /*
+     * 开票  /tms/bill/createReceipt
+     * */
+    public function createReceipt(Request $request){
+        $now_time=date('Y-m-d H:i:s',time());
+        $operationing = $request->get('operationing');//接收中间件产生的参数
+        $table_name='tms_common_bill';
+        $self_id=$request->input('self_id');
+        $bill_flag=$request->input('bill_flag');
+        $flag='bill_flag';
+//        $self_id='address_202103011352018133677963';
+        $old_info = TmsBill::where('self_id',$self_id)->select('group_code','use_flag','delete_flag','update_time')->first();
+        $update['bill_flag'] = $bill_flag;
+        $update['update_time'] = $now_time;
+        $id = TmsBill::where('self_id',$self_id)->update($update);
+
+        $operationing->access_cause='启用/禁用';
+        $operationing->table=$table_name;
+        $operationing->table_id=$self_id;
+        $operationing->now_time=$now_time;
+        $operationing->old_info=$old_info;
+        $operationing->new_info=(object)$update;
+        $operationing->operation_type=$flag;
+        if($id){
+            $msg['code']=200;
+            $msg['msg']='操作成功！';
+            $msg['data']=(object)$update;
+        }else{
+            $msg['code']=300;
+            $msg['msg']='操作失败！';
+        }
+
+        return $msg;
+    }
+
 
 
 
