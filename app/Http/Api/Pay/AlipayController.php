@@ -929,11 +929,11 @@ class AlipayController extends Controller{
             $capital_where['group_code'] = $user_info->group_code;
         }
         $userCapital = UserCapital::where($capital_where)->first();
-//        if ($userCapital->money < $price){
-//            $msg['code'] = 302;
-//            $msg['msg']  = '余额不足';
-//            return $msg;
-//        }
+        if ($userCapital->money < $price){
+            $msg['code'] = 302;
+            $msg['msg']  = '余额不足';
+            return $msg;
+        }
         $capital['money'] = $userCapital->money - $price*100;
         $capital['update_time'] = $now_time;
         UserCapital::where($capital_where)->update($capital);
@@ -942,8 +942,8 @@ class AlipayController extends Controller{
         $wallet['capital_type'] = 'wallet';
         $wallet['create_time'] = $now_time;
         $wallet['update_time'] = $now_time;
-        $wallet['now_money'] = $capital->money;
-        $wallet['now_money_md'] = get_md5($capital->money);
+        $wallet['now_money'] = $capital['money'];
+        $wallet['now_money_md'] = get_md5($capital['money']);
         $wallet['wallet_status'] = 'SU';
         UserWallet::insert($wallet);
         TmsPayment::insert($pay);
