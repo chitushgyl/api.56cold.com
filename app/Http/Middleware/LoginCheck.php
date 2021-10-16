@@ -207,7 +207,7 @@ class LoginCheck{
         $button_where['delete_flag']='Y';
         $button_where['project_type'] = $user_info->type.'_button';
 //            dd($anniu_where['project_type']);
-        $select=['id','name','app_path','project_type','level','path','button_color','app_url'];
+        $select=['id','name','app_path','project_type','level','path','button_color','app_url','routine_path'];
 
         $button=SysFoot::where($button_where)->select($select)->get();
 

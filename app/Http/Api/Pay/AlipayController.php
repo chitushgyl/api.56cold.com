@@ -906,7 +906,7 @@ class AlipayController extends Controller{
 //         * */
         $now_time = date('Y-m-d H:i:s',time());
         $pay['order_id'] = $self_id;
-        $pay['pay_number'] = $price;
+        $pay['pay_number'] = $price*100;
         $pay['platformorderid'] = generate_id('');
         $pay['create_time'] = $pay['update_time'] = $now_time;
         $pay['payname'] = $user_info->tel;
@@ -942,6 +942,7 @@ class AlipayController extends Controller{
         $wallet['capital_type'] = 'wallet';
         $wallet['create_time'] = $now_time;
         $wallet['update_time'] = $now_time;
+        $wallet['money']       = $price*100;
         $wallet['now_money'] = $capital['money'];
         $wallet['now_money_md'] = get_md5($capital['money']);
         $wallet['wallet_status'] = 'SU';
@@ -982,6 +983,104 @@ class AlipayController extends Controller{
             }
         }
 
+        if ($id){
+            $msg['code'] = 200;
+            $msg['msg']  = '支付成功！';
+            return $msg;
+        }else{
+            $msg['code'] = 303;
+            $msg['msg']  = '支付失败！';
+            return $msg;
+        }
+    }
+
+    /*
+     * 货到付款余额支付 /alipay/walletPay
+     * */
+    public function walletPay(Request $request){
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        if (!$user_info){
+            $msg['code'] = 401;
+            $msg['msg']  = '未登录，请完成登录！';
+            return $msg;
+        }
+        // 订单ID
+        $self_id = $request->input('self_id');
+        // 支付金额
+        $price = $request->input('price');
+        $type  = $request->input('type'); // 支付宝 alipay  微信 wechat
+//        /**虚拟数据
+//        $price   = 0.01;
+//        $self_id = 'order_202103121712041799645968';
+//         * */
+        $now_time = date('Y-m-d H:i:s',time());
+        $pay['order_id'] = $self_id;
+        $pay['pay_number'] = $price*100;
+        $pay['platformorderid'] = generate_id('');
+        $pay['create_time'] = $pay['update_time'] = $now_time;
+        $pay['payname'] = $user_info->tel;
+        $pay['paytype'] = 'BALANCE';//
+        $pay['pay_result'] = 'SU';//
+        $pay['state'] = 'in';//支付状态
+        $pay['self_id'] = generate_id('pay_');
+        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+//        if ($order->order_status == 2){
+//            $msg['code'] = 301;
+//            $msg['msg']  = '该订单已支付';
+//            return $msg;
+//        }
+        if ($user_info->type == 'user'){
+            $pay['total_user_id'] = $user_info->total_user_id;
+            $capital_where['total_user_id'] = $user_info->total_user_id;
+        }else{
+            $pay['group_code'] = $user_info->group_code;
+            $pay['group_name'] = $user_info->group_name;
+            $capital_where['group_code'] = $user_info->group_code;
+        }
+        $userCapital = UserCapital::where($capital_where)->first();
+        if ($userCapital->money < $price){
+            $msg['code'] = 302;
+            $msg['msg']  = '余额不足';
+            return $msg;
+        }
+        $capital['money'] = $userCapital->money - $price*100;
+        $capital['update_time'] = $now_time;
+        UserCapital::where($capital_where)->update($capital);
+        $wallet['self_id'] = generate_id('wallet_');
+        $wallet['produce_type'] = 'out';
+        $wallet['capital_type'] = 'wallet';
+        $wallet['create_time'] = $now_time;
+        $wallet['update_time'] = $now_time;
+        $wallet['money']       = $price*100;
+        $wallet['now_money'] = $capital['money'];
+        $wallet['now_money_md'] = get_md5($capital['money']);
+        $wallet['wallet_status'] = 'SU';
+        UserWallet::insert($wallet);
+        TmsPayment::insert($pay);
+        $order_update['pay_state'] = 'Y';
+        $order_update['update_time'] = date('Y-m-d H:i:s',time());
+        $id = TmsOrder::where('self_id',$self_id)->update($order_update);
+        if($order->order_type == 'vehicle'){
+            $dispatch_where['pay_status'] = 'Y';
+            $dispatch_where['update_time'] = $now_time;
+            TmsOrderDispatch::where('order_id',$self_id)->update($dispatch_where);
+        }
+        /**修改费用数据为可用**/
+        $money['delete_flag']                = 'Y';
+        $money['settle_flag']                = 'W';
+        $tmsOrderCost = TmsOrderCost::where('order_id',$self_id)->select('self_id')->get();
+        if ($tmsOrderCost){
+            $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+            TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+        }
+        if($userCapital->money >= $price){
+            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$self_id)->select('self_id')->get();
+            if ($tmsOrderDispatch){
+                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
+            }
+        }
         if ($id){
             $msg['code'] = 200;
             $msg['msg']  = '支付成功！';
@@ -1116,17 +1215,13 @@ class AlipayController extends Controller{
             if (substr($array_data['attach'],0,4) == 'user'){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
-                $where = [
-                    ['total_user_id','=',$array_data['attach']]
-                ];
+                $where['total_user_id'] = $array_data['attach'];
             }else{
                 $pay['group_code'] = $array_data['attach'];
                 $pay['group_name'] = $order->group_name;
                 $wallet['group_code'] = $array_data['attach'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$array_data['attach']]
-                ];
+                $where['group_code'] = $array_data['attach'];
             }
             TmsPayment::insert($pay);
 
@@ -1278,17 +1373,13 @@ class AlipayController extends Controller{
             if (substr($_POST['passback_params'],0,4) == 'user'){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
-                $where = [
-                    ['total_user_id','=',$_POST['passback_params']]
-                ];
+                $where['total_user_id'] = $_POST['passback_params'];
             }else{
                 $pay['group_code'] = $_POST['passback_params'];
                 $pay['group_code'] = $_POST['passback_params'];
                 $wallet['group_code'] = $_POST['passback_params'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$_POST['passback_params']]
-                ];
+                $where['group_code'] = $_POST['passback_params'];
             }
             TmsPayment::insert($pay);
             $capital = UserCapital::where($where)->select(['money','self_id','group_code','total_user_id'])->first();
@@ -1422,6 +1513,36 @@ class AlipayController extends Controller{
             $msg['msg']  = $result['err_code_des'];
             return $msg;
         }
+    }
+
+    /**
+     * 查询支付宝订单是否支付 /alipay/queryAlipay
+     * */
+    public function queryAlipay(){
+        include_once base_path('/vendor/alipay/pagepay/service/AlipayTradeService.php');
+        include_once base_path('/vendor/alipay/pagepay/buildermodel/AlipayTradeQueryContentBuilder.php');
+        $config    = config('tms.alipay_config');//引入配置文件参数
+        $self_id = 'order_202109251115091435951796';
+        //商户订单号，商户网站订单系统中唯一订单号
+        $out_trade_no = trim($self_id);
+
+        //支付宝交易号
+//        $trade_no = trim($_POST['WIDTQtrade_no']);
+        //请二选一设置
+        //构造参数
+        $RequestBuilder = new \AlipayTradeQueryContentBuilder();
+        $RequestBuilder->setOutTradeNo($out_trade_no);
+//        $RequestBuilder->setTradeNo($trade_no);
+
+        $aop = new \AlipayTradeService($config);
+
+        /**
+         * alipay.trade.query (统一收单线下交易查询)
+         * @param $builder 业务参数，使用buildmodel中的对象生成。
+         * @return $response 支付宝返回的信息
+         */
+        $response = $aop->Query($RequestBuilder);
+        dd($response);
     }
 
     /**
