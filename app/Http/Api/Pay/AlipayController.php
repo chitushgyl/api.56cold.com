@@ -994,7 +994,7 @@ class AlipayController extends Controller{
         }
     }
 
-    /*
+    /**
      * 货到付款余额支付 /alipay/walletPay
      * */
     public function walletPay(Request $request){
@@ -1024,7 +1024,7 @@ class AlipayController extends Controller{
         $pay['pay_result'] = 'SU';//
         $pay['state'] = 'in';//支付状态
         $pay['self_id'] = generate_id('pay_');
-        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name','pay_state','order_type'])->first();
 //        if ($order->order_status == 2){
 //            $msg['code'] = 301;
 //            $msg['msg']  = '该订单已支付';
@@ -1073,13 +1073,6 @@ class AlipayController extends Controller{
         if ($tmsOrderCost){
             $money_list = array_column($tmsOrderCost->toArray(),'self_id');
             TmsOrderCost::whereIn('self_id',$money_list)->update($money);
-        }
-        if($userCapital->money >= $price){
-            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$self_id)->select('self_id')->get();
-            if ($tmsOrderDispatch){
-                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
-                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
-            }
         }
         if ($id){
             $msg['code'] = 200;
