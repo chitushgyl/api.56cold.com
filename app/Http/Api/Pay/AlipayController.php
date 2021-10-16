@@ -899,8 +899,9 @@ class AlipayController extends Controller{
         $self_id = $request->input('self_id');
         // 支付金额
         $price = $request->input('price');
+        $type  = $request->input('type'); // 支付宝 alipay  微信 wechat
 //        /**虚拟数据
-        $price   = 0.01;
+//        $price   = 0.01;
 //        $self_id = 'order_202103121712041799645968';
 //         * */
         $now_time = date('Y-m-d H:i:s',time());
