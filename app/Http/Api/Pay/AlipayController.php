@@ -239,7 +239,7 @@ class AlipayController extends Controller{
         $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
         $self_id   = $request->input('self_id');// 订单ID
         $price     = $request->input('price');// 支付金额
-//        $price     = 0.01;
+        $price     = 0.01;
         if (!$user_info){
             $msg['code'] = 401;
             $msg['msg']  = '未登录，请完成登录！';
@@ -327,17 +327,13 @@ class AlipayController extends Controller{
             if ($order->total_user_id){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
-                $where = [
-                    ['total_user_id','=',$_POST['passback_params']]
-                ];
+                $where['total_user_id'] = $_POST['passback_params'];
             }else{
                 $pay['group_code'] = $_POST['passback_params'];
                 $pay['group_code'] = $_POST['passback_params'];
                 $wallet['group_code'] = $_POST['passback_params'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$_POST['passback_params']]
-                ];
+                $where['group_code'] = $_POST['passback_params'];
             }
             TmsPayment::insert($pay);
             $capital = UserCapital::where($where)->first();
@@ -351,7 +347,7 @@ class AlipayController extends Controller{
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
-
+            file_put_contents(base_path('/vendor/alipay1.txt'),$wallet);
             if ($order->order_type == 'line'){
                 $order_update['order_status'] = 3;
             }else{
@@ -363,9 +359,11 @@ class AlipayController extends Controller{
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
             $tmsOrderCost = TmsOrderCost::where('order_id',$_POST['out_trade_no'])->select('self_id')->get();
+            file_put_contents(base_path('/vendor/alipay2.txt'),$tmsOrderCost);
             if ($tmsOrderCost){
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+                file_put_contents(base_path('/vendor/alipay3.txt'),'123');
             }
             $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$_POST['out_trade_no'])->select('self_id','dispatch_flag')->get();
             if ($tmsOrderDispatch){
@@ -436,17 +434,13 @@ class AlipayController extends Controller{
             if ($order->total_user_id){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
-                $where = [
-                    ['total_user_id','=',$_POST['passback_params']]
-                ];
+                $where['total_user_id'] = $_POST['passback_params'];
             }else{
                 $pay['group_code'] = $_POST['passback_params'];
                 $pay['group_code'] = $_POST['passback_params'];
                 $wallet['group_code'] = $_POST['passback_params'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$_POST['passback_params']]
-                ];
+                $where['group_code'] = $_POST['passback_params'];
             }
             TmsPayment::insert($pay);
             $capital = UserCapital::where($where)->first();
@@ -516,17 +510,13 @@ class AlipayController extends Controller{
             if (substr($_POST['passback_params'],0,4) == 'user'){
                 $pay['total_user_id'] = $_POST['passback_params'];
                 $wallet['total_user_id'] = $_POST['passback_params'];
-                $where = [
-                    ['total_user_id','=',$_POST['passback_params']]
-                ];
+                $where['total_user_id'] = $_POST['passback_params'];
             }else{
                 $pay['group_code'] = $_POST['passback_params'];
                 $pay['group_name'] = $order->group_name;
                 $wallet['group_code'] = $_POST['passback_params'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$_POST['passback_params']]
-                ];
+                $where['group_code'] = $_POST['passback_params'];
             }
             TmsPayment::insert($pay);
             $capital = UserCapital::where($where)->first();
@@ -590,7 +580,7 @@ class AlipayController extends Controller{
             $msg['msg']  = '请选择支付类型';
             return $msg;
         }
-//        $price = 0.01;
+        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -670,17 +660,13 @@ class AlipayController extends Controller{
             if ($order->total_user_id){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
-                $where = [
-                    ['total_user_id','=',$array_data['attach']]
-                ];
+                $where['total_user_id'] = $array_data['attach'];
             }else{
                 $pay['group_code'] = $array_data['attach'];
                 $pay['group_name'] = $order->group_name;
                 $wallet['group_code'] = $array_data['attach'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$array_data['attach']]
-                ];
+                $where['group_code'] = $array_data['attach'];
             }
             TmsPayment::insert($pay);
             $capital = UserCapital::where($where)->first();
@@ -770,17 +756,13 @@ class AlipayController extends Controller{
             if ($order->total_user_id){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
-                $where = [
-                    ['total_user_id','=',$array_data['attach']]
-                ];
+                $where['total_user_id'] = $array_data['attach'];
             }else{
                 $pay['group_code'] = $array_data['attach'];
                 $pay['group_name'] = $order->group_name;
                 $wallet['group_code'] = $array_data['attach'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$array_data['attach']]
-                ];
+                $where['group_code'] = $array_data['attach'];
             }
             TmsPayment::insert($pay);
             $capital = UserCapital::where($where)->first();
@@ -848,17 +830,13 @@ class AlipayController extends Controller{
             if (substr($_POST['passback_params'],0,4) == 'user'){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
-                $where = [
-                    ['total_user_id','=',$array_data['attach']]
-                ];
+                $where['total_user_id'] = $array_data['attach'];
             }else{
                 $pay['group_code'] = $array_data['attach'];
                 $pay['group_name'] = $order->group_name;
                 $wallet['group_code'] = $array_data['attach'];
                 $wallet['group_name'] = $order->group_name;
-                $where = [
-                    ['group_code','=',$array_data['attach']]
-                ];
+                $where['group_code'] = $array_data['attach'];
             }
             TmsPayment::insert($pay);
 
