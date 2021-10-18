@@ -1024,7 +1024,7 @@ class LineController extends CommonController{
         $operationing = $request->get('operationing');//接收中间件产生的参数
         $table_name='tms_line';
         $self_id=$request->input('self_id');
-        $self_id = ['line_202110101411233866568593'];
+//        $self_id = ['line_202110101411233866568593'];
         $operationing->access_cause='删除';
         $operationing->table = $table_name;
         $operationing->table_id = $self_id;
