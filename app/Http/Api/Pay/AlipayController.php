@@ -922,10 +922,13 @@ class AlipayController extends Controller{
 //        }
         if ($user_info->type == 'user'){
             $pay['total_user_id'] = $user_info->total_user_id;
+            $wallet['total_user_id'] = $user_info->total_user_id;
             $capital_where['total_user_id'] = $user_info->total_user_id;
         }else{
             $pay['group_code'] = $user_info->group_code;
             $pay['group_name'] = $user_info->group_name;
+            $wallet['group_code'] = $user_info->group_code;
+            $wallet['group_name'] = $user_info->group_name;
             $capital_where['group_code'] = $user_info->group_code;
         }
         $userCapital = UserCapital::where($capital_where)->first();
@@ -1032,10 +1035,13 @@ class AlipayController extends Controller{
 //        }
         if ($user_info->type == 'user'){
             $pay['total_user_id'] = $user_info->total_user_id;
+            $wallet['total_user_id'] = $user_info->total_user_id;
             $capital_where['total_user_id'] = $user_info->total_user_id;
         }else{
             $pay['group_code'] = $user_info->group_code;
             $pay['group_name'] = $user_info->group_name;
+            $wallet['group_code'] = $user_info->group_code;
+            $wallet['group_name'] = $user_info->group_name;
             $capital_where['group_code'] = $user_info->group_code;
         }
         $userCapital = UserCapital::where($capital_where)->first();

@@ -1041,9 +1041,9 @@ class LineController extends CommonController{
             $query->with(['tmsLine' => function($query)use($selectList2){
                 $query->select($selectList2);
             }]);
-        }])->where($where)->select($select)->first();
+        }])->whereIn('self_id',$self_id)->select($select)->first();
         $old_info = [
-            'use_flag'=>$line->use_flag,
+            'use_flag'=>'Y',
             'update_time'=>$now_time
         ];
         $order_info = TmsOrder::whereIn('line_id',$self_id)->whereIn('order_status',[2,3,4,5])->select('self_id')->get()->toArray();
@@ -1057,10 +1057,10 @@ class LineController extends CommonController{
                 case 'combination':
                     $data['delete_flag']='N';
                     $data['update_time']=$now_time;
-                    $id=TmsLine::where($where)->update($data);
+                    $id=TmsLine::whereIn($where)->update($data);
                     break;
                 case 'alone':
-                    $line_info = TmsLineList::where('yuan_self_id',$self_id)->pluck('line_id')->toArray();
+                    $line_info = TmsLineList::whereIn('yuan_self_id',$self_id)->pluck('line_id')->toArray();
 
                     $where_line=[
                         ['delete_flag','=','Y'],
@@ -1068,7 +1068,7 @@ class LineController extends CommonController{
                     ];
                     $data['delete_flag'] = 'N';
                     $data['update_time'] = $now_time;
-                    $id=TmsLine::where($where)->update($data);
+                    $id=TmsLine::whereIn($where)->update($data);
                     TmsLine::where($where_line)->whereIn('self_id',$line_info)->update($data);
                     break;
             }
