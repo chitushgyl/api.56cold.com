@@ -85,7 +85,6 @@ class WalletController extends Controller{
             $v->wallet_status_show = $tms_wallet_status[$v->wallet_status] ?? null;
             $v->image = img_for($tms_wallet_image[$v->produce_type],'no_json');
             $v->produce_type_show = $tms_wallet_info[$v->produce_type] ?? null;
-            $v->produce_type = $tms_wallet_info[$v->produce_type] ?? null;
 
             $v->money = number_format($v->money/100,2);
             $v->now_money = number_format($v->now_money/100,2);
