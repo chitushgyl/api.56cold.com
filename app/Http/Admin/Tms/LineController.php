@@ -1024,6 +1024,7 @@ class LineController extends CommonController{
         $operationing = $request->get('operationing');//接收中间件产生的参数
         $table_name='tms_line';
         $self_id=$request->input('self_id');
+        $self_id = ['line_202110101411233866568593'];
         $operationing->access_cause='删除';
         $operationing->table = $table_name;
         $operationing->table_id = $self_id;
@@ -1041,40 +1042,44 @@ class LineController extends CommonController{
             $query->with(['tmsLine' => function($query)use($selectList2){
                 $query->select($selectList2);
             }]);
-        }])->whereIn('self_id',$self_id)->select($select)->first();
+        }])->whereIn('self_id',$self_id)->select($select)->get();
         $old_info = [
             'use_flag'=>'Y',
             'update_time'=>$now_time
         ];
+
         $order_info = TmsOrder::whereIn('line_id',$self_id)->whereIn('order_status',[2,3,4,5])->select('self_id')->get()->toArray();
         if ($order_info){
             $msg['code'] = 301;
             $msg['msg']  = '该线路有未完成订单不能删除';
             return $msg;
         }
+//        dd($line->toArray());
+
         if($line){
-            switch ($line->type){
-                case 'combination':
-                    $data['delete_flag']='N';
-                    $data['update_time']=$now_time;
-                    $id=TmsLine::whereIn($where)->update($data);
-                    break;
-                case 'alone':
-                    $line_info = TmsLineList::whereIn('yuan_self_id',$self_id)->pluck('line_id')->toArray();
+            foreach ($line as $key =>$value){
+                switch ($value->type){
+                    case 'combination':
+                        $data['delete_flag']='N';
+                        $data['update_time']=$now_time;
+                        $id=TmsLine::whereIn('self_id',$value->self_id)->update($data);
+                        break;
+                    case 'alone':
+                        $line_info = TmsLineList::where('yuan_self_id',$value->self_id)->pluck('line_id')->toArray();
 
-                    $where_line=[
-                        ['delete_flag','=','Y'],
-                        ['use_flag','=','Y'],
-                    ];
-                    $data['delete_flag'] = 'N';
-                    $data['update_time'] = $now_time;
-                    $id=TmsLine::whereIn($where)->update($data);
-                    TmsLine::where($where_line)->whereIn('self_id',$line_info)->update($data);
-                    break;
+                        $where_line=[
+                            ['delete_flag','=','Y'],
+                            ['use_flag','=','Y'],
+                        ];
+                        $data['delete_flag'] = 'N';
+                        $data['update_time'] = $now_time;
+                        $id=TmsLine::where('self_id',$value->self_id)->update($data);
+                        TmsLine::where($where_line)->whereIn('self_id',$line_info)->update($data);
+                        break;
+                }
             }
-
             $operationing->old_info = (object)$old_info;
-            $operationing->table_id = $self_id;
+            $operationing->table_id = json_encode($self_id,JSON_UNESCAPED_UNICODE);
             $operationing->new_info=$data;
 
             if($id){
