@@ -1027,7 +1027,7 @@ class LineController extends CommonController{
 //        $self_id = ['line_202110101411233866568593'];
         $operationing->access_cause='删除';
         $operationing->table = $table_name;
-        $operationing->table_id = $self_id;
+        $operationing->table_id = json_encode($self_id,JSON_UNESCAPED_UNICODE);
         $operationing->now_time = $now_time;
 
 //        $self_id='line_202108211358022844377973';
