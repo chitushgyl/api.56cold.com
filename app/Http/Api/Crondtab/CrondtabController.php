@@ -283,7 +283,7 @@ class CrondtabController extends Controller {
             $input = new \WxPayOrderQuery();
             $input->SetOut_trade_no($v->self_id);
             $result = WxPayQ::orderQuery($input);
-            if($result['result_code'] == 'SUCCESS' && $result['return_code']=='SUCCESS' && $result['return_msg'] == 'OK'){
+            if($result['result_code'] == 'SUCCESS' && $result['return_code']=='SUCCESS' && $result['return_msg'] == 'OK' && $result['trade_state'] == 'SUCCESS'){
                 DB::beginTransaction();
                 try {
                     $now_time = date('Y-m-d H:i:s', time());

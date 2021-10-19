@@ -533,6 +533,7 @@ class OrderController extends CommonController{
         $pay_type      = $request->input('pay_type');
         $remark        = $request->input('remark');
         $app_flag      = $request->input('app_flag');//app上下单   1 是 2 PC下单
+        $payer         = $request->input('payer');//付款方：发货人 consignor  收货人receiver
         if (empty($price)){
             $price = $request->input('line_price');
         }
@@ -1189,6 +1190,7 @@ class OrderController extends CommonController{
                             if ($pay_type == 'online'){
                                 $list['order_status']               = 1;
                             }
+                            $list['payer']                      = $payer;
                             $inserttt[]=$list;
                         }
 
@@ -1251,6 +1253,7 @@ class OrderController extends CommonController{
                             if ($pay_type == 'online'){
                                 $list['order_status']               = 1;
                             }
+                            $list['payer']                      = $payer;
                             $inserttt[]=$list;
                         }
 
@@ -1307,6 +1310,7 @@ class OrderController extends CommonController{
                         if ($pay_type == 'online'){
                             $list['order_status']               = 1;
                         }
+                        $list['payer']                      = $payer;
                         $inserttt[]=$list;
 
                     }
@@ -1370,6 +1374,7 @@ class OrderController extends CommonController{
                             if ($pay_type == 'online'){
                                 $list['order_status']               = 1;
                             }
+                            $list['payer']                      = $payer;
                             $inserttt[]=$list;
                         }
                     }
@@ -1470,6 +1475,7 @@ class OrderController extends CommonController{
                     if ($pay_type == 'online'){
                         $list['order_status']               = 1;
                     }
+                    $data['payer']                      = $payer;
                     $wheres['self_id'] = $self_id;
                     $old_info=TmsOrder::where($wheres)->first();
 
@@ -1576,6 +1582,7 @@ class OrderController extends CommonController{
                     $data['price']                      = ($price - 0)*100;
                     $data['order_status']               = 3;
                     $data['pay_type']                   = $pay_type;
+                    $data['payer']                      = $payer;
                     if ($pay_type == 'online'){
                         $list['order_status']               = 1;
                     }
@@ -1644,6 +1651,7 @@ class OrderController extends CommonController{
                         $list['order_status']               = 1;
                     }
                     $list['car_type']                   = $car_type;
+                    $list['payer']                      = $payer;
                     if($old_info){
 
                     }else{
@@ -2539,6 +2547,7 @@ class OrderController extends CommonController{
         $app_flag    = $request->input('app_flag')??''; //备注
         $depart_time    = $request->input('depart_time')??null; //干线发车时间
         $reduce_price   = $request->input('reduce_price');
+        $payer          = $request->input('payer');//付款方：发货人     收货人 receiver
         /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='line';  //vehicle  lcl   line
@@ -3110,6 +3119,7 @@ class OrderController extends CommonController{
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
                             }
+                            $list['payer']                   = $payer;
                             $inserttt[]=$list;
 
                             /** 存储费用 **/
@@ -3329,6 +3339,7 @@ class OrderController extends CommonController{
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
                             }
+                            $list['payer']                     = $payer;
                             $inserttt[]=$list;
                             /** 存储费用 **/
                             if ($pay_type == 'offline'){
@@ -3537,6 +3548,7 @@ class OrderController extends CommonController{
                         if ($project_type == 'customer'){
                             $list['order_status'] = 3;
                         }
+                        $list['payer']                   = $payer;
                         $inserttt[]=$list;
 
                         /** 存储费用 **/
@@ -3742,6 +3754,7 @@ class OrderController extends CommonController{
                             if ($project_type == 'customer'){
                                 $list['order_status'] = 3;
                             }
+                            $list['payer']                    = $payer;
                             $inserttt[]=$list;
 
                             /** 存储费用 **/
@@ -3942,6 +3955,7 @@ class OrderController extends CommonController{
                     $data['app_flag']                   = $app_flag;
                     $data['send_time']   = $send_time;
                     $data['reduce_price'] = $reduce_price;
+                    $data['payer']       = $payer;
                     $wheres['self_id'] = $self_id;
 
     //                    dd(123);
@@ -4043,6 +4057,7 @@ class OrderController extends CommonController{
                     $data['remark']                   = $remark;
                     $data['app_flag']                   = $app_flag;
                     $data['reduce_price']             = $reduce_price;
+                    $data['payer']                      = $payer;
                     /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
                     $inserttt=[];
 
@@ -4127,6 +4142,7 @@ class OrderController extends CommonController{
                     if ($pay_type == 'offline'){
                         $list['order_status'] = 2;
                     }
+                    $list['payer']                      = $payer;
     //                    if ($project_type == 'customer'){
     //                        $list['order_status'] = 3;
     //                    }
