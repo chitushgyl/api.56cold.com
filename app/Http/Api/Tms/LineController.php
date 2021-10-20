@@ -3,6 +3,7 @@ namespace App\Http\Api\Tms;
 use App\Http\Controllers\DetailsController as Details;
 use App\Http\Controllers\StatusController as Status;
 use App\Models\Group\SystemGroup;
+use App\Models\Tms\TmsDiscuss;
 use App\Models\Tms\TmsLineList;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -106,6 +107,11 @@ class LineController extends Controller{
             if(strtotime(date('Y-m-d H:i',time())) <= (strtotime($time.' '.$v->depart_time)-7200)){
                 $line_info[] = $v;
             }
+            $v->discuss_show      = 'N';
+            $count = TmsDiscuss::where('line_id',$v->self_id)->where('type','line')->count();
+            if ($count>0){
+                $v->discuss_show  = 'Y';
+            }
 //            dump(strtotime(date('Y-m-d H:i:s',time())));
 //            dump(strtotime($time.' '.$v->depart_time));
 
@@ -198,6 +204,12 @@ class LineController extends Controller{
             $v->type = $tms_line_type[$v->type] ?? null;
             $v->detime = date('m-d H:i', strtotime($time .' '. $v->depart_time));
             $v->detime_show       = date('Y-m-d H:i',strtotime($time.' '.$v->depart_time));
+            $v->discuss_show      = 'N';
+            $count = TmsDiscuss::where('line_id',$v->self_id)->where('type','line')->count();
+            if ($count>0){
+                $v->discuss_show  = 'Y';
+            }
+
         }
         $msg['code'] = 200;
         $msg['msg']  = '数据拉取成功！';
