@@ -210,7 +210,6 @@ class SignController extends CommonController{
 					}
 				}
             }
-            dd($datalist);
             $select_WmsWarehouseArea=['area','warehouse_id','warehouse_name','group_code','group_name','warm_id'];
             $info=WmsWarehouseArea::where('self_id','=',$area_id)->select($select_WmsWarehouseArea)->first();
 
