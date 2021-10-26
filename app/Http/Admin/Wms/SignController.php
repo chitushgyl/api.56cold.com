@@ -238,6 +238,7 @@ class SignController extends CommonController{
                 }
 
                 $datalist[$k]['self_id']				=generate_id('sign_');
+                dd($datalist);
                 $datalist[$k]['area_id']				=$area_id;
                 $datalist[$k]['area']					=$info->area;
                 $datalist[$k]['warehouse_id']			=$info->warehouse_id;
