@@ -1624,8 +1624,61 @@ class AlipayController extends Controller{
     /**
      * 支付宝充值回调
      * */
-    public function depositAlipayNotify(){
+    public function depositAlipayNotify(Request $request){
+        include_once base_path( 'vendor/alipay/pagepay/service/AlipayTradeService.php');
+        $now_time = date('Y-m-d H:i:s',time());
+        $config = config('tms.alipay_config');
+        $alipaySevice = new \AlipayTradeService($config);
+        $alipaySevice->writeLog(var_export($_POST, true));
+        $result = $alipaySevice->check($_POST);
+        if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
+            if(substr($_POST['passback_params'],0,4) == 'user'){
+                $userCapital = UserCapital::where('total_user_id','=',$_POST['passback_params'])->first();
+            }else{
+                $userCapital = UserCapital::where('group_code','=',$_POST['passback_params'])->first();
+            }
 
+            $flag = TmsPayment::where([['group_code','=',$_POST['passback_params']],['order_id','=',$_POST['out_trade_no']]])->first();
+            if ($flag){
+                echo 'success';
+                return false;
+            }
+            $pay['order_id'] = $_POST['out_trade_no'];
+            $pay['pay_number'] = $_POST['total_amount'] * 100;
+            $pay['platformorderid'] = $_POST['trade_no'];
+            $pay['create_time'] = $pay['update_time'] = $now_time;
+//            $pay['payname'] = $_POST['buyer_logon_id'];
+            $pay['paytype'] = 'ALIPAY';//
+            $pay['pay_result'] = 'SU';//
+            $pay['state'] = 'recharge';//支付状态
+            $pay['self_id'] = generate_id('pay_');
+            $pay['group_code'] = $_POST['passback_params'];
+//            file_put_contents(base_path('/vendor/5555.txt'),$pay);
+            TmsPayment::insert($pay);
+
+            $capital['money'] = $userCapital->money + $_POST['total_amount']*100;
+            $capital['update_time'] = $now_time;
+            if (substr($_POST['passback_params'],0,4) == 'user'){
+                UserCapital::where('total_user_id','=',$_POST['passback_params'])->update($capital);
+            }else{
+                UserCapital::where('group_code','=',$_POST['passback_params'])->update($capital);
+            }
+            $wallet['self_id'] = generate_id('wallet_');
+            $wallet['produce_type'] = 'recharge';
+            $wallet['capital_type'] = 'wallet';
+            $wallet['create_time'] = $now_time;
+            $wallet['update_time'] = $now_time;
+            $wallet['money'] = $_POST['total_amount'] * 100;
+            $wallet['now_money'] = $capital['money'];
+            $wallet['now_money_md'] = get_md5($capital['money']);
+            $wallet['wallet_status'] = 'SU';
+            $wallet['group_code'] = $_POST['passback_params'];
+
+            UserWallet::insert($wallet);
+            echo 'success';
+        } else {
+            echo 'fail';
+        }
     }
 
 
@@ -1677,8 +1730,59 @@ class AlipayController extends Controller{
     /**
      * 微信充值回调
      * */
-    public function depositWechatNotify(){
+    public function depositWechatNotify(Request $request){
+        $now_time = date('Y-m-d H:i:s');
+        ini_set('date.timezone', 'Asia/Shanghai');
+        error_reporting(E_ERROR);
+        $result = file_get_contents('php://input', 'r');
+        $array_data = json_decode(json_encode(simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        if ($array_data['return_code'] == 'SUCCESS') {
+            if(substr($array_data['attach'],0,4) == 'user'){
+                $userCapital = UserCapital::where('total_user_id','=',$array_data['attach'])->first();
+            }else{
+                $userCapital = UserCapital::where('group_code','=',$array_data['attach'])->first();
+            }
+            $flag = TmsPayment::where([['group_code','=',$array_data['attach']],['order_id','=',$_POST['out_trade_no']]])->first();
+            if ($flag){
+                echo 'success';
+                return false;
+            }
+            $pay['order_id'] = $array_data['out_trade_no'];
+            $pay['pay_number'] = $array_data['total_fee'] * 100;
+            $pay['platformorderid'] = $array_data['transaction_id'];
+            $pay['create_time'] = $pay['update_time'] = $now_time;
+//            $pay['payname'] = $_POST['buyer_logon_id'];
+            $pay['paytype'] = 'ALIPAY';//
+            $pay['pay_result'] = 'SU';//
+            $pay['state'] = 'recharge';//支付状态
+            $pay['self_id'] = generate_id('pay_');
+            $pay['group_code'] = $array_data['attach'];
+//            file_put_contents(base_path('/vendor/5555.txt'),$pay);
+            TmsPayment::insert($pay);
 
+            $capital['money'] = $userCapital->money + $array_data['total_fee']*100;
+            $capital['update_time'] = $now_time;
+            if(substr($array_data['attach'],0,4) == 'user'){
+                UserCapital::where('total_user_id','=',$array_data['attach'])->update($capital);
+            }else{
+                UserCapital::where('group_code','=',$array_data['attach'])->update($capital);
+            }
+            $wallet['self_id'] = generate_id('wallet_');
+            $wallet['produce_type'] = 'recharge';
+            $wallet['capital_type'] = 'wallet';
+            $wallet['create_time'] = $now_time;
+            $wallet['update_time'] = $now_time;
+            $wallet['money'] = $array_data['total_fee'] * 100;
+            $wallet['now_money'] = $capital['money'];
+            $wallet['now_money_md'] = get_md5($capital['money']);
+            $wallet['wallet_status'] = 'SU';
+            $wallet['group_code'] = $array_data['attach'];
+
+            UserWallet::insert($wallet);
+            echo 'success';
+        } else {
+            echo "fail";
+        }
     }
 
 
