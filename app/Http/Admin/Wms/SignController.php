@@ -154,7 +154,7 @@ class SignController extends CommonController{
         $input['column_right']              =$column_right='12';
 * **/
 
-		DD($input);
+//		DD($input);
         $rules=[
             'area_id'=>'required',
         ];
@@ -210,7 +210,7 @@ class SignController extends CommonController{
 					}
 				}
             }
-
+            dd($datalist);
             $select_WmsWarehouseArea=['area','warehouse_id','warehouse_name','group_code','group_name','warm_id'];
             $info=WmsWarehouseArea::where('self_id','=',$area_id)->select($select_WmsWarehouseArea)->first();
 
