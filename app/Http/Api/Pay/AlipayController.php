@@ -1581,6 +1581,7 @@ class AlipayController extends Controller{
             $msg['msg']  = '请填写价格';
             return $msg;
         }
+        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
