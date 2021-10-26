@@ -154,7 +154,7 @@ class SignController extends CommonController{
         $input['column_right']              =$column_right='12';
 * **/
 
-		//DD($input);
+		DD($input);
         $rules=[
             'area_id'=>'required',
         ];
