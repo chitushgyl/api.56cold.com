@@ -441,7 +441,11 @@ class LibraryController extends CommonController{
             $id=WmsLibraryOrder::insert($data);
 
             if($id){
-                WmsLibrarySige::insert($datalist);
+                $new_list = array_chunk($datalist,1000);
+                foreach ($new_list as $value){
+                    WmsLibrarySige::insert($datalist);
+                }
+
                 if($data["grounding_status"]=='Y'){
                     $change->change($datalist,'preentry');
                 }
