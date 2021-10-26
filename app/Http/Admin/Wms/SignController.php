@@ -252,6 +252,8 @@ class SignController extends CommonController{
 
             }
             if($cando=='Y'){
+                $new_list = array_chunk($datalist,1000);
+                dd($new_list);
                 $id=WmsWarehouseSign::insert($datalist);
                 if($id){
                     $msg['code'] = 200;
