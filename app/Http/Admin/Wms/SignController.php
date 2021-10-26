@@ -253,8 +253,10 @@ class SignController extends CommonController{
             }
             if($cando=='Y'){
                 $new_list = array_chunk($datalist,1000);
-                dd($new_list);
-                $id=WmsWarehouseSign::insert($datalist);
+//                dd($new_list);
+                foreach ($new_list as $value){
+                    $id=WmsWarehouseSign::insert($value);
+                }
                 if($id){
                     $msg['code'] = 200;
                     $msg['msg'] = "操作成功,创建了".count($datalist).'个库位';
