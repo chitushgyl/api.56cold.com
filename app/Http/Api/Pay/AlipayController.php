@@ -1690,6 +1690,7 @@ class AlipayController extends Controller{
         $input = $request->all();
         $user_info = $request->get('user_info');
         $price = $request->input('price'); //充值金额
+        $type  = $request->input('type');
         if (empty($price)){
             $msg['code'] = 301;
             $msg['msg']  = '请填写价格';
@@ -1707,11 +1708,16 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-        $appid = 'wxe2d6b74ba8fa43e7';
-        $mch_id = '1481595522';
 
-        $notify_url = $this->url.'/app/pay/wechat_notify';
-        $key = 'FdzK0xScm6GRS0zUW4LRYOak5rZA9k3o';
+        if ($type == 'user'){
+            $config    = config('tms.wechat_config_user');//引入配置文件参数
+        }else{
+            $config    = config('tms.wechat_config_driver');//引入配置文件参数
+        }
+        $appid  = $config['appid'];
+        $mch_id = $config['mch_id'];
+        $key    = $config['key'];
+        $notify_url = 'https://api.56cold.com/alipay/depositWechatNotify';
         $wechatAppPay = new \wxAppPay($appid, $mch_id, $notify_url, $key);
         $params['body'] = '微信余额充值';                       //商品描述
         $params['out_trade_no'] = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);    //自定义的订单号
