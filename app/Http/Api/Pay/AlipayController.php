@@ -1570,15 +1570,28 @@ class AlipayController extends Controller{
     }
 
     /**
-     * App支付宝充值
+     * App支付宝充值  /alipay/depositAlipay
      * */
     public function depositAlipay(Request $request){
         $input = $request->all();
         $user_info = $request->get('user_info');
-        $token = $input["token"];  //令牌
-        $price = $input['price']; //充值金额
-        $check_result = $this->check_token($token);//验证令牌
-        $user = $check_result['user'];
+        $price = $request->input('price'); //充值金额
+        if (empty($price)){
+            $msg['code'] = 301;
+            $msg['msg']  = '请填写价格';
+            return $msg;
+        }
+        /**虚拟数据
+        $user_id = 'user_15615612312454564';
+        $price = 0.01;
+        $type = 1;
+        $self_id = 'order_202103090937308279552773';
+         * */
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
 
         include_once base_path('/vendor/alipay/aop/AopClient.php');
         include_once base_path('vendor/alipay/aop/request/AlipayTradeAppPayRequest.php');
@@ -1597,10 +1610,10 @@ class AlipayController extends Controller{
             'out_trade_no' => date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8),//此订单号为商户唯一订单号
             'total_amount' => $price,//保留两位小数
             'product_code' => 'QUICK_MSECURITY_PAY',
-            'passback_params' => $user->id
+            'passback_params' => $user_id
         ]);
 
-        $request->setNotifyUrl("/alipay/depositAlipayNotify");
+        $request->setNotifyUrl("https://api.56cold.com/alipay/depositAlipayNotify");
         $request->setBizContent($bizcontent);
         //这里和普通的接口调用不同，使用的是sdkExecute
         $response = $aop->sdkExecute($request);
@@ -1616,10 +1629,48 @@ class AlipayController extends Controller{
 
 
     /**
-     * APP微信支付
+     * APP微信支付  /alipay/depositWechat
      * */
     public function depositWechat(Request $request){
+        include_once base_path('vendor/wxAppPay/weixin.php');
+        $input = $request->all();
+        $user_info = $request->get('user_info');
+        $price = $request->input('price'); //充值金额
+        if (empty($price)){
+            $msg['code'] = 301;
+            $msg['msg']  = '请填写价格';
+            return $msg;
+        }
+        $price = 0.01;
+        /**虚拟数据
+        $user_id = 'user_15615612312454564';
+        $price = 0.01;
+        $type = 1;
+        $self_id = 'order_202103090937308279552773';
+         * */
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+        $appid = 'wxe2d6b74ba8fa43e7';
+        $mch_id = '1481595522';
 
+        $notify_url = $this->url.'/app/pay/wechat_notify';
+        $key = 'FdzK0xScm6GRS0zUW4LRYOak5rZA9k3o';
+        $wechatAppPay = new \wxAppPay($appid, $mch_id, $notify_url, $key);
+        $params['body'] = '微信余额充值';                       //商品描述
+        $params['out_trade_no'] = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);    //自定义的订单号
+        $params['total_fee'] = $price * 100;                       //订单金额 只能为整数 单位为分
+        $params['trade_type'] = 'APP';                      //交易类型 JSAPI | NATIVE | APP | WAP
+        $params['attach'] = $user_id;                      //附加参数（用户ID）
+        $result = $wechatAppPay->unifiedOrder($params);
+        // print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
+        //2.创建APP端预支付参数
+        /** @var TYPE_NAME $result */
+        $data = @$wechatAppPay->getAppPayParams($result['prepay_id']);
+        // 根据上行取得的支付参数请求支付即可
+        return json_encode($data);
     }
 
     /**
