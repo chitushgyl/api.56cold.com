@@ -3,6 +3,7 @@
 function generate_id($kk){
     list($s1, $s2) = explode(' ', microtime());
     $float = explode ( ".", ((float)$s1 + (float)$s2) );
+    dd($float);
     $a = mt_rand(100,999);
     $b = mt_rand(100,999);
     $time=$kk.date('YmdHis').$float[1].$a.$b;
