@@ -443,7 +443,7 @@ class LibraryController extends CommonController{
             if($id){
                 $new_list = array_chunk($datalist,1000);
                 foreach ($new_list as $value){
-                    WmsLibrarySige::insert($datalist);
+                    WmsLibrarySige::insert($value);
                 }
 
                 if($data["grounding_status"]=='Y'){

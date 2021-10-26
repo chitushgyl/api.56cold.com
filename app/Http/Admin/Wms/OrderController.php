@@ -323,7 +323,7 @@ class OrderController extends CommonController{
 
                     if(empty($sku_info)){
                         if($abcd<$errorNum){
-                            $strs .= '数据中的第'.$a."行商品不存在".'</br>';
+                            $strs .= '数据中的第'.$a."行商品编号不存在".'</br>';
                             $cando='N';
                             $abcd++;
                         }
