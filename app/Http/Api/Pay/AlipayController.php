@@ -1634,11 +1634,16 @@ class AlipayController extends Controller{
         if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
             if(substr($_POST['passback_params'],0,4) == 'user'){
                 $userCapital = UserCapital::where('total_user_id','=',$_POST['passback_params'])->first();
+                $flag = TmsPayment::where([['total_user_id','=',$_POST['passback_params']],['order_id','=',$_POST['out_trade_no']]])->first();
+                $pay['total_user_id'] = $_POST['passback_params'];
+                $wallet['total_user_id'] = $_POST['passback_params'];
             }else{
                 $userCapital = UserCapital::where('group_code','=',$_POST['passback_params'])->first();
+                $flag = TmsPayment::where([['group_code','=',$_POST['passback_params']],['order_id','=',$_POST['out_trade_no']]])->first();
+                $pay['group_code'] = $_POST['passback_params'];
+                $wallet['group_code'] = $_POST['passback_params'];
             }
 
-            $flag = TmsPayment::where([['group_code','=',$_POST['passback_params']],['order_id','=',$_POST['out_trade_no']]])->first();
             if ($flag){
                 echo 'success';
                 return false;
@@ -1652,7 +1657,6 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'recharge';//支付状态
             $pay['self_id'] = generate_id('pay_');
-            $pay['group_code'] = $_POST['passback_params'];
 //            file_put_contents(base_path('/vendor/5555.txt'),$pay);
             TmsPayment::insert($pay);
 
@@ -1672,7 +1676,6 @@ class AlipayController extends Controller{
             $wallet['now_money'] = $capital['money'];
             $wallet['now_money_md'] = get_md5($capital['money']);
             $wallet['wallet_status'] = 'SU';
-            $wallet['group_code'] = $_POST['passback_params'];
 
             UserWallet::insert($wallet);
             echo 'success';
@@ -1745,10 +1748,16 @@ class AlipayController extends Controller{
         if ($array_data['return_code'] == 'SUCCESS') {
             if(substr($array_data['attach'],0,4) == 'user'){
                 $userCapital = UserCapital::where('total_user_id','=',$array_data['attach'])->first();
+                $flag = TmsPayment::where([['total_user_id','=',$array_data['attach']],['order_id','=',$_POST['out_trade_no']]])->first();
+                $pay['total_user_id'] = $array_data['attach'];
+                $wallet['total_user_id'] = $array_data['attach'];
             }else{
                 $userCapital = UserCapital::where('group_code','=',$array_data['attach'])->first();
+                $flag = TmsPayment::where([['group_code','=',$array_data['attach']],['order_id','=',$_POST['out_trade_no']]])->first();
+                $pay['group_code'] = $array_data['attach'];
+                $wallet['group_code'] = $array_data['attach'];
             }
-            $flag = TmsPayment::where([['group_code','=',$array_data['attach']],['order_id','=',$_POST['out_trade_no']]])->first();
+
             if ($flag){
                 echo 'success';
                 return false;
@@ -1758,11 +1767,11 @@ class AlipayController extends Controller{
             $pay['platformorderid'] = $array_data['transaction_id'];
             $pay['create_time'] = $pay['update_time'] = $now_time;
 //            $pay['payname'] = $_POST['buyer_logon_id'];
-            $pay['paytype'] = 'ALIPAY';//
+            $pay['paytype'] = 'Wechat';//
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'recharge';//支付状态
             $pay['self_id'] = generate_id('pay_');
-            $pay['group_code'] = $array_data['attach'];
+
 //            file_put_contents(base_path('/vendor/5555.txt'),$pay);
             TmsPayment::insert($pay);
 
@@ -1782,7 +1791,6 @@ class AlipayController extends Controller{
             $wallet['now_money'] = $capital['money'];
             $wallet['now_money_md'] = get_md5($capital['money']);
             $wallet['wallet_status'] = 'SU';
-            $wallet['group_code'] = $array_data['attach'];
 
             UserWallet::insert($wallet);
             echo 'success';
