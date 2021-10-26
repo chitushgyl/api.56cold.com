@@ -32,7 +32,7 @@ Route::group([
     Route::any('/warehouse/getWarehouse', 'WarehouseController@getWarehouse');
 
     Route::any('/warehouse/details', 'WarehouseController@details');
-	
+
     Route::group([
         "middleware"=>['daily'],
     ], function(){
@@ -81,11 +81,12 @@ Route::group([
 
     Route::any('/sign/getSign', 'SignController@getSign');
     Route::any('/sign/details', 'SignController@details');
+    Route::any('/sign/addSign', 'SignController@addSign');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
         Route::any('/sign/import', 'SignController@import');
-        Route::any('/sign/addSign', 'SignController@addSign');
+
         Route::any('/sign/signUseFlag', 'SignController@signUseFlag');
         Route::any('/sign/signDelFlag', 'SignController@signDelFlag');
     });
@@ -102,7 +103,7 @@ Route::group([
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-        
+
         Route::any('/group/addGroup', 'GroupController@addGroup');
         Route::any('/group/groupUseFlag', 'GroupController@groupUseFlag');
         Route::any('/group/groupDelFlag', 'GroupController@groupDelFlag');
@@ -134,7 +135,7 @@ Route::group([
     Route::any('/shop/execl', 'ShopController@execl');
     Route::any('/shop/details', 'ShopController@details');
 	Route::any('/shop/getShop', 'ShopController@getShop');
-	
+
     Route::group([
         "middleware"=>['daily'],
     ], function(){
@@ -154,8 +155,8 @@ Route::group([
 
 
     /**入库及审核**/
-    Route::any('/library/libraryList','LibraryController@libraryList'); 
-    Route::any('/library/libraryPage','LibraryController@libraryPage'); 
+    Route::any('/library/libraryList','LibraryController@libraryList');
+    Route::any('/library/libraryPage','LibraryController@libraryPage');
 
     Route::any('/library/createLibrary', 'LibraryController@createLibrary');
     Route::any('/library/libraryCheck', 'LibraryController@libraryCheck');
@@ -167,7 +168,7 @@ Route::group([
     ], function(){
         Route::any('/library/import','LibraryController@import');
         Route::any('/library/addLibrary', 'LibraryController@addLibrary');
-		Route::any('/library/checkStatus', 'LibraryController@checkStatus');        
+		Route::any('/library/checkStatus', 'LibraryController@checkStatus');
     });
 
 
@@ -180,7 +181,7 @@ Route::group([
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-		Route::any('/search/mistakeRevise', 'SearchController@mistakeRevise');        
+		Route::any('/search/mistakeRevise', 'SearchController@mistakeRevise');
 		Route::any('/search/addMove', 'SearchController@addMove');
     });
 
@@ -188,12 +189,12 @@ Route::group([
     /**盘点库存**/
     Route::any('/check/checkList', 'CheckController@checkList');
     Route::any('check/checkPage', 'CheckController@checkPage');
-	Route::any('check/addCheck', 'CheckController@addCheck'); 
+	Route::any('check/addCheck', 'CheckController@addCheck');
 	Route::any('check/details', 'CheckController@details');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-     
+
     });
 
     /**出库订单管理**/
@@ -208,7 +209,7 @@ Route::group([
         "middleware"=>['daily'],
     ], function(){
 		Route::any('/order/statusOrder','OrderController@statusOrder');
-        
+
 
     });
 
@@ -218,12 +219,12 @@ Route::group([
     Route::any('/total/totalPage', 'TotalController@totalPage');
     Route::any('/total/createTotal','TotalController@createTotal');
     Route::any('/total/details', 'TotalController@details');
- 
+
     Route::group([
         "middleware"=>['daily'],
     ], function(){
      Route::any('/total/orderPrint', 'TotalController@orderPrint');
-	  Route::any('/total/addTotal', 'TotalController@addTotal');     
+	  Route::any('/total/addTotal', 'TotalController@addTotal');
     });
 
 
@@ -233,13 +234,13 @@ Route::group([
 
 
     /**商品查询**/
-    Route::any('/goodquery/goodqueryList', 'GoodqueryController@goodqueryList');            
-    Route::any('/goodquery/goodqueryPage', 'GoodqueryController@goodqueryPage');          
+    Route::any('/goodquery/goodqueryList', 'GoodqueryController@goodqueryList');
+    Route::any('/goodquery/goodqueryPage', 'GoodqueryController@goodqueryPage');
 
     /**库位查询**/
-    Route::any('/warehousequery/warehousequeryList', 'WarehousequeryController@warehousequeryList');          
-    Route::any('/warehousequery/warehousequeryPage', 'WarehousequeryController@warehousequeryPage');           
-    Route::any('/warehousequery/details', 'WarehousequeryController@details');   
+    Route::any('/warehousequery/warehousequeryList', 'WarehousequeryController@warehousequeryList');
+    Route::any('/warehousequery/warehousequeryPage', 'WarehousequeryController@warehousequeryPage');
+    Route::any('/warehousequery/details', 'WarehousequeryController@details');
 
 
 
@@ -266,8 +267,8 @@ Route::group([
         Route::any('/money/paymentCheck', 'MoneyController@paymentCheck');//付款方确认
         Route::any('/money/payeeCheck', 'MoneyController@payeeCheck');//收款方确认
     });
-	
-	
+
+
     /**WMS费用结算管理**/
     Route::any('/settle/settleList', 'SettleController@settleList');
     Route::any('/settle/settlePage', 'SettleController@settlePage');
