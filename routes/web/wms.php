@@ -162,11 +162,11 @@ Route::group([
     Route::any('/library/libraryCheck', 'LibraryController@libraryCheck');
     Route::any('/library/getLibrary', 'LibraryController@getLibrary');
     Route::any('/library/details', 'LibraryController@details');
-
+    Route::any('/library/import','LibraryController@import');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-        Route::any('/library/import','LibraryController@import');
+
         Route::any('/library/addLibrary', 'LibraryController@addLibrary');
 		Route::any('/library/checkStatus', 'LibraryController@checkStatus');
     });
