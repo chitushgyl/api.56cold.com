@@ -387,9 +387,10 @@ class LibraryController extends CommonController{
                     $list["update_time"]        =$now_time;
                     $list['create_user_id']     = $user_info->admin_id;
                     $list['create_user_name']   = $user_info->name;
-                    $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
+                    $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*(float)$v['now_num'];
                     $list['weight']             = $getGoods->wms_weight*$v['now_num'];
-
+                    dump($getGoods->wms_length,$getGoods->wms_wide,$getGoods->wms_high,$v['now_num']);
+                    dd(123);
                     $bulk+=  $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
                     $weight+=  $getGoods->wms_weight*$v['now_num'];
                     $datalist[]=$list;
