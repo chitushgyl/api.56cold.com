@@ -70,7 +70,7 @@ class GoodController extends CommonController{
             case 'all':
                 $data['total']=ErpShopGoodsSku::where($where)->count(); //总的数据量
                 $data['items']=ErpShopGoodsSku::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -79,7 +79,7 @@ class GoodController extends CommonController{
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=ErpShopGoodsSku::where($where)->count(); //总的数据量
                 $data['items']=ErpShopGoodsSku::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='N';
                 break;
@@ -87,7 +87,7 @@ class GoodController extends CommonController{
             case 'more':
                 $data['total']=ErpShopGoodsSku::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
                 $data['items']=ErpShopGoodsSku::where($where)->whereIn('group_code',$group_info['group_code'])
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -542,7 +542,7 @@ class GoodController extends CommonController{
                     $list['group_name']         = $info->group_name;
                     $list['create_user_id']     =$user_info->admin_id;
                     $list['create_user_name']   =$user_info->name;
-                    $list['create_time']        =$list['update_time']=$now_time;
+                    $list['create_time']        =$list['update_time']=date('Y-m-d H:i:s',time());
                     $list['file_id']            =$file_id;
                     $datalist[]=$list;
                 }
