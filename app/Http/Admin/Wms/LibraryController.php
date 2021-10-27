@@ -342,9 +342,6 @@ class LibraryController extends CommonController{
                         }
                     }
                 }
-                dump($getGoods->wms_length,$getGoods->wms_wide,$getGoods->wms_high,$v['now_num']);
-                dd(123);
-
                 $list=[];
                 /**现在可以开始做数据了**/
                 if($cando == 'Y'){
