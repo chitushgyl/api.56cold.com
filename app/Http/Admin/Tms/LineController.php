@@ -341,7 +341,7 @@ class LineController extends CommonController{
         $select=['self_id','shift_number','type','price','use_flag','group_name','group_code','min_money','special','min_number','max_number','unit_price','start_price','max_price',
             'pick_price','send_price','pick_type','send_type','all_weight','all_volume','trunking','control','carriage_id',
             'send_sheng_name','send_shi_name','send_qu_name','gather_sheng_name','gather_shi_name','gather_qu_name','send_address','gather_address',
-            'start_time','end_time','time0','time1','time2','time3','time4','time5','time6','depart_time','send_sheng','send_shi','send_qu','gather_contacts_name','gather_contacts_tel','send_contacts_name','send_contacts_tel',
+            'start_time','end_time','time0','time1','time2','time3','time4','time5','time6','depart_time','send_sheng','send_shi','send_qu',
             'gather_sheng','gather_shi','gather_qu','gather_name','gather_tel','send_name','send_tel','send_address_id','send_contacts_id','gather_address_id','gather_contacts_id','more_price'];
         $selectList=['line_id','yuan_self_id'];
         $selectList2=['self_id','use_flag','delete_flag','shift_number','send_shi_name','gather_shi_name'];
