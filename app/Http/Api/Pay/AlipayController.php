@@ -1763,7 +1763,7 @@ class AlipayController extends Controller{
                 return false;
             }
             $pay['order_id'] = $array_data['out_trade_no'];
-            $pay['pay_number'] = $array_data['total_fee'] * 100;
+            $pay['pay_number'] = $array_data['total_fee'];
             $pay['platformorderid'] = $array_data['transaction_id'];
             $pay['create_time'] = $pay['update_time'] = $now_time;
 //            $pay['payname'] = $_POST['buyer_logon_id'];
@@ -1775,7 +1775,7 @@ class AlipayController extends Controller{
 //            file_put_contents(base_path('/vendor/5555.txt'),$pay);
             TmsPayment::insert($pay);
 
-            $capital['money'] = $userCapital->money + $array_data['total_fee']*100;
+            $capital['money'] = $userCapital->money + $array_data['total_fee'];
             $capital['update_time'] = $now_time;
             if(substr($array_data['attach'],0,4) == 'user'){
                 UserCapital::where('total_user_id','=',$array_data['attach'])->update($capital);
@@ -1787,7 +1787,7 @@ class AlipayController extends Controller{
             $wallet['capital_type'] = 'wallet';
             $wallet['create_time'] = $now_time;
             $wallet['update_time'] = $now_time;
-            $wallet['money'] = $array_data['total_fee'] * 100;
+            $wallet['money'] = $array_data['total_fee'];
             $wallet['now_money'] = $capital['money'];
             $wallet['now_money_md'] = get_md5($capital['money']);
             $wallet['wallet_status'] = 'SU';
