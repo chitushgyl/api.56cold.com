@@ -397,7 +397,7 @@ class ShopController extends CommonController{
              * 第四个位置为数据库的对应字段
              */
             $shuzu=[
-                '门店编号' =>['Y','N','64','external_id'],
+                '门店编号' =>['Y','Y','64','external_id'],
                 '门店名称' =>['Y','Y','255','name'],
                 '线路号' =>['N','Y','255','line_code'],
                 '门店地址' =>['N','Y','255','address'],
