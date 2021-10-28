@@ -1806,7 +1806,6 @@ class AlipayController extends Controller{
     public function routineDeposit(Request $request){
         $input = $request->all();
         $user_info = $request->get('user_info');//接收中间件产生的参数
-        $self_id = $request->input('self_id');//订单ID
         $price = $request->input('price');//支付金额
         $openid = $request->input('openid');//小程序用户唯一标识
         $type = $request->input('type');//1下单支付 2货到付款支付
@@ -1818,13 +1817,8 @@ class AlipayController extends Controller{
         }
 //        $price = 0.01;
         $body = '订单支付';
-        $out_trade_no = $self_id;
-        if ($type == 1){
-            $notify = 'https://api.56cold.com/alipay/appWechat_notify';
-        }else{
-            $notify = 'https://api.56cold.com/alipay/paymentWechatNotify';
-        }
-
+        $out_trade_no = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+        $notify = 'https://api.56cold.com/alipay/depositWechatNotify';
         $config    = config('tms.routine_config_user');//引入配置文件参数
         $appid  = $config['appid'];
         $mch_id = $config['mch_id'];

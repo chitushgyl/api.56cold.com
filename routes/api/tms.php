@@ -100,6 +100,7 @@ Route::group([
     Route::any('/alipay/walletPay', 'Pay\AlipayController@walletPay');
     Route::any('/alipay/depositAlipay', 'Pay\AlipayController@depositAlipay');
     Route::any('/alipay/depositWechat', 'Pay\AlipayController@depositWechat');
+    Route::any('/alipay/routineDeposit', 'Pay\AlipayController@routineDeposit');
 });
 Route::any('/alipay/notify', 'Pay\AlipayController@notify');
 Route::any('/alipay/wxpaynotify', 'Pay\AlipayController@wxpaynotify');
