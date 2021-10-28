@@ -447,8 +447,8 @@ class GoodController extends CommonController{
              */
 
             $shuzu=[
-                '产品编号' =>['Y','N','64','external_sku_id'],
-                '产品名称' =>['Y','Y','255','good_name'],
+                '商品编号' =>['Y','N','64','external_sku_id'],
+                '商品名称' =>['Y','Y','255','good_name'],
                 '商品英文名称' =>['N','Y','255','good_english_name'],
                 '规格' =>['N','Y','50','wms_spec'],
                 '主计量单位' =>['N','Y','10','wms_unit'],
