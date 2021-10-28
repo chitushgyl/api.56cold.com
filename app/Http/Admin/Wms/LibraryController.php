@@ -115,7 +115,7 @@ class LibraryController extends CommonController{
             case 'all':
                 $data['total']=WmsLibraryOrder::where($where)->count(); //总的数据量
                 $data['items']=WmsLibraryOrder::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')->orderBy('self_id','desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -124,7 +124,7 @@ class LibraryController extends CommonController{
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=WmsLibraryOrder::where($where)->count(); //总的数据量
                 $data['items']=WmsLibraryOrder::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')->orderBy('self_id','desc')
                     ->select($select)->get();
                 $data['group_show']='N';
                 break;
@@ -132,7 +132,7 @@ class LibraryController extends CommonController{
             case 'more':
                 $data['total']=WmsLibraryOrder::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
                 $data['items']=WmsLibraryOrder::where($where)->whereIn('group_code',$group_info['group_code'])
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')->orderBy('self_id','desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;

@@ -92,7 +92,7 @@ class LineController extends CommonController{
                     $data['items'] = $data['items']->orderBy('price','desc');
                 }
                 $data['items'] = $data['items']
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -111,7 +111,7 @@ class LineController extends CommonController{
                     $data['items'] = $data['items']->orderBy('price','desc');
                 }
                 $data['items'] = $data['items']
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
                     ->select($select)->get();
                 $data['group_show']='N';
                 break;
@@ -129,7 +129,7 @@ class LineController extends CommonController{
                     $data['items'] = $data['items']->orderBy('price','desc');
                 }
                 $data['items'] = $data['items']
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
