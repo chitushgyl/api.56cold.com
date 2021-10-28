@@ -1816,7 +1816,7 @@ class AlipayController extends Controller{
             $user_id = $user_info->group_code;
         }
 //        $price = 0.01;
-        $body = '订单支付';
+        $body = '余额充值';
         $out_trade_no = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
         $notify = 'https://api.56cold.com/alipay/depositWechatNotify';
         $config    = config('tms.routine_config_user');//引入配置文件参数
