@@ -444,15 +444,15 @@ class ShopController extends CommonController{
                     ['company_id','=',$company_id],
                 ];
 
-                $good_info = WmsShop::where($where)->value('external_id');
+//                $good_info = WmsShop::where($where)->value('external_id');
 
-                if($good_info){
-                    if($abcd<$errorNum){
-                        $strs .= '数据中的第'.$a."行门店编号已存在".'</br>';
-                        $cando='N';
-                        $abcd++;
-                    }
-                }
+//                if($good_info){
+//                    if($abcd<$errorNum){
+//                        $strs .= '数据中的第'.$a."行门店编号已存在".'</br>';
+//                        $cando='N';
+//                        $abcd++;
+//                    }
+//                }
 
                 $list=[];
                 if($cando =='Y'){
