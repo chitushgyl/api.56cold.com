@@ -49,6 +49,7 @@ class GoodController extends CommonController{
         $group_code     =$request->input('group_code');
         $good_name      =$request->input('good_name');
         $company_name   =$request->input('company_name');
+        $external_sku_id   =$request->input('external_sku_id');
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
 
@@ -59,6 +60,7 @@ class GoodController extends CommonController{
             ['type'=>'=','name'=>'group_code','value'=>$group_code],
             ['type'=>'like','name'=>'good_name','value'=>$good_name],
             ['type'=>'like','name'=>'company_name','value'=>$company_name],
+            ['type'=>'like','name'=>'external_sku_id','value'=>$external_sku_id],
         ];
 
         $where=get_list_where($search);
