@@ -1748,12 +1748,12 @@ class AlipayController extends Controller{
         if ($array_data['return_code'] == 'SUCCESS') {
             if(substr($array_data['attach'],0,4) == 'user'){
                 $userCapital = UserCapital::where('total_user_id','=',$array_data['attach'])->first();
-                $flag = TmsPayment::where([['total_user_id','=',$array_data['attach']],['order_id','=',$_POST['out_trade_no']]])->first();
+                $flag = TmsPayment::where([['total_user_id','=',$array_data['attach']],['order_id','=',$array_data['out_trade_no']]])->first();
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
             }else{
                 $userCapital = UserCapital::where('group_code','=',$array_data['attach'])->first();
-                $flag = TmsPayment::where([['group_code','=',$array_data['attach']],['order_id','=',$_POST['out_trade_no']]])->first();
+                $flag = TmsPayment::where([['group_code','=',$array_data['attach']],['order_id','=',$array_data['out_trade_no']]])->first();
                 $pay['group_code'] = $array_data['attach'];
                 $wallet['group_code'] = $array_data['attach'];
             }
