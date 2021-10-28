@@ -1737,7 +1737,7 @@ class AlipayController extends Controller{
     }
 
     /**
-     * 微信充值回调
+     * 微信充值回调  /alipay/depositWechatNotify
      * */
     public function depositWechatNotify(Request $request){
         $now_time = date('Y-m-d H:i:s');
@@ -1797,6 +1797,52 @@ class AlipayController extends Controller{
         } else {
             echo "fail";
         }
+    }
+
+
+    /**
+     * 小程序充值 /alipay/routineDeposit
+     * */
+    public function routineDeposit(Request $request){
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $self_id = $request->input('self_id');//订单ID
+        $price = $request->input('price');//支付金额
+        $openid = $request->input('openid');//小程序用户唯一标识
+        $type = $request->input('type');//1下单支付 2货到付款支付
+        include_once base_path( '/vendor/wxAppPay/weixin.php');
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+//        $price = 0.01;
+        $body = '订单支付';
+        $out_trade_no = $self_id;
+        if ($type == 1){
+            $notify = 'https://api.56cold.com/alipay/appWechat_notify';
+        }else{
+            $notify = 'https://api.56cold.com/alipay/paymentWechatNotify';
+        }
+
+        $config    = config('tms.routine_config_user');//引入配置文件参数
+        $appid  = $config['appid'];
+        $mch_id = $config['mch_id'];
+        $key    = $config['key'];
+        $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify,$key);
+        $params['openid'] = $openid;                    //用户唯一标识
+        $params['body'] = $body;                       //商品描述
+        $params['out_trade_no'] = $out_trade_no;    //自定义的订单号
+        $params['total_fee'] = $price*100;                       //订单金额 只能为整数 单位为分
+        $params['trade_type'] = 'JSAPI';                      //交易类型 JSAPI | NATIVE | APP | WAP
+        $params['attach'] = $user_id;                      //附加参数（用户ID）
+        $result = $wechatAppPay->jsapi($params);
+//        print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
+//        exit();
+        //2.创建小程序端预支付参数
+        /** @var TYPE_NAME $result */
+        $data = @$wechatAppPay->getPayParams($result);
+        return json_encode(['code'=>200,'msg'=>'请求成功','data'=>$data]);
     }
 
 

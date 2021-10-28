@@ -48,6 +48,8 @@ class ShopController extends CommonController{
         $warehouse_name =$request->input('warehouse_name');
         $tel        =$request->input('tel');
         $contacts    =$request->input('contacts');
+        $line_code    =$request->input('line_code');
+        $contacts_code    =$request->input('contacts_code');
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
 
@@ -59,11 +61,13 @@ class ShopController extends CommonController{
             ['type'=>'like','name'=>'warehouse_name','value'=>$warehouse_name],
             ['type'=>'like','name'=>'tel','value'=>$tel],
             ['type'=>'like','name'=>'contacts','value'=>$contacts],
+            ['type'=>'like','name'=>'line_code','value'=>$line_code],
+            ['type'=>'like','name'=>'contacts_code','value'=>$contacts_code],
         ];
 
         $where=get_list_where($search);
 
-        $select=['self_id','external_id','name','contacts','address','tel','group_name','company_name','use_flag','city'];
+        $select=['self_id','external_id','name','contacts','address','tel','group_name','company_name','use_flag','city','line_code','contacts_code'];
 
         switch ($group_info['group_id']){
             case 'all':
@@ -154,6 +158,8 @@ class ShopController extends CommonController{
         $longitude      	=$request->input('longitude');
         $dimensionality     =$request->input('dimensionality');
         $company_id      	=$request->input('company_id');
+        $line_code      	=$request->input('line_code');
+        $contacts_code      =$request->input('contacts_code');
 
         /*** 虚拟数据
         $input['self_id']           =$self_id='good_202007011336328472133661';
@@ -165,6 +171,8 @@ class ShopController extends CommonController{
         $input['longitude']              =$longitude='12';
         $input['dimensionality']              =$dimensionality='15';
         $input['company_id']              =$company_id='15';
+        $input['line_code']              =$line_code='15';
+        $input['contacts_code']              =$contacts_code='15';
 ***/
 
         //第一步，验证数据
@@ -211,6 +219,8 @@ class ShopController extends CommonController{
             $data['longitude'] = $longitude;
             $data['dimensionality'] = $dimensionality;
             $data['company_id'] = $company_id;
+            $data['line_code'] = $line_code;
+            $data['contacts_code'] = $contacts_code;
 
             $where2['self_id'] = $self_id;
             $old_info=WmsShop::where($where2)->first();
@@ -389,8 +399,10 @@ class ShopController extends CommonController{
             $shuzu=[
                 '门店编号' =>['Y','N','64','external_id'],
                 '门店名称' =>['Y','Y','255','name'],
+                '线路号' =>['N','Y','255','line_code'],
                 '门店地址' =>['N','Y','255','address'],
                 '联系人' =>['N','Y','50','contacts'],
+                '收货人编号' =>['N','Y','50','contacts_code'],
                 '联系电话' =>['N','Y','50','tel'],
             ];
             $ret=arr_check($shuzu,$info_check);
@@ -447,9 +459,11 @@ class ShopController extends CommonController{
                     $list['self_id']            =generate_id('shop_');
                     $list['external_id']        = $v['external_id'];
                     $list['name']               = $v['name'];
+                    $list['line_code']          = $v['line_code'];
                     $list['address']            = $v['address'];
                     $list['contacts']           = $v['contacts'];
                     $list['tel']                = $v['tel'];
+                    $list['contacts_code']      = $v['contacts_code'];
                     $list['company_id']         = $company_id;
                     $list['company_name']       = $info->company_name;
                     $list['group_code']         = $info->group_code;
@@ -526,7 +540,7 @@ class ShopController extends CommonController{
                 ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ];
             $where=get_list_where($search);
-            $select=['self_id','company_name','use_flag','group_name','name','contacts','address','tel'];
+            $select=['self_id','company_name','use_flag','group_name','name','contacts','address','tel','line_code','contacts_code'];
             $info=WmsShop::where($where)->orderBy('create_time', 'desc')->select($select)->get();
 
             if($info){
@@ -536,8 +550,10 @@ class ShopController extends CommonController{
                     "group_name"=>'所属公司',
                     "company_name"=>'业务往来公司',
                     "name"=>'门店名称',
+                    "line_code"=>'线路号',
                     "contacts"=>'联系人',
                     "tel"=>'联系电话',
+                    "contacts_code"=>'收货人编号',
                     "address"=>'门店地址',
                     "use_flag"=>'状态',
                 ]];
@@ -551,8 +567,10 @@ class ShopController extends CommonController{
                     $list['company_name']=$v->company_name;
                     $list['group_name']=$v->group_name;
                     $list['name']=$v->name;
+                    $list['line_code']=$v->line_code;
                     $list['contacts']=$v->contacts;
                     $list['tel']=$v->tel;
+                    $list['contacts_code']=$v->contacts_code;
                     $list['address']=$v->address;
 
                     if($v->use_flag == 'Y'){
@@ -594,7 +612,7 @@ class ShopController extends CommonController{
         $self_id=$request->input('self_id');
         $table_name='wms_shop';
         $select=['self_id','group_code','group_name','use_flag','create_user_name','create_time',
-            'external_id','name','contacts','address','tel','company_name'];
+            'external_id','name','contacts','address','tel','company_name','line_code','contacts_code'];
 
         $info=$details->details($self_id,$table_name,$select);
 
