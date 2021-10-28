@@ -218,9 +218,9 @@ class LibraryController extends CommonController{
              */
 
             $shuzu=[
-                '产品编号' =>['Y','N','64','external_sku_id'],
-                '产品名称' =>['Y','Y','255','good_name'],
-                '产品英文名称' =>['N','Y','255','good_english_name'],
+                '商品编号' =>['Y','N','64','external_sku_id'],
+                '商品名称' =>['Y','Y','255','good_name'],
+                '商品英文名称' =>['N','Y','255','good_english_name'],
                 '生产日期' =>['Y','Y','50','production_date'],
                 '到期时间' =>['N','Y','50','expire_time'],
                 '库位' =>['Y','Y','50','sign'],
