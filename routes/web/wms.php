@@ -278,7 +278,7 @@ Route::group([
     Route::any('/settle/details','SettleController@details');
 	Route::any('/settle/createGathering','SettleController@createGathering');
     Route::any('/settle/addGathering','SettleController@addGathering');
-
+    Route::any('/settle/updateMoney','SettleController@updateMoney');
 
 });
 

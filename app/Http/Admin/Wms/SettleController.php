@@ -223,7 +223,7 @@ class SettleController extends CommonController{
             $operationing->table_id=$seld;
             $operationing->old_info=null;
             $operationing->new_info=$data;
-            
+
             if($id){
                 /**修改所有的为已结算***/
                 $money_up['settle_flag']        ='Y';
@@ -273,7 +273,7 @@ class SettleController extends CommonController{
             $data['info']->practical_money=number_format($data['info']->practical_money/100,2);
             $data['info']->already_money=number_format($data['info']->already_money/100,2);
 			//dd($data['info']->wmsSettleList);
-            if($data['info']->wmsSettleList){				
+            if($data['info']->wmsSettleList){
                 foreach ($data['info']->wmsSettleList as $k => $v){
 					//($v);
                     $v->money=number_format($v->money/100,2);
@@ -467,6 +467,78 @@ class SettleController extends CommonController{
             return $msg;
         }
 
+    }
+
+    /**
+     * 修改金额  /wms/settle/updateMoney
+     * */
+    public function updateMoney(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_settle';
+
+        $operationing->access_cause     ='创建/修改结算金额';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $input              =$request->all();
+
+        /** 接收数据*/
+        $self_id            =$request->input('self_id');
+        $money              =$request->input('money');
+
+        /*** 虚拟数据
+        $input['self_id']           =$self_id='money_202012101742404594964738';
+        $input['money']             =$money='2000';
+         **/
+
+        $rules=[
+            'self_id'=>'required',
+            'money'=>'required',
+        ];
+        $message=[
+            'self_id.required'=>'请填结算订单编号',
+            'money.required'=>'请输入金额',
+        ];
+
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$self_id],
+            ];
+
+            $select=['self_id','group_code','group_name','warehouse_id','warehouse_name','company_id','company_name','use_flag','receivable_money',
+                'practical_money','already_money','gathering_flag'];
+            $old_info=WmsSettle::where($where)->select($select)->first();
+
+            if($old_info){
+                $data['practical_money']      =$money*100;
+                $data['update_time']        =$now_time;
+                $id=WmsSettle::where($where)->update($data);
+                $operationing->table_id=$self_id;
+                $operationing->old_info=$old_info;
+                $operationing->new_info=$data;
+            }else{
+                $msg['code']=301;
+                $msg['msg']="拉取不到数据";
+                return $msg;
+            }
+
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
     }
 
 }
