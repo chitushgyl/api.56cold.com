@@ -243,10 +243,10 @@ class OrderController extends CommonController{
 
 			$last_names		=array_flip(array_unique($order_check));
 
-			dump($order_check);dump(array_unique($order_check));dump($last_names);
+//			dump($order_check);dump(array_unique($order_check));dump($last_names);
 
 			$order_check    =array_count_values($order_check);
-            dd($order_check);
+//            dd($order_check);
 
 
             foreach($order_check as $k => $v){
@@ -301,13 +301,10 @@ class OrderController extends CommonController{
 
             }
 
-			//dump($last_names);
-			//dump($order_check);
-			//DUMP($info_wait);
-			//dd($orderdata);
-
-           // dd($orderdata);
-
+			dump($last_names);
+			dump($order_check);
+			DUMP($info_wait);
+			dd($orderdata);
 
             if($cando == 'Y'){
                 foreach($info_wait as $k => $v){
