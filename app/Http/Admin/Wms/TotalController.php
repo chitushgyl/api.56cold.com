@@ -170,7 +170,7 @@ class TotalController  extends CommonController{
 
         $select = ['self_id','status','count','total_flag','shop_id','shop_name',
             'company_id','company_name','warehouse_id','warehouse_name','group_code','group_name'];
-        $select2 = ['self_id','good_name','spec','num','order_id','sku_id','external_sku_id','sanitation','shop_id','shop_name'];
+        $select2 = ['self_id','good_name','spec','num','order_id','sku_id','external_sku_id','sanitation','shop_id','shop_name','receipt_code','shop_code','price','total_price'];
         $order = WmsOutOrder::with(['wmsOutOrderList' => function($query) use($select2){
             $query->select($select2);
             $query->where('delete_flag','=','Y');
@@ -413,6 +413,8 @@ class TotalController  extends CommonController{
 					$out["update_time"]         =$now_time;
                     $out['bulk']                =$vv['wms_length']*$vv['wms_wide']*$vv['wms_high']*$shiji_number;
                     $out['weight']              =$vv['wms_weight']*$shiji_number;
+                    $out['price']               =$data['price'];
+                    $out['total_price']         =$data['price']*$shiji_number;
 
 					$out['shop_id']              =$data['shop_id'];
 					$out['shop_name']            =$data['shop_name'];
@@ -728,8 +730,8 @@ class TotalController  extends CommonController{
 						$list['production_date']    =$vvv->production_date;
 						$list['expire_time']        =$vvv->expire_time;
 						$list['good_describe']      =unit_do($vvv->good_unit , $vvv->good_target_unit, $vvv->good_scale, $vvv->num);
-						$list['price']              =$vvv->wmsGoods->sale_price;
-						$list['total_money']        =$vvv->wmsGoods->sale_price*$vvv->num;
+						$list['price']              =$vvv->price/100;
+						$list['total_money']        =$vvv->total_price/100;
 						$order[]=$list;
 						$abc['info']=$order;
 

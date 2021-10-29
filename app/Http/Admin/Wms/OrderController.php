@@ -190,6 +190,8 @@ class OrderController extends CommonController{
                 '商品编码' =>['Y','Y','255','external_sku_id'],
                 '商品名称' =>['N','Y','255','good_name'],
                 '数量' =>['Y','Y','255','num'],
+                '含税单价' =>['N','Y','255','price'],
+                '含税金额' =>['N','Y','255','total_price'],
                 '卫检日期' =>['N','Y','255','sanitation'],
 				'发货日期' =>['N','Y','255','delivery_time'],
             ];
@@ -361,6 +363,8 @@ class OrderController extends CommonController{
                         $list['sanitation']         = $v['sanitation'];
                         $list['recipt_code']        = $v['recipt_code'];
                         $list['shop_code']          = $v['shop_code'];
+                        $list['price']              = $v['price']*100;
+                        $list['total_price']        = $v['total_price']*100;
 //                        $list['int_cold']           = $v['int_cold'];
 //                        $list['int_freeze']         = $v['int_freeze'];
 //                        $list['int_normal']         = $v['int_normal'];
