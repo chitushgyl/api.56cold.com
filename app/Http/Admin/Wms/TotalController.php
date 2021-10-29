@@ -668,7 +668,7 @@ class TotalController  extends CommonController{
             ->where($where)
 		   ->select($total_select)->first();
 
-
+dd($info);
 
 
         if($info){
