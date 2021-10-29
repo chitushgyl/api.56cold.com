@@ -668,7 +668,7 @@ class TotalController  extends CommonController{
             ->where($where)
 		   ->select($total_select)->first();
 
-dd($info->toArray());
+//dd($info->toArray());
 
 
         if($info){
@@ -692,7 +692,7 @@ dd($info->toArray());
 					$abc['shop_code']=$vv->shop_code;
 					$abc['shop_address']=$v->shop_address;
 					$abc['contact_tel']=$v->shop_contacts.'  '.$v->shop_tel;
-					$abc['pay_type']=$info->pay_type;
+					$abc['pay_type']=$info->wmsGroup->pay_type;
 
 //dump($abc);
                     if($vv->quehuo == 'Y'){
