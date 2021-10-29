@@ -65,7 +65,7 @@ class WmsTotal extends Model{
     public function wmsGroup(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
-        return $this->hasOne('App\Models\Wms\WmsGroup','company_id','self_id');
+        return $this->hasOne('App\Models\Wms\WmsGroup','self_id','company_id');
     }
 
 }

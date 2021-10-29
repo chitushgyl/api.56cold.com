@@ -625,7 +625,7 @@ class TotalController  extends CommonController{
         $order_select = ['self_id','shop_name','total_id','shop_external_id','create_time','total_time','delivery_time'];
         $order_list_select= ['self_id','good_name','spec','order_id','external_sku_id','quehuo','quehuo_num','recipt_code','shop_code'];
         $wms_out_sige_select= ['total_id','order_id','order_list_id','sku_id','num','area','area_id','good_name','external_sku_id','spec','good_english_name','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','shop_id','shop_name'];
-        $shop_select = ['self_id','group_code','group_name','use_flag','company_name','contacts','address','tel','total_price','pay_type'];
+        $group_select = ['self_id','group_code','group_name','use_flag','company_name','contacts','address','tel','total_price','pay_type'];
         $good_select = ['self_id','external_sku_id','sale_price'];
 		/**
         $info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select){
@@ -644,7 +644,7 @@ class TotalController  extends CommonController{
             ->select($total_select)->first();
 		*/
 
-		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select,$good_select){
+		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select,$good_select,$group_select){
 			$query->where('delete_flag','=','Y');
 			$query->select($order_select);
             $query->with(['wmsOutOrderList' => function($query)use($order_list_select){
@@ -661,10 +661,9 @@ class TotalController  extends CommonController{
                 }]);
 			}]);
 		}])
-            ->with(['wmsGroup' => function($query)use($wms_out_sige_select){
+            ->with(['wmsGroup' => function($query)use($group_select){
                 $query->where('delete_flag','=','Y');
-                $query->select($wms_out_sige_select);
-                $query->orderBy('area','asc');
+                $query->select($group_select);
             }])
             ->where($where)
 		   ->select($total_select)->first();
