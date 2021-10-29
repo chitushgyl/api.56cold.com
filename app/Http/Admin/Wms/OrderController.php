@@ -247,7 +247,25 @@ class OrderController extends CommonController{
 
 			$order_check    =array_count_values($order_check);
 //            dd($order_check);
+            foreach ($last_names as $key =>$value){
+                $where_shop1=[
+                    ['delete_flag','=','Y'],
+                    ['external_id','=',$key],
+                    ['company_id','=',$company_id],
+                ];
 
+//                dd($where_shop);
+                $select_wmsShop1=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name'];
+                $shop_info2 = wmsShop::where($where_shop1)->select($select_wmsShop1)->first();
+
+                if(empty($shop_info2)){
+                    if($abcd<$errorNum){
+                        $strs .= '数据中的第'.($value+2)."行客户编码不存在".'</br>';
+                        $cando='N';
+                        $abcd++;
+                    }
+                }
+            }
 
             foreach($order_check as $k => $v){
 				//dd($v);
@@ -260,14 +278,6 @@ class OrderController extends CommonController{
 //                dd($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name'];
                 $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
-
-                if(empty($shop_info)){
-                    if($abcd<$errorNum){
-                        $strs .= '数据中的第'.$a."行客户编码不存在".'</br>';
-                        $cando='N';
-                        $abcd++;
-                    }
-                }
 
                 //dd($cando);
                 if($cando == 'Y'){
@@ -290,7 +300,9 @@ class OrderController extends CommonController{
                     $order_2['create_user_name']    =$user_info->name;
                     $order_2['create_time']         =$order_2['update_time']            =$now_time;
                     $order_2['file_id']             =$file_id;
-					$order_2['delivery_time']       =$info_wait[$last_names[$k]]['delivery_time'];
+//					$order_2['delivery_time']       =;
+//					$order_2['recipt_code']         =;
+//					$order_2['shop_code']           =;
 
 
 					//dump($k);
@@ -301,10 +313,10 @@ class OrderController extends CommonController{
 
             }
 
-			dump($last_names);
-			dump($order_check);
-			DUMP($info_wait);
-			dd($orderdata);
+//			dump($last_names);
+//			dump($order_check);
+//			DUMP($info_wait);
+//			dd($orderdata);
 
             if($cando == 'Y'){
                 foreach($info_wait as $k => $v){
@@ -345,6 +357,14 @@ class OrderController extends CommonController{
                         $list['create_user_name']   = $user_info->name;
                         $list['create_time']        =$list['update_time']=$now_time;
                         $list['sanitation']         = $v['sanitation'];
+                        $list['recipt_code']        = $v['recipt_code'];
+                        $list['shop_code']          = $v['shop_code'];
+                        $list['int_cold']           = $v['int_cold'];
+                        $list['int_freeze']         = $v['int_freeze'];
+                        $list['int_normal']         = $v['int_normal'];
+                        $list['scattered_cold']     = $v['scattered_cold'];
+                        $list['scattered_freeze']   = $v['scattered_freeze'];
+                        $list['scattered_normal']   = $v['scattered_normal'];
 						//$list['expect_date']        = $v['expect_date'];
 
                         $datalist[]=$list;

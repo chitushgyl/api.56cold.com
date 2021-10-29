@@ -18,7 +18,7 @@ class WmsTotal extends Model{
 
     //指定主键字段 默认为id
     //protected $primaryKey = 'id';
-    
+
     //删除时间字段定义 自定义命名
     //const DELETED_AT = 'updated_at';
     //创建时间字段定义 自定义命名
@@ -58,9 +58,14 @@ class WmsTotal extends Model{
     }
 
    public function wmsOutSige(){
-        //参数：关联模型名称，外键，主键  
+        //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
         return $this->hasMany('App\Models\Wms\WmsOutSige','total_id','self_id');
+    }
+    public function wmsGroup(){
+        //参数：关联模型名称，外键，主键
+        //如果主键是id可以省略
+        return $this->hasOne('App\Models\Wms\WmsGroup','company_id','self_id');
     }
 
 }

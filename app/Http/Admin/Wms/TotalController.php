@@ -204,7 +204,14 @@ class TotalController  extends CommonController{
             $data["company_id"]             =$order[0]['company_id'];
             $data["company_name"]           =$order[0]['company_name'];
             $data["order_count"]            =$count;
-
+//            $data['recipt_code']            = $order[0]['recipt_code'];
+//            $data['shop_code']              = $order[0]['shop_code'];
+//            $data['int_cold']               = $order[0]['int_cold'];
+//            $data['int_freeze']             = $order[0]['int_freeze'];
+//            $data['int_normal']             = $order[0]['int_normal'];
+//            $data['scattered_cold']         = $order[0]['scattered_cold'];
+//            $data['scattered_freeze']       = $order[0]['scattered_freeze'];
+//            $data['scattered_normal']       = $order[0]['scattered_normal'];
 //dd($data);
 
             $temp['total_id']=$totalId;
@@ -213,7 +220,7 @@ class TotalController  extends CommonController{
 
             WmsOutOrder::whereIn('self_id', $total)->update($temp);
 
-            
+
 
             $order_do=[];
             foreach ($order as $k => $v){
@@ -351,7 +358,7 @@ class TotalController  extends CommonController{
          *  wms_out_sige     需要写入wms_library_change
          **  需要改变  wms_library_sige  中的实际库存
          */
-		
+
 	//dump($data);dd($resssss);
 		if($resssss){
 			foreach($resssss as $kk=>$vv){
@@ -409,7 +416,7 @@ class TotalController  extends CommonController{
 
 					$out['shop_id']              =$data['shop_id'];
 					$out['shop_name']            =$data['shop_name'];
-					
+
 					$wms_out_sige[]=$out;
 					/** wms_out_sige   表的数据制作**/
 					$library_sige['self_id']=$vv['self_id'];
@@ -480,7 +487,7 @@ class TotalController  extends CommonController{
         $order_list_select= ['self_id','good_name','spec','order_id','external_sku_id','quehuo','quehuo_num'];
 		$wms_out_sige_select= ['total_id','shop_name','good_name','spec','order_list_id','external_sku_id','area_id','num','area','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale'];
 
-		 
+
 		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select){
 			$query->where('delete_flag','=','Y');
 			$query->select($order_select);
@@ -495,7 +502,7 @@ class TotalController  extends CommonController{
 		}])->where($where)
 		   ->select($total_select)->first();
 
-        
+
 
         $out_list=[];
         $quhuo_list=[];
@@ -616,9 +623,10 @@ class TotalController  extends CommonController{
 
         $total_select=['self_id','create_user_name','create_time','group_name','warehouse_name','order_count','company_name'];
         $order_select = ['self_id','shop_name','total_id','shop_external_id','create_time','total_time','delivery_time'];
-        $order_list_select= ['self_id','good_name','spec','order_id','external_sku_id','quehuo','quehuo_num'];
-        $wms_out_sige_select= ['total_id','order_id','order_list_id','num','area','area_id','good_name','external_sku_id','spec','good_english_name','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','shop_id','shop_name'];
-
+        $order_list_select= ['self_id','good_name','spec','order_id','external_sku_id','quehuo','quehuo_num','recipt_code','shop_code'];
+        $wms_out_sige_select= ['total_id','order_id','order_list_id','sku_id','num','area','area_id','good_name','external_sku_id','spec','good_english_name','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','shop_id','shop_name'];
+        $shop_select = ['self_id','group_code','group_name','use_flag','company_name','contacts','address','tel','total_price','pay_type'];
+        $good_select = ['self_id','external_sku_id','sale_price'];
 		/**
         $info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select){
             $query->where('delete_flag','=','Y');
@@ -635,31 +643,41 @@ class TotalController  extends CommonController{
         }])->where($where)
             ->select($total_select)->first();
 		*/
-		
-		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select){
+
+		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select,$good_select){
 			$query->where('delete_flag','=','Y');
 			$query->select($order_select);
-			$query->with(['wmsOutOrderList' => function($query)use($order_list_select){
-				$query->select($order_list_select);
-				$query->where('delete_flag','=','Y');
-			}]);
-			$query->with(['wmsOutSige' => function($query)use($wms_out_sige_select){
+            $query->with(['wmsOutOrderList' => function($query)use($order_list_select){
+                $query->select($order_list_select);
+                $query->where('delete_flag','=','Y');
+            }]);
+			$query->with(['wmsOutSige' => function($query)use($wms_out_sige_select,$good_select){
 				$query->where('delete_flag','=','Y');
 				$query->select($wms_out_sige_select);
-				$query->orderBy('area','asc');
+				$query->orderBy('area','asc')
+                ->with(['wmsGoods' => function($query)use($good_select){
+                    $query->where('delete_flag','=','Y');
+                    $query->select($good_select);
+                }]);
 			}]);
-		}])->where($where)
+		}])
+            ->with(['wmsGroup' => function($query)use($wms_out_sige_select){
+                $query->where('delete_flag','=','Y');
+                $query->select($wms_out_sige_select);
+                $query->orderBy('area','asc');
+            }])
+            ->where($where)
 		   ->select($total_select)->first();
-		
-		
 
-        
+
+
+
         if($info){
 
             $out_list=[];
 
             foreach ($info->wmsOutOrder as $k => $v){
-               
+
                 $quhuo=[];
                 $abc=[];
                 //DUMP($v->ToArray());
@@ -671,7 +689,12 @@ class TotalController  extends CommonController{
                     $abc['create_time']=$v->create_time;
                     $abc['total_time']=$v->total_time;
 					$abc['delivery_time']=$v->delivery_time;
-					
+					$abc['recipt_code']=$vv->recipt_code;
+					$abc['shop_code']=$vv->shop_code;
+					$abc['shop_address']=$v->shop_address;
+					$abc['contact_tel']=$v->shop_contacts.'  '.$v->shop_tel;
+					$abc['pay_type']=$info->pay_type;
+
 //dump($abc);
                     if($vv->quehuo == 'Y'){
                         $list2['external_sku_id']    =$vv->external_sku_id;
@@ -687,9 +710,9 @@ class TotalController  extends CommonController{
                         $abc['quhuo']=null;
                         $abc['quhuo_flag']='N';
                     }
- 
+
                 }
-				
+
 
 				if($v->wmsOutSige){
 				 $abc['out_flag']='Y';
@@ -698,13 +721,15 @@ class TotalController  extends CommonController{
 						$list['shop_name']          =$vvv->shop_name;
 						$list['external_sku_id']    =$vvv->external_sku_id;
 						$list['good_name']          =$vvv->good_name;
-						$list['good_english_name']  =$vvv->good_english_name;				
+						$list['good_english_name']  =$vvv->good_english_name;
 						$list['spec']               =$vvv->spec;
 						$list['num']                =$vvv->num;
 						$list['sign']               =$vvv->area.'-'.$vvv->row.'-'.$vvv->column.'-'.$vvv->tier;
 						$list['production_date']    =$vvv->production_date;
 						$list['expire_time']        =$vvv->expire_time;
 						$list['good_describe']      =unit_do($vvv->good_unit , $vvv->good_target_unit, $vvv->good_scale, $vvv->num);
+						$list['price']              =$vvv->wmsGoods->sale_price;
+						$list['total_money']        =$vvv->wmsGoods->sale_price*$vvv->num;
 						$order[]=$list;
 						$abc['info']=$order;
 
@@ -716,11 +741,11 @@ class TotalController  extends CommonController{
 					$abc['info']=$order;
 
 				}
-				
+
             }
 
-	
-			
+
+
 			$operationing->table_id=$self_id;
             $operationing->old_info=null;
             $operationing->new_info=null;

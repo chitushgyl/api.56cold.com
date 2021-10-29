@@ -18,7 +18,7 @@ class WmsOutSige extends Model{
 
     //指定主键字段 默认为id
     //protected $primaryKey = 'id';
-    
+
     //删除时间字段定义 自定义命名
     //const DELETED_AT = 'updated_at';
     //创建时间字段定义 自定义命名
@@ -55,6 +55,12 @@ class WmsOutSige extends Model{
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
         return $this->hasOne('App\Models\Wms\WmsLibrarySige','self_id','library_sige_id');
+    }
+
+    public function wmsGoods(){
+        //参数：关联模型名称，外键，主键
+        //如果主键是id可以省略
+        return $this->hasOne('App\Models\Shop\ErpShopGoodsSku','sku_id','self_id');
     }
 
 
