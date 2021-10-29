@@ -183,6 +183,8 @@ class OrderController extends CommonController{
              */
 
             $shuzu=[
+                '往来单位编码' =>['N','Y','64','shop_code'],
+                '单据编码' =>['N','Y','64','recipt_code'],
                 '客户编码' =>['Y','Y','64','shop_external_id'],
                 '客户简称' =>['N','Y','255','shop_name'],
                 '商品编码' =>['Y','Y','255','external_sku_id'],
@@ -358,13 +360,13 @@ class OrderController extends CommonController{
                         $list['create_time']        =$list['update_time']=$now_time;
                         $list['sanitation']         = $v['sanitation'];
                         $list['recipt_code']        = $v['recipt_code'];
-                        $list['shop_code']          = $v['shop_code'];
-                        $list['int_cold']           = $v['int_cold'];
-                        $list['int_freeze']         = $v['int_freeze'];
-                        $list['int_normal']         = $v['int_normal'];
-                        $list['scattered_cold']     = $v['scattered_cold'];
-                        $list['scattered_freeze']   = $v['scattered_freeze'];
-                        $list['scattered_normal']   = $v['scattered_normal'];
+//                        $list['shop_code']          = $v['shop_code'];
+//                        $list['int_cold']           = $v['int_cold'];
+//                        $list['int_freeze']         = $v['int_freeze'];
+//                        $list['int_normal']         = $v['int_normal'];
+//                        $list['scattered_cold']     = $v['scattered_cold'];
+//                        $list['scattered_freeze']   = $v['scattered_freeze'];
+//                        $list['scattered_normal']   = $v['scattered_normal'];
 						//$list['expect_date']        = $v['expect_date'];
 
                         $datalist[]=$list;
