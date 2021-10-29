@@ -219,12 +219,12 @@ Route::group([
     Route::any('/total/totalPage', 'TotalController@totalPage');
     Route::any('/total/createTotal','TotalController@createTotal');
     Route::any('/total/details', 'TotalController@details');
-
+    Route::any('/total/orderPrint', 'TotalController@orderPrint');
+    Route::any('/total/addTotal', 'TotalController@addTotal');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-     Route::any('/total/orderPrint', 'TotalController@orderPrint');
-	  Route::any('/total/addTotal', 'TotalController@addTotal');
+
     });
 
 
