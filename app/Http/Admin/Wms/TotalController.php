@@ -696,6 +696,7 @@ class TotalController  extends CommonController{
 					$abc['contact_tel']=$v->shop_contacts.'  '.$v->shop_tel;
 					$abc['pay_type']=$info->wmsGroup->pay_type;
 					$abc['warehouse_name']=$v->warehouse_name;
+					$abc['company_name']=$v->company_name;
 
 //dump($abc);
                     if($vv->quehuo == 'Y'){
