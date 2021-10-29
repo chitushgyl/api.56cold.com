@@ -360,7 +360,7 @@ class OrderController extends CommonController{
                         $list['create_time']        =$list['update_time']=$now_time;
                         $list['sanitation']         = $v['sanitation'];
                         $list['recipt_code']        = $v['recipt_code'];
-//                        $list['shop_code']          = $v['shop_code'];
+                        $list['shop_code']          = $v['shop_code'];
 //                        $list['int_cold']           = $v['int_cold'];
 //                        $list['int_freeze']         = $v['int_freeze'];
 //                        $list['int_normal']         = $v['int_normal'];
