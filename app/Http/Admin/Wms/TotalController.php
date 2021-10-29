@@ -170,7 +170,7 @@ class TotalController  extends CommonController{
 
         $select = ['self_id','status','count','total_flag','shop_id','shop_name',
             'company_id','company_name','warehouse_id','warehouse_name','group_code','group_name'];
-        $select2 = ['self_id','good_name','spec','num','order_id','sku_id','external_sku_id','sanitation','shop_id','shop_name','receipt_code','shop_code','price','total_price'];
+        $select2 = ['self_id','good_name','spec','num','order_id','sku_id','external_sku_id','sanitation','shop_id','shop_name','recipt_code','shop_code','price','total_price'];
         $order = WmsOutOrder::with(['wmsOutOrderList' => function($query) use($select2){
             $query->select($select2);
             $query->where('delete_flag','=','Y');
