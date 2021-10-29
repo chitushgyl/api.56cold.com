@@ -66,7 +66,7 @@ class GoodController extends CommonController{
         $where=get_list_where($search);
 
         $select=['self_id','use_flag','good_name','good_english_name','external_sku_id','wms_unit','wms_target_unit','wms_scale','wms_spec',
-            'wms_length','wms_wide','wms_high','wms_weight','wms_out_unit','company_name','group_name','period_value','period'];
+            'wms_length','wms_wide','wms_high','wms_weight','wms_out_unit','company_name','group_name','period_value','period','sale_price'];
 
         switch ($group_info['group_id']){
             case 'all':
@@ -175,6 +175,7 @@ class GoodController extends CommonController{
         $wms_out_unit       =$request->input('wms_out_unit');
         $period             =$request->input('period');
         $period_value       =$request->input('period_value');
+        $sale_price         =$request->input('sale_price');//单价
 
 
         /*** 虚拟数据
@@ -191,6 +192,7 @@ class GoodController extends CommonController{
         $input['wms_high']              =$wms_high='常温';
         $input['wms_weight']              =$wms_weight='12';
         $input['wms_out_unit']              =$wms_out_unit='15';
+        $input['sale_price']              =$wms_out_unit='15';
          ***/
 
         //dd($input);
@@ -273,6 +275,7 @@ class GoodController extends CommonController{
             $data['period']             = $period;
             $data['period_value']       = $period_value;
             $data['type']               = 'wms';
+            $data['sale_price']         = $sale_price;
 
             $wheres['self_id'] = $self_id;
             $old_info=ErpShopGoodsSku::where($wheres)->first();
@@ -460,6 +463,7 @@ class GoodController extends CommonController{
                 '箱重（KG）' =>['N','Y','20','wms_weight'],
                 '有效期' =>['N','Y','5','period_value'],
                 '有效期单位' =>['N','Y','10','period'],
+                '单价' =>['N','Y','10','sale_price'],
             ];
 
             $ret=arr_check($shuzu,$info_check);
@@ -538,6 +542,7 @@ class GoodController extends CommonController{
                     $list['period_value']       = $v['period_value'];
                     $list['period']             = $period[$v['period']];
                     $list['type']               = 'wms';
+                    $list['sale_price']         = $v['sale_price'];
                     $list['company_id']         = $info->self_id;
                     $list['company_name']       = $info->company_name;
                     $list['group_code']         = $info->group_code;
@@ -730,7 +735,7 @@ class GoodController extends CommonController{
 
         $self_id=$request->input('self_id');
         $table_name='erp_shop_goods_sku';
-        $select=['self_id','group_code','group_name','use_flag','create_user_name','create_time',
+        $select=['self_id','group_code','group_name','use_flag','create_user_name','create_time','sale_price',
             'good_name','good_english_name','external_sku_id','wms_unit','wms_target_unit','wms_scale','wms_spec','wms_length','wms_wide','wms_high','wms_weight','wms_out_unit','company_name','period_value','period'];
         //$self_id='group_202009282038310201863384';
         $info=$details->details($self_id,$table_name,$select);

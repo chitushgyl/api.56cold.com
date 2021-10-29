@@ -60,7 +60,7 @@ class GroupController extends CommonController{
         $where=get_list_where($search);
 
         $select=['self_id','company_name','use_flag','group_name','contacts','address','tel',
-            'preentry_type','preentry_price','out_type','out_price','storage_type','storage_price','total_type','total_price'];
+            'preentry_type','preentry_price','out_type','out_price','storage_type','storage_price','total_type','total_price','pay_type'];
 
         switch ($group_info['group_id']){
             case 'all':
@@ -188,6 +188,7 @@ class GroupController extends CommonController{
         $storage_price      =$request->input('storage_price');
         $total_type       	=$request->input('total_type');
         $total_price        =$request->input('total_price');
+        $pay_type           =$request->input('pay_type');//结算方式
 
         /*** 虚拟数据
         $input['self_id']           =$self_id='group_202006040950004008768595';
@@ -201,6 +202,7 @@ class GroupController extends CommonController{
         $input['storage_price']     =$storage_price  ='152';
         $input['total_type']        =$total_type  ='pull';
         $input['total_price']       =$total_price  ='152';
+        $input['pay_type']       =$pay_type  ='152';
 	***/
 //        dd($input);
         $rules=[
@@ -227,6 +229,7 @@ class GroupController extends CommonController{
             $data['storage_price']           	=$storage_price*100;
             $data['total_type']      		    =$total_type;
             $data['total_price']           	    =$total_price*100;
+            $data['pay_type']           	    =$pay_type;
 
             $wheres['self_id'] = $self_id;
             $old_info=WmsGroup::where($wheres)->first();
@@ -416,6 +419,7 @@ class GroupController extends CommonController{
                 '联系人' =>['N','Y','50','contacts'],
                 '联系电话' =>['N','Y','50','tel'],
                 '公司地址' =>['N','Y','50','address'],
+                '结算方式' =>['N','Y','50','pay_type'],
                 '入库费' =>['N','Y','50','preentry_price'],
                 '出库费' =>['N','Y','50','out_price'],
                 '仓储费' =>['N','Y','50','storage_price'],
@@ -566,6 +570,7 @@ class GroupController extends CommonController{
 
                     $list['group_code']         = $info->group_code;
                     $list['group_name']         = $info->group_name;
+                    $list['pay_type']           = $v['pay_type'];
                     $list['create_user_id']     =$user_info->admin_id;
                     $list['create_user_name']   =$user_info->name;
                     $list['create_time']        =$list['update_time']=$now_time;
@@ -643,7 +648,7 @@ class GroupController extends CommonController{
             ];
             $where=get_list_where($search);
             $select=['self_id','company_name','use_flag','group_name','contacts','address','tel',
-                'preentry_type','preentry_price','out_type','out_price','storage_type','storage_price','total_type','total_price'];
+                'preentry_type','preentry_price','out_type','out_price','storage_type','storage_price','total_type','total_price','pay_type'];
             $info=WmsGroup::where($where)->orderBy('create_time', 'desc')->select($select)->get();
 
             if($info){
@@ -735,7 +740,7 @@ class GroupController extends CommonController{
         $table_name='wms_group';
         $select=['self_id','group_code','group_name','use_flag','create_user_name','create_time',
             'company_name','contacts','address','tel',
-            'preentry_type','preentry_price','out_type','out_price','storage_type','storage_price','total_type','total_price'];
+            'preentry_type','preentry_price','out_type','out_price','storage_type','storage_price','total_type','total_price','pay_type'];
         //$self_id='group_202009282038310201863384';
         $info=$details->details($self_id,$table_name,$select);
 
