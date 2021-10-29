@@ -621,7 +621,7 @@ class TotalController  extends CommonController{
         ];
 
 
-        $total_select=['self_id','create_user_name','create_time','group_name','warehouse_name','order_count','company_name'];
+        $total_select=['self_id','create_user_name','create_time','group_name','warehouse_name','order_count','company_name','company_id'];
         $order_select = ['self_id','shop_name','total_id','shop_external_id','create_time','total_time','delivery_time'];
         $order_list_select= ['self_id','good_name','spec','order_id','external_sku_id','quehuo','quehuo_num','recipt_code','shop_code'];
         $wms_out_sige_select= ['total_id','order_id','order_list_id','sku_id','num','area','area_id','good_name','external_sku_id','spec','good_english_name','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','shop_id','shop_name'];
@@ -668,7 +668,7 @@ class TotalController  extends CommonController{
             ->where($where)
 		   ->select($total_select)->first();
 
-dd($info);
+//dd($info);
 
 
         if($info){
