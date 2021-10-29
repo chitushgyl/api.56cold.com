@@ -203,12 +203,12 @@ Route::group([
     Route::any('/order/print', 'OrderController@print');
     Route::any('/order/details', 'OrderController@details');
     Route::any('/order/getOrder', 'OrderController@getOrder');
-
+    Route::any('/order/statusOrder','OrderController@statusOrder');
 	Route::any('/order/import', 'OrderController@import');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-		Route::any('/order/statusOrder','OrderController@statusOrder');
+
 
 
     });
@@ -261,11 +261,12 @@ Route::group([
     Route::any('/money/moneyList', 'MoneyController@moneyList');
     Route::any('/money/moneyPage', 'MoneyController@moneyPage');
     Route::any('/money/details','MoneyController@details');
+    Route::any('/money/paymentCheck', 'MoneyController@paymentCheck');//付款方确认
+    Route::any('/money/payeeCheck', 'MoneyController@payeeCheck');//收款方确认
     Route::group([
         "middleware"=>['daily'],
     ], function(){
-        Route::any('/money/paymentCheck', 'MoneyController@paymentCheck');//付款方确认
-        Route::any('/money/payeeCheck', 'MoneyController@payeeCheck');//收款方确认
+
     });
 
 
