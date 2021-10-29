@@ -522,6 +522,11 @@ class SettleController extends CommonController{
                 $operationing->table_id=$self_id;
                 $operationing->old_info=$old_info;
                 $operationing->new_info=$data;
+                if($id){
+                    $msg['code']=200;
+                    $msg['msg']="操作成功";
+                    return $msg;
+                }
             }else{
                 $msg['code']=301;
                 $msg['msg']="拉取不到数据";
