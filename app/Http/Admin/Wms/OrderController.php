@@ -184,7 +184,7 @@ class OrderController extends CommonController{
 
             $shuzu=[
                 '往来单位编码' =>['N','Y','64','shop_code'],
-                '单据编码' =>['N','Y','64','recipt_code'],
+                '单据编号' =>['N','Y','64','recipt_code'],
                 '门店编码' =>['Y','Y','64','shop_external_id'],
                 '门店简称' =>['N','Y','255','shop_name'],
                 '商品编码' =>['Y','Y','255','external_sku_id'],
