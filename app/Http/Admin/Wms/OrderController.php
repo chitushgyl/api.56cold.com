@@ -245,32 +245,27 @@ class OrderController extends CommonController{
 
             $order_check    =array_column($info_wait,'shop_external_id');
             $order_num    =array_column($info_wait,'shop_external_id','shop_code');
-
 			$last_names		=array_flip(array_unique($order_check));
 
-			dump($order_num);
 //			dump(array_unique($order_check));dump($last_names);
-
 			$order_check    =array_count_values($order_check);
 //            dd($order_check);
-//            foreach ($last_names as $key =>$value){
-//                $where_shop1=[
-//                    ['delete_flag','=','Y'],
-//                    ['external_id','=',$key],
-//                    ['company_id','=',$company_id],
-//                ];
-//
-////                dd($where_shop1);
-//                $select_wmsShop1=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name'];
-//                $shop_info2 = wmsShop::where($where_shop1)->select($select_wmsShop1)->first();
-//                if(empty($shop_info2)){
-//                    if($abcd<$errorNum){
-//                        $strs .= '数据中的第'.($value+2)."行门店编码不存在".'</br>';
-//                        $cando='N';
-//                        $abcd++;
-//                    }
-//                }
-//            }
+            foreach ($last_names as $key =>$value){
+                $where_shop1=[
+                    ['delete_flag','=','Y'],
+                    ['external_id','=',$key],
+                    ['company_id','=',$company_id],
+                ];
+                $select_wmsShop1=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name'];
+                $shop_info2 = wmsShop::where($where_shop1)->select($select_wmsShop1)->first();
+                if(empty($shop_info2)){
+                    if($abcd<$errorNum){
+                        $strs .= '数据中的第'.($value+2)."行门店编码不存在".'</br>';
+                        $cando='N';
+                        $abcd++;
+                    }
+                }
+            }
 
             foreach($order_num as $k => $v){
 				//dd($v);
@@ -281,11 +276,11 @@ class OrderController extends CommonController{
                     ['company_id','=',$company_id],
                 ];
 
-//                dump($where_shop);
+                dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name','contacts_code'];
                 $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
                 dump($shop_info);
-                dump($shop_info->self_id);
+//                dump($shop_info->self_id);
                 //dd($cando);
                 if($cando == 'Y'){
                     $order_2=[];
