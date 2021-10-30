@@ -50,6 +50,7 @@ class ShopController extends CommonController{
         $contacts    =$request->input('contacts');
         $line_code    =$request->input('line_code');
         $contacts_code    =$request->input('contacts_code');
+        $external_id    =$request->input('external_id');
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
 
@@ -63,6 +64,7 @@ class ShopController extends CommonController{
             ['type'=>'like','name'=>'contacts','value'=>$contacts],
             ['type'=>'like','name'=>'line_code','value'=>$line_code],
             ['type'=>'like','name'=>'contacts_code','value'=>$contacts_code],
+            ['type'=>'like','name'=>'external_id','value'=>$external_id],
         ];
 
         $where=get_list_where($search);
