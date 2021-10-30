@@ -320,7 +320,7 @@ class OrderController extends CommonController{
 //			dump($last_names);
 //			dump($order_check);
 //			DUMP($info_wait);
-//			dd($orderdata);
+			dump($orderdata);
 
             if($cando == 'Y'){
                 foreach($info_wait as $k => $v){
