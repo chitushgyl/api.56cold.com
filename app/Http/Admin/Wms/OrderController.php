@@ -266,8 +266,7 @@ class OrderController extends CommonController{
                     }
                 }
             }
-            $shop_info = wmsShop::where('external_id',1025)->where('contacts_code','H077')->where('delete_flag','Y')->where('company_id',$company_id)->first();
-            dd($shop_info);
+
             foreach($order_num as $k => $v){
                 $where_shop=[
                     ['delete_flag','=','Y'],
@@ -301,6 +300,7 @@ class OrderController extends CommonController{
                     $order_2['file_id']             =$file_id;
                     $orderdata[$k]=$order_2;
                 }
+                dd($orderdata);
             }
 
 //			dump($last_names);
