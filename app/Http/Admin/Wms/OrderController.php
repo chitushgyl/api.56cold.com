@@ -266,6 +266,7 @@ class OrderController extends CommonController{
                 dump($shop_info2);
                 if(empty($shop_info2)){
                     if($abcd<$errorNum){
+                        dump(456);
                         $strs .= '数据中的第'.($value+2)."行门店编码不存在".'</br>';
                         $cando='N';
                         $abcd++;
@@ -286,10 +287,9 @@ class OrderController extends CommonController{
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name','contacts_code'];
                 $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
                 dump($shop_info);
-//                dd($shop_info->self_id);
+                dump($shop_info->self_id);
                 //dd($cando);
                 if($cando == 'Y'){
-                    dd(123);
                     $order_2=[];
                     $order_2['self_id']             =generate_id('order_');
                     $order_2['shop_id']             =$shop_info->self_id;
