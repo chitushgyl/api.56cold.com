@@ -244,10 +244,12 @@ class OrderController extends CommonController{
             //通过门店拆分订单
 
             $order_check    =array_column($info_wait,'shop_external_id');
+            $order_num    =array_column($info_wait,'shop_external_id','shop_code');
 
 			$last_names		=array_flip(array_unique($order_check));
 
-			dump($order_check);dump(array_unique($order_check));dump($last_names);
+			dump($order_num);
+			dump(array_unique($order_check));dump($last_names);
 
 			$order_check    =array_count_values($order_check);
             dd($order_check);
@@ -264,7 +266,7 @@ class OrderController extends CommonController{
 
                 if(empty($shop_info2)){
                     if($abcd<$errorNum){
-                        $strs .= '数据中的第'.($value+2)."行客户编码不存在".'</br>';
+                        $strs .= '数据中的第'.($value+2)."行门店编码不存在".'</br>';
                         $cando='N';
                         $abcd++;
                     }
