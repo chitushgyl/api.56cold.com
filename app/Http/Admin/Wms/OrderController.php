@@ -266,7 +266,7 @@ class OrderController extends CommonController{
                     }
                 }
             }
-            $shop_info = wmsShop::where('external_id',1025)->where('contacts_code','H077')->first();
+            $shop_info = wmsShop::where('external_id',1025)->where('contacts_code','H077')->where('delete_flag','Y')->where('company_id',$company_id)->first();
             dd($shop_info);
             foreach($order_num as $k => $v){
                 $where_shop=[
