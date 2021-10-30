@@ -281,7 +281,7 @@ class OrderController extends CommonController{
                 if($cando == 'Y'){
                     $order_2=[];
                     $order_2['self_id']             =generate_id('order_');
-                    $order_2['shop_id']             =$shop_info['self_id'];
+                    $order_2['shop_id']             =$shop_info->self_id;
                     $order_2['shop_external_id']    =$shop_info['external_id'];
                     $order_2['shop_name']           =$shop_info['name'];
                     $order_2['shop_contacts']       =$shop_info['contacts'];
