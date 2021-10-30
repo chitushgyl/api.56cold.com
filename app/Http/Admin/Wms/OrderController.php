@@ -248,7 +248,7 @@ class OrderController extends CommonController{
 
 			$last_names		=array_flip(array_unique($order_check));
 
-//			dump($order_num);
+			dump($order_num);
 //			dump(array_unique($order_check));dump($last_names);
 
 			$order_check    =array_count_values($order_check);
