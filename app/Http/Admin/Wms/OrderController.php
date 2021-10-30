@@ -265,8 +265,8 @@ class OrderController extends CommonController{
                 $shop_info2 = wmsShop::where($where_shop1)->select($select_wmsShop1)->first();
                 dump($shop_info2);
                 if(empty($shop_info2)){
+                    dd(456);
                     if($abcd<$errorNum){
-                        dd(456);
                         $strs .= '数据中的第'.($value+2)."行门店编码不存在".'</br>';
                         $cando='N';
                         $abcd++;
