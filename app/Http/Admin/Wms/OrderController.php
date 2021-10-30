@@ -272,7 +272,7 @@ class OrderController extends CommonController{
                 $where_shop=[
                     ['delete_flag','=','Y'],
                     ['external_id','=',1025],
-                    ['contacts_code','=','H077'],
+                    ['contacts_code','=','HO77'],
                     ['company_id','=',$company_id],
                 ];
 
