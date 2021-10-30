@@ -703,7 +703,7 @@ class TotalController  extends CommonController{
 					$abc['warehouse_name']=$v->warehouse_name;
 					$abc['company_name']=$v->company_name;
 					$abc['line_code']=$v->wmsShop->line_code;
-					$abc['shop']=$v->wmsShop->external_id;
+					$abc['shop_num']=$v->wmsShop->external_id;
 
 //dump($abc);
                     if($vv->quehuo == 'Y'){
