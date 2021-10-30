@@ -629,6 +629,7 @@ class TotalController  extends CommonController{
         $wms_out_sige_select= ['total_id','order_id','order_list_id','sku_id','num','area','area_id','good_name','external_sku_id','spec','good_english_name','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','shop_id','shop_name','price','total_price'];
         $group_select = ['self_id','group_code','group_name','use_flag','company_name','contacts','address','tel','total_price','pay_type'];
         $good_select = ['self_id','external_sku_id','sale_price'];
+        $shop_select = ['self_id','line_code','contacts_code','external_id','name'];
 		/**
         $info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select){
             $query->where('delete_flag','=','Y');
@@ -646,11 +647,15 @@ class TotalController  extends CommonController{
             ->select($total_select)->first();
 		*/
 
-		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select,$good_select,$group_select){
+		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select,$good_select,$group_select,$shop_select){
 			$query->where('delete_flag','=','Y');
 			$query->select($order_select);
             $query->with(['wmsOutOrderList' => function($query)use($order_list_select){
                 $query->select($order_list_select);
+                $query->where('delete_flag','=','Y');
+            }]);
+            $query->with(['wmsShop' => function($query)use($shop_select){
+                $query->select($shop_select);
                 $query->where('delete_flag','=','Y');
             }]);
 			$query->with(['wmsOutSige' => function($query)use($wms_out_sige_select,$good_select){
@@ -670,7 +675,7 @@ class TotalController  extends CommonController{
             ->where($where)
 		   ->select($total_select)->first();
 
-//dd($info->toArray());
+dd($info->toArray());
 
 
         if($info){
