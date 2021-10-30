@@ -266,7 +266,7 @@ class OrderController extends CommonController{
                     }
                 }
             }
-
+            dump($order_num);
             foreach($order_num as $k => $v){
 				//dd($v);
                 $where_shop=[
