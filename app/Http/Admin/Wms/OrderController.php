@@ -271,7 +271,7 @@ class OrderController extends CommonController{
             $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
             DB::connection()->enableQueryLog();
             wmsShop::where('delete_flag','Y')->where('external_id',1025)->where('contacts_code','H077')->where('company_id',$company_id)->select($select_wmsShop)->first();
-//            dump(DB::getQueryLog());
+            dump(DB::getQueryLog());
             foreach($order_num as $k => $v){
                 $where_shop=[
                     ['delete_flag','=','Y'],
