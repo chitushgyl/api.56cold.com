@@ -266,7 +266,7 @@ class OrderController extends CommonController{
                 dump($shop_info2);
                 if(empty($shop_info2)){
                     if($abcd<$errorNum){
-                        dump(456);
+                        dd(456);
                         $strs .= '数据中的第'.($value+2)."行门店编码不存在".'</br>';
                         $cando='N';
                         $abcd++;
