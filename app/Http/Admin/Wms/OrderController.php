@@ -244,7 +244,7 @@ class OrderController extends CommonController{
             //通过门店拆分订单
 
             $order_check    =array_column($info_wait,'shop_external_id');
-            $order_num    =array_column($info_wait,'shop_external_id','shop_code');
+            $order_num    =array_column($info_wait,'shop_code','shop_external_id');
 			$last_names		=array_flip(array_unique($order_check));
 
 //			dump(array_unique($order_check));dump($last_names);
@@ -271,8 +271,8 @@ class OrderController extends CommonController{
 				//dd($v);
                 $where_shop=[
                     ['delete_flag','=','Y'],
-                    ['external_id','=',$v],
-                    ['contacts_code','=',$k],
+                    ['external_id','=',$k],
+                    ['contacts_code','=',$v],
                     ['company_id','=',$company_id],
                 ];
 
@@ -293,7 +293,7 @@ class OrderController extends CommonController{
                     $order_2['shop_tel']            =$shop_info->tel;
                     $order_2['group_code']          =$shop_info->group_code;
                     $order_2['group_name']          =$shop_info->group_name;
-                    $order_2['count']               =$order_check[$v];
+                    $order_2['count']               =$order_check[$k];
                     $order_2['warehouse_id']        =$warehouse_info->self_id;
                     $order_2['warehouse_name']      =$warehouse_info->warehouse_name;
                     $order_2['company_id']          =$shop_info->company_id;
