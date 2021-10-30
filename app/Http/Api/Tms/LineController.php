@@ -28,6 +28,7 @@ class LineController extends Controller{
         $cold         = $request->input('cold');//温度
         $min_money    = $request->input('min_money');//最低干线费
         $depart_time  = $request->input('depart_time');//发车时间排序
+        $start_city   = $request->input('start_city');
         if (empty($time)){
             $time = date('Y-m-d',time());
         }
