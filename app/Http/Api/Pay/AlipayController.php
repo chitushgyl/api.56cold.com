@@ -1810,7 +1810,7 @@ class AlipayController extends Controller{
         $openid = $request->input('openid');//小程序用户唯一标识
         $type = $request->input('type');//1下单支付 2货到付款支付
         include_once base_path( '/vendor/wxAppPay/weixin.php');
-        if ($user_info->type == 'user'){
+        if ($user_info->type == 'user' || $user_info->type == 'carriage'){
             $user_id = $user_info->total_user_id;
         }else{
             $user_id = $user_info->group_code;
