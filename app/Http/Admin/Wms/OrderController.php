@@ -252,7 +252,7 @@ class OrderController extends CommonController{
 			dump(array_unique($order_check));dump($last_names);
 
 			$order_check    =array_count_values($order_check);
-            dd($order_check);
+//            dd($order_check);
             foreach ($last_names as $key =>$value){
                 $where_shop1=[
                     ['delete_flag','=','Y'],
@@ -273,11 +273,12 @@ class OrderController extends CommonController{
                 }
             }
 
-            foreach($order_check as $k => $v){
+            foreach($order_num as $k => $v){
 				//dd($v);
                 $where_shop=[
                     ['delete_flag','=','Y'],
-                    ['external_id','=',$k],
+                    ['external_id','=',$v],
+                    ['contacts_code','=',$k],
                     ['company_id','=',$company_id],
                 ];
 
@@ -297,7 +298,7 @@ class OrderController extends CommonController{
                     $order_2['shop_tel']            =$shop_info->tel;
                     $order_2['group_code']          =$shop_info->group_code;
                     $order_2['group_name']          =$shop_info->group_name;
-                    $order_2['count']               =$v;
+                    $order_2['count']               =$order_check[$v];
                     $order_2['warehouse_id']        =$warehouse_info->self_id;
                     $order_2['warehouse_name']      =$warehouse_info->warehouse_name;
                     $order_2['company_id']          =$shop_info->company_id;
@@ -322,7 +323,7 @@ class OrderController extends CommonController{
 //			dump($last_names);
 //			dump($order_check);
 //			DUMP($info_wait);
-			dump($orderdata);
+			dd($orderdata);
 
             if($cando == 'Y'){
                 foreach($info_wait as $k => $v){
