@@ -269,12 +269,16 @@ class OrderController extends CommonController{
             dump($order_num);
             foreach($order_num as $k => $v){
 				//dd($v);
-                $where_shop=[
-                    ['delete_flag','=','Y'],
-                    ['external_id','=',$k],
-                    ['contacts_code','=',$v],
-                    ['company_id','=',$company_id],
-                ];
+//                $where_shop=[
+//                    ['delete_flag','=','Y'],
+//                    ['external_id','=',$k],
+//                    ['contacts_code','=',$v],
+//                    ['company_id','=',$company_id],
+//                ];
+                $where_shop['delete_flag'] = 'Y';
+                $where_shop['external_id'] = $k;
+                $where_shop['contacts_code'] = $v;
+                $where_shop['company_id'] = $company_id;
 
                 dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name','contacts_code'];
