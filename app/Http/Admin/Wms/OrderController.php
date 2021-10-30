@@ -2,6 +2,7 @@
 namespace App\Http\Admin\Wms;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -266,6 +267,16 @@ class OrderController extends CommonController{
                     }
                 }
             }
+
+            $where_shop=[
+                ['delete_flag','=','Y'],
+                ['external_id','=',1025],
+                ['contacts_code','=','H077'],
+                ['company_id','=',$company_id],
+            ];
+            $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
+            $sql = wmsShop::query()->where($where_shop)->select($select_wmsShop)->first()->toSql();
+            dump($sql);
             foreach($order_num as $k => $v){
                 $where_shop=[
                     ['delete_flag','=','Y'],
@@ -275,7 +286,7 @@ class OrderController extends CommonController{
                 ];
                 dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
-                $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
+                $shop_info = wmsShop::query()->where($where_shop)->select($select_wmsShop)->first()->toSql();
                 dump($shop_info);
                 if($cando == 'Y'){
                     $order_2=[];
