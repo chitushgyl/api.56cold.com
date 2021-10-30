@@ -266,7 +266,15 @@ class OrderController extends CommonController{
                     }
                 }
             }
-
+            $where_shop=[
+                ['delete_flag','=','Y'],
+                ['external_id','=',1025],
+                ['contacts_code','=','H077'],
+                ['company_id','=',$company_id],
+            ];
+            $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
+            $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
+            dd($shop_info);
             foreach($order_num as $k => $v){
                 $where_shop=[
                     ['delete_flag','=','Y'],
