@@ -268,14 +268,14 @@ class OrderController extends CommonController{
                 }
             }
 
-            $where_shop=[
+            $where_shop2=[
                 ['delete_flag','=','Y'],
                 ['external_id','=',1025],
                 ['contacts_code','=','H077'],
                 ['company_id','=',$company_id],
             ];
             $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
-            $sql = wmsShop::query()->where($where_shop)->select($select_wmsShop)->first()->toSql();
+            $sql = wmsShop::query()->where($where_shop2)->select($select_wmsShop)->toSql();
             dump($sql);
             foreach($order_num as $k => $v){
                 $where_shop=[
@@ -286,7 +286,7 @@ class OrderController extends CommonController{
                 ];
                 dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
-                $shop_info = wmsShop::query()->where($where_shop)->select($select_wmsShop)->first()->toSql();
+                $shop_info = wmsShop::query()->where($where_shop)->select($select_wmsShop)->toSql();
                 dump($shop_info);
                 if($cando == 'Y'){
                     $order_2=[];
