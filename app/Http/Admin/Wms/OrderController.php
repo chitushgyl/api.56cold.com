@@ -380,7 +380,7 @@ class OrderController extends CommonController{
                     $a++;
                 }
             }
-			//dd($datalist);
+			dd($datalist);
             $operationing->new_info=$orderdata;
 
             if($cando == 'N'){
