@@ -268,11 +268,6 @@ class OrderController extends CommonController{
                 }
             }
 
-            $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
-            DB::connection()->enableQueryLog();
-            wmsShop::where('delete_flag','Y')->where('external_id',1025)->where('contacts_code','H077')->where('company_id',$company_id)->select($select_wmsShop)->first();
-            dump(DB::getQueryLog());
-            dd(123);
             foreach($order_num as $k => $v){
                 $where_shop=[
                     ['delete_flag','=','Y'],
@@ -280,15 +275,13 @@ class OrderController extends CommonController{
                     ['contacts_code','=',$v],
                     ['company_id','=',$company_id],
                 ];
-                dump($where_shop);
+//                dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
-                DB::connection()->enableQueryLog();
                 $shop_info = wmsShop::where('delete_flag','Y')->where('external_id',$k)->where('contacts_code',$v)->where('company_id',$company_id)->select($select_wmsShop)->first();
-                dump(DB::getQueryLog());
                 if($cando == 'Y'){
                     $order_2=[];
                     $order_2['self_id']             =generate_id('order_');
-                    $order_2['shop_id']             =$shop_info->self_id;
+                    $order_2['shop_id']             =$shop_info['self_id'];
                     $order_2['shop_external_id']    =$shop_info->external_id;
                     $order_2['shop_name']           =$shop_info->name;
                     $order_2['shop_contacts']       =$shop_info->contacts;
