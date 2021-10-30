@@ -282,7 +282,7 @@ class OrderController extends CommonController{
                     ['company_id','=',$company_id],
                 ];
 
-//                dd($where_shop);
+                dd($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name'];
                 $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
 
