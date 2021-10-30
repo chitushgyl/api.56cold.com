@@ -277,7 +277,7 @@ class OrderController extends CommonController{
                 ];
 //                dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
-                $shop_info = wmsShop::where('delete_flag','Y')->where('external_id',$k)->where('contacts_code',$v)->where('company_id',$company_id)->select($select_wmsShop)->first();
+                $shop_info = wmsShop::where($where_shop)->first();
                 if($cando == 'Y'){
                     $order_2=[];
                     $order_2['self_id']             =generate_id('order_');
@@ -365,7 +365,6 @@ class OrderController extends CommonController{
                     $a++;
                 }
             }
-			dd($datalist);
             $operationing->new_info=$orderdata;
 
             if($cando == 'N'){
