@@ -1588,7 +1588,7 @@ class AlipayController extends Controller{
         $type = 1;
         $self_id = 'order_202103090937308279552773';
          * */
-        if ($user_info->type == 'user'){
+        if ($user_info->type == 'user' || $user_info->type == 'carriage'){
             $user_id = $user_info->total_user_id;
         }else{
             $user_id = $user_info->group_code;
@@ -1706,7 +1706,7 @@ class AlipayController extends Controller{
         $type = 1;
         $self_id = 'order_202103090937308279552773';
          * */
-        if ($user_info->type == 'user'){
+        if ($user_info->type == 'user' || $user_info->type == 'carriage'){
             $user_id = $user_info->total_user_id;
         }else{
             $user_id = $user_info->group_code;
