@@ -253,8 +253,8 @@ class OrderController extends CommonController{
             foreach ($last_names as $key =>$value){
                 $where_shop1=[
                     ['delete_flag','=','Y'],
-                    ['external_id','=',$key],
-                    ['company_id','=',$company_id],
+                    ['external_id','=',1025],
+                    ['company_id','=','H077'],
                 ];
                 $select_wmsShop1=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name'];
                 $shop_info2 = wmsShop::where($where_shop1)->select($select_wmsShop1)->first();
