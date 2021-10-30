@@ -268,15 +268,9 @@ class OrderController extends CommonController{
                 }
             }
 
-            $where_shop2=[
-                ['delete_flag','=','Y'],
-                ['external_id','=',1025],
-                ['contacts_code','=','H077'],
-                ['company_id','=',$company_id],
-            ];
             $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
             DB::connection()->enableQueryLog();
-            wmsShop::where($where_shop2)->select($select_wmsShop)->first();
+            wmsShop::where('delete_flag','Y')->where('external_id',1025)->where('contacts_code','H077')->where('company_id',$company_id)->select($select_wmsShop)->first();
 //            dump(DB::getQueryLog());
             foreach($order_num as $k => $v){
                 $where_shop=[
@@ -287,7 +281,8 @@ class OrderController extends CommonController{
                 ];
                 dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','delete_flag','group_name','company_id','company_name','contacts_code'];
-                $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
+                DB::connection()->enableQueryLog();
+                $shop_info = wmsShop::where('delete_flag','Y')->where('external_id',$k)->where('contacts_code',$v)->where('company_id',$company_id)->select($select_wmsShop)->first();
                 dump(DB::getQueryLog());
                 if($cando == 'Y'){
                     $order_2=[];
