@@ -266,26 +266,19 @@ class OrderController extends CommonController{
                     }
                 }
             }
-            dump($order_num);
+            $shop_info = wmsShop::where('external_id',1025)->where('contacts_code','H077')->first();
+            dd($shop_info);
             foreach($order_num as $k => $v){
-				//dd($v);
-//                $where_shop=[
-//                    ['delete_flag','=','Y'],
-//                    ['external_id','=',$k],
-//                    ['contacts_code','=',$v],
-//                    ['company_id','=',$company_id],
-//                ];
-                $where_shop['delete_flag'] = 'Y';
-                $where_shop['external_id'] = $k;
-                $where_shop['contacts_code'] = $v;
-                $where_shop['company_id'] = $company_id;
-
+                $where_shop=[
+                    ['delete_flag','=','Y'],
+                    ['external_id','=',$k],
+                    ['contacts_code','=',$v],
+                    ['company_id','=',$company_id],
+                ];
                 dump($where_shop);
                 $select_wmsShop=['self_id','group_code','external_id','name','contacts','address','tel','group_name','company_id','company_name','contacts_code'];
                 $shop_info = wmsShop::where($where_shop)->select($select_wmsShop)->first();
                 dump($shop_info);
-//                dump($shop_info->self_id);
-                //dd($cando);
                 if($cando == 'Y'){
                     $order_2=[];
                     $order_2['self_id']             =generate_id('order_');
@@ -306,17 +299,8 @@ class OrderController extends CommonController{
                     $order_2['create_user_name']    =$user_info->name;
                     $order_2['create_time']         =$order_2['update_time']            =$now_time;
                     $order_2['file_id']             =$file_id;
-//					$order_2['delivery_time']       =;
-//					$order_2['recipt_code']         =;
-//					$order_2['shop_code']           =;
-
-
-					//dump($k);
-					//dump($last_names[$k]);
-					//dump($info_wait[$last_names[$k]]['delivery_time']);
                     $orderdata[$k]=$order_2;
                 }
-
             }
 
 //			dump($last_names);
