@@ -348,8 +348,8 @@ class OrderController extends CommonController{
                         $list['sanitation']         = $v['sanitation'];
                         $list['recipt_code']        = $v['recipt_code'];
                         $list['shop_code']          = $v['shop_code'];
-                        $list['price']              = $v['price']*100;
-                        $list['total_price']        = $v['total_price']*100;
+                        $list['price']              = $v['price'];
+                        $list['total_price']        = $v['total_price'];
 //                        $list['int_cold']           = $v['int_cold'];
 //                        $list['int_freeze']         = $v['int_freeze'];
 //                        $list['int_normal']         = $v['int_normal'];

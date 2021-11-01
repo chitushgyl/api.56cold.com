@@ -734,12 +734,13 @@ class TotalController  extends CommonController{
 						$list['good_english_name']  =$vvv->good_english_name;
 						$list['spec']               =$vvv->spec;
 						$list['num']                =$vvv->num;
+						$list['good_unit']          =$vvv->good_unit;
 						$list['sign']               =$vvv->area.'-'.$vvv->row.'-'.$vvv->column.'-'.$vvv->tier;
 						$list['production_date']    =$vvv->production_date;
 						$list['expire_time']        =$vvv->expire_time;
 						$list['good_describe']      =unit_do($vvv->good_unit , $vvv->good_target_unit, $vvv->good_scale, $vvv->num);
-						$list['price']              =$vvv->price/100;
-						$list['total_money']        =$vvv->total_price/100;
+						$list['price']              =$vvv->price;
+						$list['total_money']        =$vvv->price * $vvv->num;
 						$order[]=$list;
 						$abc['info']=$order;
 
