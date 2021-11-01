@@ -239,7 +239,7 @@ class AlipayController extends Controller{
         $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
         $self_id   = $request->input('self_id');// 订单ID
         $price     = $request->input('price');// 支付金额
-        $price     = 0.01;
+//        $price     = 0.01;
         if (!$user_info){
             $msg['code'] = 401;
             $msg['msg']  = '未登录，请完成登录！';
@@ -580,7 +580,7 @@ class AlipayController extends Controller{
             $msg['msg']  = '请选择支付类型';
             return $msg;
         }
-        $price = 0.01;
+//        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -900,10 +900,10 @@ class AlipayController extends Controller{
         // 支付金额
         $price = $request->input('price');
         $type  = $request->input('type'); // 支付宝 alipay  微信 wechat
-//        /**虚拟数据
-        $price   = 0.01;
+        /**虚拟数据
+//        $price   = 0.01;
 //        $self_id = 'order_202103121712041799645968';
-//         * */
+         * */
         $now_time = date('Y-m-d H:i:s',time());
         $pay['order_id'] = $self_id;
         $pay['pay_number'] = $price*100;
@@ -1013,10 +1013,10 @@ class AlipayController extends Controller{
         // 支付金额
         $price = $request->input('price');
         $type  = $request->input('type'); // 支付宝 alipay  微信 wechat
-//        /**虚拟数据
+        /**虚拟数据
         $price   = 0.01;
-//        $self_id = 'order_202103121712041799645968';
-//         * */
+        $self_id = 'order_202103121712041799645968';
+         * */
         $now_time = date('Y-m-d H:i:s',time());
         $pay['order_id'] = $self_id;
         $pay['pay_number'] = $price*100;
@@ -1108,13 +1108,13 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-        $price = 0.01;
+//        $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
         if ($type == 1){
-            $notify = 'https://api.56cold.com/alipay/appWechat_notify';
+            $notify = 'https://ytapi.56cold.com/alipay/appWechat_notify';
         }else{
-            $notify = 'https://api.56cold.com/alipay/paymentWechatNotify';
+            $notify = 'https://ytapi.56cold.com/alipay/paymentWechatNotify';
         }
 
         $config    = config('tms.routine_config_user');//引入配置文件参数
@@ -1152,10 +1152,10 @@ class AlipayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-        $price = 0.01;
+//        $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
-        $notify_url = 'https://api.56cold.com/alipay/nativeNotify';
+        $notify_url = 'https://ytapi.56cold.com/alipay/nativeNotify';
         include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
         include_once base_path('/vendor/wxpay/NativePay.php');
         $notify = new \NativePay;
@@ -1176,7 +1176,7 @@ class AlipayController extends Controller{
         if($res){
             $msg['code'] = 200;
             $msg['msg'] = '请求成功';
-            $msg['data'] = 'https://api.56cold.com/'.$res;
+            $msg['data'] = 'https://ytapi.56cold.com/'.$res;
             return $msg;
         }else{
             $msg['code'] = 301;
@@ -1305,7 +1305,7 @@ class AlipayController extends Controller{
         $aop->signType = $config['sign_type'];
         //运单支付
         $subject = '订单支付';
-        $notifyurl = "https://api.56cold.com/alipay/qrcode_notify";
+        $notifyurl = "https://ytapi.56cold.com/alipay/qrcode_notify";
 
         $aop->alipayrsaPublicKey = $config['alipay_public_key'];
         $bizcontent = json_encode([
@@ -1329,7 +1329,7 @@ class AlipayController extends Controller{
         if($res){
             $msg['code'] = 200;
             $msg['msg'] = '请求成功';
-            $msg['data'] = 'https://api.56cold.com/'.$res;
+            $msg['data'] = 'https://ytapi.56cold.com/'.$res;
             return $msg;
         }else{
             $msg['code'] = 301;
@@ -1614,7 +1614,7 @@ class AlipayController extends Controller{
             'passback_params' => $user_id
         ]);
 
-        $request->setNotifyUrl("https://api.56cold.com/alipay/depositAlipayNotify");
+        $request->setNotifyUrl("https://ytapi.56cold.com/alipay/depositAlipayNotify");
         $request->setBizContent($bizcontent);
         //这里和普通的接口调用不同，使用的是sdkExecute
         $response = $aop->sdkExecute($request);
@@ -1720,7 +1720,7 @@ class AlipayController extends Controller{
         $appid  = $config['appid'];
         $mch_id = $config['mch_id'];
         $key    = $config['key'];
-        $notify_url = 'https://api.56cold.com/alipay/depositWechatNotify';
+        $notify_url = 'https://ytapi.56cold.com/alipay/depositWechatNotify';
         $wechatAppPay = new \wxAppPay($appid, $mch_id, $notify_url, $key);
         $params['body'] = '微信余额充值';                       //商品描述
         $params['out_trade_no'] = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);    //自定义的订单号
@@ -1818,7 +1818,7 @@ class AlipayController extends Controller{
 //        $price = 0.01;
         $body = '余额充值';
         $out_trade_no = date('Ymd') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
-        $notify = 'https://api.56cold.com/alipay/depositWechatNotify';
+        $notify = 'https://ytapi.56cold.com/alipay/depositWechatNotify';
         $config    = config('tms.routine_config_user');//引入配置文件参数
         $appid  = $config['appid'];
         $mch_id = $config['mch_id'];
