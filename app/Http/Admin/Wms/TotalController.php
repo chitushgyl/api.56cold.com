@@ -754,11 +754,11 @@ class TotalController  extends CommonController{
                         $warehouseType = WmsWarehouseArea::with(['wmsWarm' => function ($query){
                             $query->select(['self_id','control']);
                         }])->where('self_id',$vvv->area_id)->select(['self_id','warm_id'])->first();
-                        if ($warehouseType->wmsWarm->control == 'cold'){
+                        if ($warehouseType->wmsWarm->control == 'freeze'){
                             if($vvv->good_unit == '箱'){
                                 $int_cold_num += $vvv->num;
                             }
-                        }elseif ($warehouseType->wmsWarm->control == 'freeze'){
+                        }elseif ($warehouseType->wmsWarm->control == 'refrigeration'){
                             if($vvv->good_unit == '箱'){
                                 $int_freeze_num += $vvv->num;
                             }
