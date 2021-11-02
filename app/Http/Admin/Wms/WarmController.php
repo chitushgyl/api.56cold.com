@@ -138,6 +138,7 @@ class WarmController extends CommonController{
         $warm_name       =$request->input('warm_name');
         $min_warm       =$request->input('min_warm');
         $max_warm       =$request->input('max_warm');
+        $control       =$request->input('control');
 
         /*** 虚拟数据*
         $input['self_id']           =$self_id='good_202007011336328472133661';
@@ -179,6 +180,7 @@ class WarmController extends CommonController{
             $data['warm_name'] = $warm_name;
             $data['min_warm'] = $min_warm;
             $data['max_warm'] = $max_warm;
+            $data['control'] = $control;
 
 
             $where2['self_id'] = $self_id;
