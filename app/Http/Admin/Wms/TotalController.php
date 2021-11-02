@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Admin\Wms;
+use App\Models\Wms\WmsWarehouseArea;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
 use Illuminate\Support\Facades\Input;
@@ -143,6 +144,9 @@ class TotalController  extends CommonController{
     public function addTotal(Request $request,Change $change,WmsMoney $money){
         $bulk=0;
         $weight=0;
+//        $int_cold_num = 0;
+//        $int_freeze_num = 0;
+//        $int_normal_num = 0;
         $pull=[];
         $datalist=[];
         $operationing       = $request->get('operationing');//接收中间件产生的参数
@@ -281,6 +285,9 @@ class TotalController  extends CommonController{
                         $bulk=$infos['bulk'];
                         $weight=$infos['weight'];
                         $datalist=$infos['datalist'];
+//                        $int_cold_num=$infos['int_cold_num'];
+//                        $int_freeze_num=$infos['int_freeze_num'];
+//                        $int_normal_num=$infos['int_normal_num'];
                     }
 
 
@@ -302,6 +309,9 @@ class TotalController  extends CommonController{
             $data['pull_count']=$pull_count;
             $data['bulk']=$bulk;
             $data['weight']=$weight;
+//            $data['int_cold'] = $int_cold_num;
+//            $data['int_freeze'] = $int_freeze_num;
+//            $data['int_normal'] = $int_normal_num;
             $id=WmsTotal::insert($data);
 
 			$operationing->table_id=$data['self_id'];
@@ -358,7 +368,9 @@ class TotalController  extends CommonController{
          *  wms_out_sige     需要写入wms_library_change
          **  需要改变  wms_library_sige  中的实际库存
          */
-
+        $int_cold_num = 0;
+        $int_freeze_num = 0;
+        $int_normal_num = 0;
 	//dump($data);dd($resssss);
 		if($resssss){
 			foreach($resssss as $kk=>$vv){
@@ -469,6 +481,9 @@ class TotalController  extends CommonController{
         $infos['bulk']=$bulk;
         $infos['weight']=$weight;
         $infos['datalist']=$datalist;
+//        $infos['int_cold_num']=$int_cold_num;
+//        $infos['int_freeze_num']=$int_freeze_num;
+//        $infos['int_normal_num']=$int_normal_num;
         return $infos;
 
     }
@@ -626,7 +641,7 @@ class TotalController  extends CommonController{
         $total_select=['self_id','create_user_name','create_time','group_name','warehouse_name','order_count','company_name','company_id'];
         $order_select = ['self_id','shop_name','total_id','shop_external_id','shop_id','create_time','total_time','delivery_time','warehouse_name','shop_address','shop_contacts','shop_tel','company_name'];
         $order_list_select= ['self_id','good_name','spec','order_id','external_sku_id','quehuo','quehuo_num','recipt_code','shop_code'];
-        $wms_out_sige_select= ['total_id','order_id','order_list_id','sku_id','num','area','area_id','good_name','external_sku_id','spec','good_english_name','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','shop_id','shop_name','price','total_price'];
+        $wms_out_sige_select= ['total_id','area_id','order_id','order_list_id','sku_id','num','area','area_id','good_name','external_sku_id','spec','good_english_name','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','shop_id','shop_name','price','total_price'];
         $group_select = ['self_id','group_code','group_name','use_flag','company_name','contacts','address','tel','total_price','pay_type'];
         $good_select = ['self_id','external_sku_id','sale_price'];
         $shop_select = ['self_id','line_code','contacts_code','external_id','name'];
@@ -722,7 +737,9 @@ class TotalController  extends CommonController{
                     }
 
                 }
-
+                $int_cold_num = 0;
+                $int_freeze_num = 0;
+                $int_normal_num = 0;
 
 				if($v->wmsOutSige){
 				 $abc['out_flag']='Y';
@@ -734,6 +751,22 @@ class TotalController  extends CommonController{
 						$list['good_english_name']  =$vvv->good_english_name;
 						$list['spec']               =$vvv->spec;
 						$list['num']                =$vvv->num;
+                        $warehouseType = WmsWarehouseArea::with(['wmsWarm' => function ($query){
+                            $query->select(['self_id','control']);
+                        }])->where('self_id',$vvv->area_id)->select(['self_id','warm_id'])->first();
+                        if ($warehouseType->wmsWarm->control == 'cold'){
+                            if($vvv->good_unit == '箱'){
+                                $int_cold_num += $vvv->num;
+                            }
+                        }elseif ($warehouseType->wmsWarm->control == 'freeze'){
+                            if($vvv->good_unit == '箱'){
+                                $int_freeze_num += $vvv->num;
+                            }
+                        }elseif($warehouseType->wmsWarm->control == 'normal'){
+                            if($vvv->good_unit == '箱'){
+                                $int_normal_num += $vvv->num;
+                            }
+                        }
 						$list['good_unit']          =$vvv->good_unit;
 						$list['sign']               =$vvv->area.'-'.$vvv->row.'-'.$vvv->column.'-'.$vvv->tier;
 						$list['production_date']    =$vvv->production_date;
@@ -755,7 +788,9 @@ class TotalController  extends CommonController{
 
             }
 
-
+            $abc['int_cold']=$int_cold_num;
+            $abc['int_freeze']=$int_freeze_num;
+            $abc['int_normal']=$int_normal_num;
 
 			$operationing->table_id=$self_id;
             $operationing->old_info=null;
