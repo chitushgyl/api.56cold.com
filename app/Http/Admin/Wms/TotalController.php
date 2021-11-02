@@ -778,6 +778,9 @@ class TotalController  extends CommonController{
 						$abc['info']=$order;
 
 					}
+                    $abc['int_cold']=$int_cold_num;
+                    $abc['int_freeze']=$int_freeze_num;
+                    $abc['int_normal']=$int_normal_num;
 					$out_list[]=$abc;
 
 				}else{
@@ -787,10 +790,6 @@ class TotalController  extends CommonController{
 				}
 
             }
-
-            $out_list['int_cold']=$int_cold_num;
-            $out_list['int_freeze']=$int_freeze_num;
-            $out_list['int_normal']=$int_normal_num;
 
 			$operationing->table_id=$self_id;
             $operationing->old_info=null;
