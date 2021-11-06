@@ -6,6 +6,7 @@ use App\Models\Group\SystemGroup;
 use App\Models\Group\SystemGroupAuthority;
 use App\Models\Log\LogLogin;
 use App\Models\Tms\AppVersionConfig;
+use App\Models\Tms\TmsAdvert;
 use App\Models\Tms\TmsAttestation;
 use App\Models\Tms\TmsCar;
 use App\Models\Tms\TmsCarriage;
@@ -1300,6 +1301,26 @@ class UserController extends Controller{
 
         $msg['code'] = 200;
         $msg['msg']  = '注销成功!';
+        return $msg;
+    }
+   /**
+    * 获取广告弹窗 /user/getAdvertPop
+    * */
+    public function getAdvertPop(Request $request){
+        $project_type       =$request->get('project_type');
+        $now_time   = date('Y-m-d H:i:s',time());
+        $user_info  = $request->get('user_info');//接收中间件产生的参数
+        $input		= $request->all();
+        $type       = $request->input('type');
+
+        $where['use_flag'] = 'Y';
+        $where['delete_flag'] = 'Y';
+        $where['type'] = $type;
+        $info = TmsAdvert::where($where)->get();
+
+        $msg['code'] = 200;
+        $msg['msg']  = '获取成功!';
+        $msg['data']  = $info;
         return $msg;
     }
 

@@ -222,9 +222,6 @@ class TotalController  extends CommonController{
             $temp['total_flag']='Y';
             $temp['total_time']=$now_time;
 
-            WmsOutOrder::whereIn('self_id', $total)->update($temp);
-
-
 
             $order_do=[];
             foreach ($order as $k => $v){
@@ -312,6 +309,7 @@ class TotalController  extends CommonController{
 //            $data['int_cold'] = $int_cold_num;
 //            $data['int_freeze'] = $int_freeze_num;
 //            $data['int_normal'] = $int_normal_num;
+            WmsOutOrder::whereIn('self_id', $total)->update($temp);
             $id=WmsTotal::insert($data);
 
 			$operationing->table_id=$data['self_id'];

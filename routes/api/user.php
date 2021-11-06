@@ -34,6 +34,7 @@ Route::group([
         Route::any('/attestation', 'UserController@attestation');                   //企业认证
         Route::any('/details', 'UserController@details');                   //企业认证
         Route::any('/log_off', 'UserController@log_off');                   //企业认证
+        Route::any('/getAdvertPop', 'UserController@getAdvertPop');
     });
 });
 
