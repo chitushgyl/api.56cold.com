@@ -1318,7 +1318,7 @@ class UserController extends Controller{
         $where['type'] = $type;
         $info = TmsAdvert::where($where)->get();
         foreach($info as $key => $value){
-            $value->img = img_for($value->img,'in');
+            $value->img = img_for($value->img,'no_json');
         }
         $msg['code'] = 200;
         $msg['msg']  = '获取成功!';
