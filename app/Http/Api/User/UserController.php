@@ -1317,7 +1317,9 @@ class UserController extends Controller{
         $where['delete_flag'] = 'Y';
         $where['type'] = $type;
         $info = TmsAdvert::where($where)->get();
-
+        foreach($info as $key => $value){
+            $value->img = img_for($value->img,'in');
+        }
         $msg['code'] = 200;
         $msg['msg']  = '获取成功!';
         $msg['data']  = $info;
