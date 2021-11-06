@@ -2202,7 +2202,7 @@ class OrderController extends Controller{
                 $info->pay_state = '已付款';
             }elseif($info->pay_type == 'offline' && $info->pay_state == 'N'){
                 $info->pay_state = '未付款';
-            }elseif($info->pay_type == null && $info->pay_state == 'N'){
+            }elseif(!$info->pay_type && $info->pay_state == 'N'){
                 $info->pay_state = '未付款';
             }
             $receipt_info = [];
