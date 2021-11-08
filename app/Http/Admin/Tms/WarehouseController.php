@@ -591,7 +591,7 @@ class WarehouseController extends CommonController {
                     $list['group_name']         = $info->group_name;
                     $list['create_time']        = $list['update_time']=$now_time;
                     $list['areanumber']         = $v['areanumber'];
-                    if($v['wtype'] == '中转型'){
+                    if($v['wtype'] == '仓配一体型'){
                         $list['wtype']              = 'transfer';
                     }else{
                         $list['wtype']              = 'storage';
