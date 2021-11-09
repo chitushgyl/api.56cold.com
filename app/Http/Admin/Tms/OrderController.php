@@ -2313,7 +2313,12 @@ class OrderController extends CommonController{
         if($validator->passes()) {
             //二次验证
              $order = TmsOrder::where('self_id',$order_id)->select(['self_id','order_status','total_money','pay_type','group_code'])->first();
-            if ($order->order_status == 4 || $order->order_status == 5){
+            if ($order->order_status == 3){
+                $msg['code'] = 303;
+                $msg['msg'] = '此订单已被承接不可以取消，请联系司机取消接单或客服';
+                return $msg;
+            }
+             if ($order->order_status == 4 || $order->order_status == 5){
                 $msg['code'] = 303;
                 $msg['msg'] = '此订单运输中不可以取消';
                 return $msg;
