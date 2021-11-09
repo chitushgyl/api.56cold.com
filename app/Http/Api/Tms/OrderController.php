@@ -903,6 +903,9 @@ class OrderController extends Controller{
                             $list['company_id']                 = $company_id;
                             $list['company_name']               = $company_name;
                             $list['receiver_id']                = $line_info->group_code;
+                            if($user_info->group_code != $line_info['group_code']) {
+                                $list['receiver_id'] = '1234';
+                            }
                             if ($line_info->special == 1 && $line_info->carriage_group_code){
                                 $list['receiver_id']                = $line_info->carriage_group_code;
                             }
@@ -986,6 +989,11 @@ class OrderController extends Controller{
                             $list['reduce_price']             = 0;
                             $list['total_money']              = $pick_money*100;
                             $list['on_line_money']            = $pick_money*100;
+                            if($user_info->group_code != $line_info['group_code']){
+                                $list['total_money']              = 200*100;
+                                $list['on_line_money']            = 200*100;
+                            }
+
                             if ($k>0){
                                 $list['total_money']              = $line_info['more_price'];
                                 $list['on_line_money']            = $line_info['more_price'];
@@ -1066,6 +1074,9 @@ class OrderController extends Controller{
                             $money['create_time']                = $now_time;
                             $money['update_time']                = $now_time;
                             $money['money']                      = $pick_money*100;
+                            if($user_info->group_code != $line_info['group_code']) {
+                                $money['money'] = 200 * 100;
+                            }
                             $money['money_type']                 = 'gather';
                             $money['type']                       = 'out';
                             $money['settle_flag']                = 'W';
@@ -1077,6 +1088,9 @@ class OrderController extends Controller{
                             $money_['create_time']                = $now_time;
                             $money_['update_time']                = $now_time;
                             $money_['money']                      = $pick_money*100;
+                            if($user_info->group_code != $line_info['group_code']) {
+                                $money_['money'] = 200 * 100;
+                            }
                             $money_['money_type']                 = 'gather';
                             $money_['type']                       = 'in';
                             $money_['settle_flag']                = 'W';
@@ -1482,6 +1496,9 @@ class OrderController extends Controller{
                             $list['company_id']                 = $company_id;
                             $list['company_name']               = $company_name;
                             $list['receiver_id']                = $line_info->group_code;
+                            if($user_info->group_code != $line_info['group_code']) {
+                                $list['receiver_id'] = '1234';
+                            }
                             if ($line_info->special == 1 && $line_info->carriage_id){
                                 $list['receiver_id']                = $line_info->carriage_id;
                             }
@@ -1561,6 +1578,10 @@ class OrderController extends Controller{
                             $list['reduce_price']             = 0;
                             $list['total_money']              = $line_info['send_price'];
                             $list['on_line_money']            = $line_info['send_price'];
+                            if($user_info->group_code != $line_info['group_code']) {
+                                $list['total_money'] = 200;
+                                $list['on_line_money'] = 200;
+                            }
                             if ($line_info->special == 1){
                                 $list['total_money'] = line_count_price($line_info,$list['good_number'])*100;
                                 $list['on_line_money'] = line_count_price($line_info,$list['good_number'])*100;
@@ -1641,6 +1662,9 @@ class OrderController extends Controller{
                             $money['create_time']                = $now_time;
                             $money['update_time']                = $now_time;
                             $money['money']                      = $list['total_money'];
+                            if($user_info->group_code != $line_info['group_code']) {
+                                $money['money'] = 200;
+                            }
                             $money['money_type']                 = 'send';
                             $money['type']                       = 'out';
                             $money['settle_flag']                = 'W';
@@ -1652,6 +1676,9 @@ class OrderController extends Controller{
                             $money_['create_time']                = $now_time;
                             $money_['update_time']                = $now_time;
                             $money_['money']                      = $list['total_money'];
+                            if($user_info->group_code != $line_info['group_code']) {
+                                $money_['money'] = 200;
+                            }
                             $money_['money_type']                 = 'send';
                             $money_['type']                       = 'in';
                             $money_['settle_flag']                = 'W';
@@ -1673,6 +1700,10 @@ class OrderController extends Controller{
                     $data['order_type']       = $order_type;
                     $data['pick_money']       = ($pick_money - 0)*100;
                     $data['send_money']       = ($send_money - 0)*100;
+                    if($user_info->group_code != $line_info['group_code']) {
+                       $data['pick_money'] = 200 * 100;
+                       $data['send_money'] = 200 * 100;
+                    }
                     $data['price']            = ($price - 0)*100;
                     $data['more_money']       = $more_money;
                     // 配送
