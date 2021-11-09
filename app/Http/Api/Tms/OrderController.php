@@ -1028,13 +1028,14 @@ class OrderController extends Controller{
                             }else{
                                 switch ($project_type){
                                     case 'user':
-                                        $money_['shouk_group_code']           = $line_info->group_code;
-                                        $money_['shouk_type']                 = 'GROUP_CODE';
-                                        $money_['fk_group_code']              = '1234';
-                                        $money_['fk_type']                    = 'PLATFORM';
-                                        $money_['ZIJ_group_code']             = '1234';
-                                        $money_['delete_flag']                = 'N';
-
+                                        if($user_info->group_code == $line_info['group_code']) {
+                                            $money_['shouk_group_code'] = $line_info->group_code;
+                                            $money_['shouk_type'] = 'GROUP_CODE';
+                                            $money_['fk_group_code'] = '1234';
+                                            $money_['fk_type'] = 'PLATFORM';
+                                            $money_['ZIJ_group_code'] = '1234';
+                                            $money_['delete_flag'] = 'N';
+                                        }
                                         $money['shouk_group_code']           = '1234';
                                         $money['shouk_type']                 = 'PLATFORM';
                                         $money['fk_total_user_id']           = $user_info->total_user_id;
@@ -1051,12 +1052,14 @@ class OrderController extends Controller{
                                         $money['delete_flag']                = 'N';
                                         break;
                                     case 'company':
-                                        $money_['shouk_group_code']           = $line_info->group_code;
-                                        $money_['shouk_type']                 = 'GROUP_CODE';
-                                        $money_['fk_group_code']              = '1234';
-                                        $money_['fk_type']                    = 'PLATFORM';
-                                        $money_['ZIJ_group_code']             = '1234';
-                                        $money_['delete_flag']                = 'N';
+                                        if($user_info->group_code == $line_info['group_code']) {
+                                            $money_['shouk_group_code'] = $line_info->group_code;
+                                            $money_['shouk_type'] = 'GROUP_CODE';
+                                            $money_['fk_group_code'] = '1234';
+                                            $money_['fk_type'] = 'PLATFORM';
+                                            $money_['ZIJ_group_code'] = '1234';
+                                            $money_['delete_flag'] = 'N';
+                                        }
 
                                         $money['shouk_group_code']           = '1234';
                                         $money['shouk_type']                 = 'PLATFORM';
@@ -1423,13 +1426,14 @@ class OrderController extends Controller{
                         }else{
                             switch ($project_type){
                                 case 'user':
-                                    $money_['shouk_group_code']           = $line_info->group_code;
-                                    $money_['shouk_type']                 = 'GROUP_CODE';
-                                    $money_['fk_group_code']              = '1234';
-                                    $money_['fk_type']                    = 'PLATFORM';
-                                    $money_['ZIJ_group_code']             = '1234';
-                                    $money_['delete_flag']                = 'N';
-
+                                    if($user_info->group_code == $line_info['group_code']) {
+                                        $money_['shouk_group_code'] = $line_info->group_code;
+                                        $money_['shouk_type'] = 'GROUP_CODE';
+                                        $money_['fk_group_code'] = '1234';
+                                        $money_['fk_type'] = 'PLATFORM';
+                                        $money_['ZIJ_group_code'] = '1234';
+                                        $money_['delete_flag'] = 'N';
+                                    }
                                     $money['shouk_group_code']           = '1234';
                                     $money['shouk_type']                 = 'PLATFORM';
                                     $money['fk_total_user_id']           = $user_info->total_user_id;
@@ -1446,13 +1450,14 @@ class OrderController extends Controller{
                                     $money['delete_flag']                = 'N';
                                     break;
                                 case 'company':
-                                    $money_['shouk_group_code']           = $line_info->group_code;
-                                    $money_['shouk_type']                 = 'GROUP_CODE';
-                                    $money_['fk_group_code']              = '1234';
-                                    $money_['fk_type']                    = 'PLATFORM';
-                                    $money_['ZIJ_group_code']             = '1234';
-                                    $money_['delete_flag']                = 'N';
-
+                                    if($user_info->group_code == $line_info['group_code']) {
+                                        $money_['shouk_group_code'] = $line_info->group_code;
+                                        $money_['shouk_type'] = 'GROUP_CODE';
+                                        $money_['fk_group_code'] = '1234';
+                                        $money_['fk_type'] = 'PLATFORM';
+                                        $money_['ZIJ_group_code'] = '1234';
+                                        $money_['delete_flag'] = 'N';
+                                    }
                                     $money['shouk_group_code']           = '1234';
                                     $money['shouk_type']                 = 'PLATFORM';
                                     $money['fk_group_code']              = $user_info->group_code;
