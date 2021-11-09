@@ -106,9 +106,9 @@ class LineController extends Controller{
             $v->price_show = '元/公斤';
             $v->startime_show = '发车 '.$v->detime;
             $v->sendprice_show = '配送费'.$v->send_price.'元';
-            if(strtotime(date('Y-m-d H:i',time())) <= (strtotime($time.' '.$v->depart_time)-7200)){
-                $line_info[] = $v;
-            }
+//            if(strtotime(date('Y-m-d H:i',time())) <= (strtotime($time.' '.$v->depart_time)-7200)){
+//                $line_info[] = $v;
+//            }
             $v->discuss_show      = 'N';
             $count = TmsDiscuss::where('line_id',$v->self_id)->where('type','line')->count();
             if ($count>0){
