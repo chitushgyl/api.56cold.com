@@ -73,11 +73,12 @@ class LineController extends Controller{
             if ($depart_time){
                 $data['info'] = $data['info']->orderBy('depart_time','asc');
             }
-//            ->offset($firstrow)
-//            ->limit($listrows)
-        $data['info']   =$data['info'] ->select($select)
 
+        $data['info']   =$data['info'] ->select($select)
+            ->where('depart_time','<=',date('H:i',time()-7200))
             ->orderBy('create_time','asc')
+            ->offset($firstrow)
+            ->limit($listrows)
             ->get();
 
         $tms_pick_type    = array_column(config('tms.tms_pick_type'),'name','key');
@@ -119,7 +120,7 @@ class LineController extends Controller{
         }
 
 //        dd($line_info);
-        $data['info'] = array_slice($line_info,$firstrow,$listrows);
+//        $data['info'] = array_slice($line_info,$firstrow,$listrows);
         $msg['code'] = 200;
         $msg['msg']  = '数据拉取成功！';
         $msg['data'] = $data;
