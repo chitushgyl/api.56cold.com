@@ -1811,7 +1811,9 @@ class OrderController extends Controller{
                         $id = TmsOrder::insert($data);
                         TmsOrderDispatch::insert($inserttt);
                         TmsOrderCost::insert($money_list);
-                        TmsOrderCost::insert($money_list_);
+                        if($user_info->group_code == $line_info['group_code']) {
+                            TmsOrderCost::insert($money_list_);
+                        }
                         //落地配线路 配送订单直接调度
 //                        if ($line_info->special == 1){
 //
