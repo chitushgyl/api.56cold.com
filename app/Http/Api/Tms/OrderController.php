@@ -1583,8 +1583,8 @@ class OrderController extends Controller{
                             $list['total_money']              = $line_info['send_price'];
                             $list['on_line_money']            = $line_info['send_price'];
                             if($user_info->group_code != $line_info['group_code']) {
-                                $list['total_money'] = 200;
-                                $list['on_line_money'] = 200;
+                                $list['total_money'] = 200*100;
+                                $list['on_line_money'] = 200*100;
                             }
                             if ($line_info->special == 1){
                                 $list['total_money'] = line_count_price($line_info,$list['good_number'])*100;
@@ -1669,7 +1669,7 @@ class OrderController extends Controller{
                             $money['update_time']                = $now_time;
                             $money['money']                      = $list['total_money'];
                             if($user_info->group_code != $line_info['group_code']) {
-                                $money['money'] = 200;
+                                $money['money'] = 200*100;
                             }
                             $money['money_type']                 = 'send';
                             $money['type']                       = 'out';
