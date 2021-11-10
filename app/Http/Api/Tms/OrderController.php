@@ -1683,12 +1683,12 @@ class OrderController extends Controller{
                             $money_['update_time']                = $now_time;
                             $money_['money']                      = $list['total_money'];
                             if($user_info->group_code != $line_info['group_code']) {
-                                $money_['money'] = 200;
+                                $money_['money'] = 200*100;
                             }
                             $money_['money_type']                 = 'send';
                             $money_['type']                       = 'in';
                             $money_['settle_flag']                = 'W';
-                            if($user_info->group_code != $line_info['group_code']) {
+                            if($user_info->group_code == $line_info['group_code']) {
                                 $money_list_[] = $money_;
                             }
                         }
