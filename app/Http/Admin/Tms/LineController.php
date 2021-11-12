@@ -60,6 +60,10 @@ class LineController extends CommonController{
         $min_price      = $request->input('min_price');
         $price          = $request->input('price');
         $trunking       = $request->input('trunking');
+        $cold           = $request->input('cold');//温度
+        $time           = $request->input('time');//发车日期
+        $min_money    = $request->input('min_money');//最低干线费
+        $depart_time  = $request->input('depart_time');//发车时间排序
         $listrows       = $num;
         $firstrow       = ($page-1)*$listrows;
 
@@ -69,11 +73,12 @@ class LineController extends CommonController{
             ['type'=>'=','name'=>'group_code','value'=>$group_code],
             ['type'=>'like','name'=>'send_shi_name','value'=>$start_city],
             ['type'=>'like','name'=>'gather_shi_name','value'=>$end_city],
+            ['type'=>'=','name'=>'control','value'=>$cold],
         ];
 
         $where=get_list_where($search);
 
-        $select=['self_id','shift_number','type','price','min_money','use_flag','group_name','send_address','gather_address','send_address_id','gather_address_id',
+        $select=['self_id','shift_number','type','price','min_money','use_flag','group_name','send_address','gather_address','send_address_id','gather_address_id','trunking','control',
             'pick_price','send_price','pick_type','send_type','all_weight','all_volume','trunking','control','send_shi','send_qu','send_name','send_tel','gather_name','gather_tel',
             'send_sheng_name','send_shi_name','send_qu_name','gather_sheng_name','gather_shi_name','gather_qu_name','gather_sheng','gather_shi','gather_qu','send_sheng',
             'start_time','end_time','time0','time1','time2','time3','time4','time5','time6','depart_time','more_price'];
@@ -82,14 +87,14 @@ class LineController extends CommonController{
             case 'all':
                 $data['total']=TmsLine::where($where)->count(); //总的数据量
                 $data['items']=TmsLine::where($where);
-                if ($min_price){
-                    $data['items'] = $data['items']->orderBy('min_money','desc');
+                if ($min_money){
+                    $data['items'] = $data['items']->orderBy('send_price','desc');
                 }
                 if ($trunking){
                     $data['items'] = $data['items']->orderBy('trunking','desc');
                 }
-                if ($price){
-                    $data['items'] = $data['items']->orderBy('price','desc');
+                if ($depart_time){
+                    $data['items'] = $data['items']->orderBy('depart_time','desc');
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
@@ -101,14 +106,14 @@ class LineController extends CommonController{
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=TmsLine::where($where)->count(); //总的数据量
                 $data['items']=TmsLine::where($where);
-                if ($min_price){
-                    $data['items'] = $data['items']->orderBy('min_money','desc');
+                if ($min_money){
+                    $data['items'] = $data['items']->orderBy('send_price','desc');
                 }
                 if ($trunking){
                     $data['items'] = $data['items']->orderBy('trunking','desc');
                 }
-                if ($price){
-                    $data['items'] = $data['items']->orderBy('price','desc');
+                if ($depart_time){
+                    $data['items'] = $data['items']->orderBy('depart_time','desc');
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
@@ -119,14 +124,14 @@ class LineController extends CommonController{
             case 'more':
                 $data['total']=TmsLine::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
                 $data['items']=TmsLine::where($where)->whereIn('group_code',$group_info['group_code']);
-                if ($min_price){
-                    $data['items'] = $data['items']->orderBy('min_money','desc');
+                if ($min_money){
+                    $data['items'] = $data['items']->orderBy('send_price','desc');
                 }
                 if ($trunking){
                     $data['items'] = $data['items']->orderBy('trunking','desc');
                 }
-                if ($price){
-                    $data['items'] = $data['items']->orderBy('price','desc');
+                if ($depart_time){
+                    $data['items'] = $data['items']->orderBy('depart_time','desc');
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
@@ -186,6 +191,9 @@ class LineController extends CommonController{
             $v->type_show=$tms_line_type[$v->type]??null;
             $v->button_info=$button_info;
             $v->type_inco=img_for($tms_order_inco_type[$v->type],'no_json') ?? null;
+            $v->price_show = '元/公斤';
+            $v->startime_show = '发车 '.$v->detime;
+            $v->sendprice_show = '配送费'.$v->send_price.'元';
         }
 
 //        DD($data['items']->toArray());
