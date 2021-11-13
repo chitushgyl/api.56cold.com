@@ -88,13 +88,13 @@ class LineController extends CommonController{
                 $data['total']=TmsLine::where($where)->count(); //总的数据量
                 $data['items']=TmsLine::where($where);
                 if ($min_money){
-                    $data['items'] = $data['items']->orderBy('send_price','desc');
+                    $data['items'] = $data['items']->orderBy('send_price','asc');
                 }
                 if ($trunking){
-                    $data['items'] = $data['items']->orderBy('trunking','desc');
+                    $data['items'] = $data['items']->orderBy('trunking','asc');
                 }
                 if ($depart_time){
-                    $data['items'] = $data['items']->orderBy('depart_time','desc');
+                    $data['items'] = $data['items']->orderBy('depart_time','asc');
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
@@ -107,13 +107,13 @@ class LineController extends CommonController{
                 $data['total']=TmsLine::where($where)->count(); //总的数据量
                 $data['items']=TmsLine::where($where);
                 if ($min_money){
-                    $data['items'] = $data['items']->orderBy('send_price','desc');
+                    $data['items'] = $data['items']->orderBy('send_price','asc');
                 }
                 if ($trunking){
-                    $data['items'] = $data['items']->orderBy('trunking','desc');
+                    $data['items'] = $data['items']->orderBy('trunking','asc');
                 }
                 if ($depart_time){
-                    $data['items'] = $data['items']->orderBy('depart_time','desc');
+                    $data['items'] = $data['items']->orderBy('depart_time','asc');
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
@@ -125,13 +125,13 @@ class LineController extends CommonController{
                 $data['total']=TmsLine::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
                 $data['items']=TmsLine::where($where)->whereIn('group_code',$group_info['group_code']);
                 if ($min_money){
-                    $data['items'] = $data['items']->orderBy('send_price','desc');
+                    $data['items'] = $data['items']->orderBy('send_price','asc');
                 }
                 if ($trunking){
-                    $data['items'] = $data['items']->orderBy('trunking','desc');
+                    $data['items'] = $data['items']->orderBy('trunking','asc');
                 }
                 if ($depart_time){
-                    $data['items'] = $data['items']->orderBy('depart_time','desc');
+                    $data['items'] = $data['items']->orderBy('depart_time','asc');
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')

@@ -711,5 +711,12 @@ class OrderController extends CommonController{
     }
 
 
+    /**
+     * 删除出库订单
+     * */
+    public function  delOutOrder(Request $request){
+
+    }
+
 }
 ?>
