@@ -2315,7 +2315,7 @@ class OrderController extends CommonController{
              $order = TmsOrder::where('self_id',$order_id)->select(['self_id','order_status','total_money','pay_type','group_code'])->first();
             if ($order->order_status == 3){
                 $msg['code'] = 303;
-                $msg['msg'] = '此订单已被承接不可以取消，请联系司机取消接单或客服';
+                $msg['msg'] = '该订单已被承接，取消请联系客服';
                 return $msg;
             }
              if ($order->order_status == 4 || $order->order_status == 5){

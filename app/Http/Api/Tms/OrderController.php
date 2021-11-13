@@ -2589,7 +2589,7 @@ class OrderController extends Controller{
             $wait_info=TmsOrder::where($where)->select($select)->first();
             if ($wait_info->order_status == 3){
                 $msg['code'] = 305;
-                $msg['msg'] = '此订单已被承接不可以取消，请联系司机取消接单或客服';
+                $msg['msg'] = '该订单已被承接，取消请联系客服';
                 return $msg;
             }
 
