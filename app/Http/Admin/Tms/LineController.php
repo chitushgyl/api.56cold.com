@@ -98,6 +98,7 @@ class LineController extends CommonController{
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
+                    ->where('depart_time','<=',strtotime(date('H:i',time()+7200)))
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -117,6 +118,7 @@ class LineController extends CommonController{
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
+                    ->where('depart_time','<=',strtotime(date('H:i',time()+7200)))
                     ->select($select)->get();
                 $data['group_show']='N';
                 break;
@@ -135,6 +137,7 @@ class LineController extends CommonController{
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
+                    ->where('depart_time','<=',strtotime(date('H:i',time()+7200)))
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -191,6 +194,7 @@ class LineController extends CommonController{
             $v->type_show=$tms_line_type[$v->type]??null;
             $v->button_info=$button_info;
             $v->type_inco=img_for($tms_order_inco_type[$v->type],'no_json') ?? null;
+            $v->detime       = date('m-d H:i',strtotime($time.' '.$v->depart_time));
             $v->price_show = '元/公斤';
             $v->startime_show = '发车 '.$v->detime;
             $v->sendprice_show = '配送费'.$v->send_price.'元';
