@@ -715,7 +715,43 @@ class OrderController extends CommonController{
      * 删除出库订单
      * */
     public function  delOutOrder(Request $request){
+        $now_time=date('Y-m-d H:i:s',time());
+        $operationing = $request->get('operationing');//接收中间件产生的参数
+        $table_name='wms_out_order';
+        $medol_name='WmsOutOrder';
+        $self_id=$request->input('self_id');
+        $flag='delFlag';
+        //$self_id='group_202007311841426065800243';
+        $wms_order = WmsOutOrder::where('self_id',$self_id)->first();
+        $update['update_time'] = $now_time;
+        $update['delete_flag'] = 'Y';
+        DB::beginTransaction();
+        try{
+            $res = WmsOutOrder::where('self_id',$self_id)->update($update);
+            WmsOutOrderList::where('order_id',$self_id)->update($update);
+            DB::commit();
+            if ($res){
+                $msg['code']=200;
+                $msg['msg']='删除成功';
+            }
+        }catch (\Exception $e){
+            DB::rollBack();
 
+            $msg['code']=200;
+            $msg['msg']='删除成功';
+        }
+
+
+
+        $operationing->access_cause='删除';
+        $operationing->table=$table_name;
+        $operationing->table_id=$self_id;
+        $operationing->now_time=$now_time;
+        $operationing->old_info=$wms_order;
+        $operationing->new_info=(object)$update;
+        $operationing->operation_type=$flag;
+
+        return $msg;
     }
 
 }

@@ -3,6 +3,7 @@ namespace App\Http\Admin\Wms;
 use App\Models\Wms\WmsWarehouseArea;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Wms\WmsTotal;
@@ -232,86 +233,92 @@ class TotalController  extends CommonController{
                 }
             }
 //dd($order_do);
-            foreach ($order_do as $k => $v){
-                //dd($v);
-                if($v['sanitation']){
-                    $where2=[
-                        ['sku_id','=',$v['sku_id']],
-                        ['now_num','>',0],
-                        ['can_use','=','Y'],
-                        ['grounding_status','=','Y'],
-                        ['delete_flag','=','Y'],
-                        ['expire_time','>',$v['sanitation']]
-                    ];
-                }else{
-                    $where2=[
-                        ['sku_id','=',$v['sku_id']],
-                        ['now_num','>',0],
-                        ['can_use','=','Y'],
-                        ['grounding_status','=','Y'],
-                        ['delete_flag','=','Y'],
-                        ['expire_time','>',substr($now_time,0,-9)]
-                    ];
-                }
-				//$v["shop_id"]            	=$order[0]['shop_id'];
-				//$v["shop_name"]            	=$order[0]['shop_name'];
+            DB::beginTransaction();
+            try {
+                foreach ($order_do as $k => $v) {
+                    //dd($v);
+                    if ($v['sanitation']) {
+                        $where2 = [
+                            ['sku_id', '=', $v['sku_id']],
+                            ['now_num', '>', 0],
+                            ['can_use', '=', 'Y'],
+                            ['grounding_status', '=', 'Y'],
+                            ['delete_flag', '=', 'Y'],
+                            ['expire_time', '>', $v['sanitation']]
+                        ];
+                    } else {
+                        $where2 = [
+                            ['sku_id', '=', $v['sku_id']],
+                            ['now_num', '>', 0],
+                            ['can_use', '=', 'Y'],
+                            ['grounding_status', '=', 'Y'],
+                            ['delete_flag', '=', 'Y'],
+                            ['expire_time', '>', substr($now_time, 0, -9)]
+                        ];
+                    }
+                    //$v["shop_id"]            	=$order[0]['shop_id'];
+                    //$v["shop_name"]            	=$order[0]['shop_name'];
 
-                $resssss=WmsLibrarySige::where($where2)->orderBy('expire_time', 'asc')->get()->toArray();
-                //dd($resssss);
-                if($resssss){
-                    $totalNum=array_sum(array_column($resssss,'now_num'));
-                    $numds=$v['num']-$totalNum;
+                    $resssss = WmsLibrarySige::where($where2)->orderBy('expire_time', 'asc')->get()->toArray();
+                    //dd($resssss);
+                    if ($resssss) {
+                        $totalNum = array_sum(array_column($resssss, 'now_num'));
+                        $numds = $v['num'] - $totalNum;
 
-                    if($numds>0){
-                        //表示缺货$numds
-                        $xiugai["quehuo"]="Y";
-                        $xiugai["quehuo_num"]=$numds;
+                        if ($numds > 0) {
+                            //表示缺货$numds
+                            $xiugai["quehuo"] = "Y";
+                            $xiugai["quehuo_num"] = $numds;
 
-                        $infos=self::dataInsert($xiugai,$totalId,$v,$resssss,$now_time,$user_info,$change,$pull,$bulk,$weight,$datalist);
-                        $pull=$infos['pull'];
-                        $bulk=$infos['bulk'];
-                        $weight=$infos['weight'];
-                        $datalist=$infos['datalist'];
+                            $infos = self::dataInsert($xiugai, $totalId, $v, $resssss, $now_time, $user_info, $change, $pull, $bulk, $weight, $datalist);
+                            $pull = $infos['pull'];
+                            $bulk = $infos['bulk'];
+                            $weight = $infos['weight'];
+                            $datalist = $infos['datalist'];
 
-                    }else{
-                        $xiugai["quehuo"]="N";
-                        $xiugai["quehuo_num"]=0;
+                        } else {
+                            $xiugai["quehuo"] = "N";
+                            $xiugai["quehuo_num"] = 0;
 
-                        $infos=self::dataInsert($xiugai,$totalId,$v,$resssss,$now_time,$user_info,$change,$pull,$bulk,$weight,$datalist);
-                        $pull=$infos['pull'];
-                        $bulk=$infos['bulk'];
-                        $weight=$infos['weight'];
-                        $datalist=$infos['datalist'];
+                            $infos = self::dataInsert($xiugai, $totalId, $v, $resssss, $now_time, $user_info, $change, $pull, $bulk, $weight, $datalist);
+                            $pull = $infos['pull'];
+                            $bulk = $infos['bulk'];
+                            $weight = $infos['weight'];
+                            $datalist = $infos['datalist'];
 //                        $int_cold_num=$infos['int_cold_num'];
 //                        $int_freeze_num=$infos['int_freeze_num'];
 //                        $int_normal_num=$infos['int_normal_num'];
+                        }
+
+
+                    } else {
+                        $xiugai['quehuo'] = 'Y';
+                        $xiugai['quehuo_num'] = $v['num'];
+                        $infos = self::dataInsert($xiugai, $totalId, $v, $resssss, $now_time, $user_info, $change, $pull, $bulk, $weight, $datalist);
+                        $pull = $infos['pull'];
+                        $bulk = $infos['bulk'];
+                        $weight = $infos['weight'];
+                        $datalist = $infos['datalist'];
                     }
 
 
-                }else{
-                    $xiugai['quehuo']='Y';
-                    $xiugai['quehuo_num']=$v['num'];
-                    $infos=self::dataInsert($xiugai,$totalId,$v,$resssss,$now_time,$user_info,$change,$pull,$bulk,$weight,$datalist);
-                    $pull=$infos['pull'];
-                    $bulk=$infos['bulk'];
-                    $weight=$infos['weight'];
-                    $datalist=$infos['datalist'];
                 }
 
-
-            }
-
-            $pull=array_unique($pull);
-            $pull_count=count($pull);
-            $data['pull_count']=$pull_count;
-            $data['bulk']=$bulk;
-            $data['weight']=$weight;
+                $pull = array_unique($pull);
+                $pull_count = count($pull);
+                $data['pull_count'] = $pull_count;
+                $data['bulk'] = $bulk;
+                $data['weight'] = $weight;
 //            $data['int_cold'] = $int_cold_num;
 //            $data['int_freeze'] = $int_freeze_num;
 //            $data['int_normal'] = $int_normal_num;
-            WmsOutOrder::whereIn('self_id', $total)->update($temp);
-            $id=WmsTotal::insert($data);
-
+                WmsOutOrder::whereIn('self_id', $total)->update($temp);
+                $id = WmsTotal::insert($data);
+            }catch (\Exception $e){
+                $msg['code']=301;
+                $msg['msg']='操作失败';
+                return $msg;
+            }
 			$operationing->table_id=$data['self_id'];
             $operationing->old_info=null;
             $operationing->new_info=$data;
