@@ -264,7 +264,7 @@ class DispatchController extends CommonController{
             $select=['self_id','receiver_id','company_name','create_time','create_time','group_name','group_code','order_type','order_id',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status','car_type','receipt_flag',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address','clod','on_line_money','company_id','total_user_id',
-                'good_info','good_number','good_weight','good_volume','total_money','send_time','gather_time','pay_type','pay_status'];
+                'good_info','good_number','good_weight','good_volume','total_money','send_time','gather_time','pay_type','pay_status','dispatch_flag'];
             $select2 = ['self_id','parame_name'];
             $select3 = ['self_id','total_user_id','tel'];
             $data['info']=TmsOrderDispatch::with(['tmsCarType' => function($query) use($select2){
