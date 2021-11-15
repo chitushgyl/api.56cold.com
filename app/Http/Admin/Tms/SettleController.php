@@ -44,6 +44,7 @@ class SettleController extends CommonController{
         $group_code     =$request->input('group_code');
 		$company_id     =$request->input('company_id');
 		$warehouse_id   =$request->input('warehouse_id');
+		$gathering_flag   =$request->input('gathering_flag');
         $area           =$request->input('area');
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
@@ -55,6 +56,7 @@ class SettleController extends CommonController{
             ['type'=>'=','name'=>'group_code','value'=>$group_code],
             ['type'=>'=','name'=>'company_id','value'=>$company_id],
 			['type'=>'=','name'=>'warehouse_id','value'=>$warehouse_id],
+			['type'=>'=','name'=>'gathering_flag','value'=>$gathering_flag],
         ];
 
 
