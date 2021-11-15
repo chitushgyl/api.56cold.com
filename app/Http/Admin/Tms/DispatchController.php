@@ -293,7 +293,7 @@ class DispatchController extends CommonController{
                 ->offset($firstrow)
                 ->limit($listrows)
                 ->orderBy('update_time','DESC')->get(); //总的数据量
-            $data['total'] = TmsOrderDispatch::where($where)->whereIn('order_status',[2,3])->count();
+            $data['total'] = TmsOrderDispatch::where($where)->where('dispatch_flag','Y')->whereIn('order_status',[2,3])->count();
             foreach ($data['info'] as $key => $value){
 //                dd($value);
                 $value->self_id_show = substr($value->self_id,15);
