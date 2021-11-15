@@ -288,8 +288,11 @@ class DispatchController extends CommonController{
                 }
             }
             $data['info'] = $data['info']
-            ->select($select)->offset($firstrow)->limit($listrows)->orderBy('update_time','DESC')->get(); //总的数据量
-//            dd($data['info']->toArray());
+                ->select($select)
+//                ->offset($firstrow)
+//                ->limit($listrows)
+                ->orderBy('update_time','DESC')->get(); //总的数据量
+            dd($data['info']->toArray());
             $data['total'] = TmsOrderDispatch::where($where)->where('dispatch_flag','Y')->count();
             foreach ($data['info'] as $key => $value){
 //                dd($value);
