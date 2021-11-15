@@ -236,11 +236,11 @@ class SettleController extends CommonController{
         }
         $rules=[
             'group_code'=>'required',
-            'type'=>'required',
+//            'type'=>'required',
         ];
         $message=[
             'group_code.required'=>'请选择结算公司',
-            'type.required'=>'请选择结算对象',
+//            'type.required'=>'请选择结算对象',
         ];
 
         $validator=Validator::make($input,$rules,$message);
