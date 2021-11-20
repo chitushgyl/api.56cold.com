@@ -131,9 +131,9 @@ class CityController extends CommonController{
         $data['info']=TmsDeliveryCity::where($where)->select($select)->first();
 
         if ($data['info']){
-            $data['info']->start_price= number_format($data['info']->start_price/100,2);
-            $data['info']->unit_price=number_format($data['info']->unit_price/100,2);
-            $data['info']->max_price = number_format($data['info']->max_price/100,2);
+//            $data['info']->start_price= number_format($data['info']->start_price/100,2);
+//            $data['info']->unit_price=number_format($data['info']->unit_price/100,2);
+//            $data['info']->max_price = number_format($data['info']->max_price/100,2);
 
         }
 
