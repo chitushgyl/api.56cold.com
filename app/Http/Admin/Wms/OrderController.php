@@ -108,9 +108,9 @@ class OrderController extends CommonController{
 			$v->status_show=null;
 //            $v->button_info = $button_info;
             if ($v->total_flag == 'Y'){
-                $v->button_info = $button_info1;
-            }else{
                 $v->button_info = $button_info2;
+            }else{
+                $v->button_info = $button_info1;
             }
 			switch ($v->status) {
 				case '1':
