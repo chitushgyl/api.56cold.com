@@ -727,7 +727,7 @@ class OrderController extends CommonController{
 
 
     /**
-     * 删除出库订单
+     * 删除出库订单 /wms/order/delOutOrder
      * */
     public function  delOutOrder(Request $request){
         $now_time=date('Y-m-d H:i:s',time());
