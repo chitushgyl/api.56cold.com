@@ -68,7 +68,7 @@ class LineController extends Controller{
         }])->where($where)->orderBy('special','asc');
 
             if ($min_money){
-                $data['info'] = $data['info']->orderBy('send_price','desc');
+                $data['info'] = $data['info']->orderBy('send_price','asc');
             }
             if ($depart_time){
                 $data['info'] = $data['info']->orderBy('depart_time','asc');

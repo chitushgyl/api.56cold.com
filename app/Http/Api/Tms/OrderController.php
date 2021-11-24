@@ -18,6 +18,7 @@ use App\Models\User\UserIdentity;
 use App\Models\User\UserWallet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\StatusController as Status;
@@ -1812,72 +1813,21 @@ class OrderController extends Controller{
                             $list['order_status'] = 3;
                             $data['order_status'] = 3;
                         }
-                        $id = TmsOrder::insert($data);
-                        TmsOrderDispatch::insert($inserttt);
-                        TmsOrderCost::insert($money_list);
-                        TmsOrderCost::insert($money_list_);
-                        //落地配线路 配送订单直接调度
-//                        if ($line_info->special == 1){
-//
-//                            $tmsOrder['order_status'] = 4;
-//                            $tmsOrder['update_time']  = $now_time;
-//                            TmsOrder::where('self_id',$data['self_id'])->update($tmsOrder);
-////                            dd($dispatch);
-//                            $dispatch_list = TmsOrderDispatch::whereIn('self_id',$dispatch)->select('self_id','total_money','order_status')->get();
-//                            $carriage_id            =generate_id('carriage_');
-//                            foreach ($dispatch_list as $kkk => $vvv){
-//                                $company_info = TmsGroup::where('self_id',$line_info->carriage_id)->select('self_id','company_name')->first();
-//                                $carriage_list['self_id']            =generate_id('c_d_');
-//                                $carriage_list['order_dispatch_id']  = $vvv['self_id'];
-//                                $carriage_list['carriage_id']        = $carriage_id;
-//                                $carriage_list['group_code']         = $line_info->group_code;
-//                                $carriage_list['group_name']         = $line_info->group_name;
-//                                $carriage_list['create_user_id']     = $line_info->create_user_id;
-//                                $carriage_list['create_user_name']   = $line_info->create_user_name;
-//                                $carriage_list['create_time']        = $list['update_time']=$now_time;
-//                                $carriage_list['company_id']         = $company_info->self_id;
-//                                $carriage_list['company_name']       = $company_info->company_name;
-//
-//                                $carriage_info['self_id']            = $carriage_id;
-//                                $carriage_info['create_user_id']     = $line_info->create_user_id;
-//                                $carriage_info['create_user_name']   = $line_info->create_user_name;
-//                                $carriage_info['create_time']        = $data['update_time']=$now_time;
-//                                $carriage_info['group_code']         = $line_info->group_code;
-//                                $carriage_info['group_name']         = $line_info->group_name;
-//                                $carriage_info['total_money']        = $vvv['total_money'];
-//                                $carriage_info['company_id']         = $company_info->self_id;
-//                                $carriage_info['company_name']       = $company_info->company_name;
-//                                $carriage_info['order_status']       = 1;
-//                                $carriage_info['carriage_flag']      =  'company';
-//
-//                                $carriage_money['self_id']                    = generate_id('order_money_');
-//                                $carriage_money['shouk_company_id']           = $company_info->self_id;
-//                                $carriage_money['shouk_type']                 = 'COMPANY';
-//                                $carriage_money['fk_group_code']              = $line_info->group_code;
-//                                $carriage_money['fk_type']                    = 'GROUP_CODE';
-//                                $carriage_money['ZIJ_group_code']             = $line_info->group_code;
-//                                $carriage_money['carriage_id']                = $carriage_id;
-//                                $carriage_money['create_time']                = $now_time;
-//                                $carriage_money['update_time']                = $now_time;
-//                                $carriage_money['money']                      = $vvv['total_money'];
-//                                $carriage_money['money_type']                 = 'freight';
-//                                $carriage_money['type']                       = 'out';
-//
-//
-//                                TmsCarriage::insert($carriage_info);
-//                                TmsCarriageDispatch::insert($carriage_list);
-//                                TmsOrderCost::insert($carriage_money);
-//                                $dispatch_update['order_status']       = 4;
-//                                $dispatch_update['dispatch_flag']      ='N';
-//                                $dispatch_update['update_time']        =$now_time;
-//                                $abc = TmsOrderDispatch::where('delete_flag','Y')->whereIn('self_id',$dispatch)->update($dispatch_update);
-////                                dd($abc);
-//                            }
-//
-//                        }
+                        DB::beginTransaction();
+                        try {
+                            $id = TmsOrder::insert($data);
+                            TmsOrderDispatch::insert($inserttt);
+                            TmsOrderCost::insert($money_list);
+                            TmsOrderCost::insert($money_list_);
+                            DB::commit();
+                        }catch(\Exception $e){
+                            DB::rollBack();
+                            $msg['code'] = 302;
+                            $msg['msg']  = "操作失败";
+                            return $msg;
+                        }
 
                     }
-
                     if($id){
                         $msg['code'] = 200;
                         $msg['msg']  = "操作成功";
@@ -2129,19 +2079,25 @@ class OrderController extends Controller{
 //                        if ($project_type == 'customer'){
 //                            $data['order_status'] = 3;
 //                        }
-                        $id = TmsOrder::insert($data);
-                        TmsOrderDispatch::insert($inserttt);
-                        TmsOrderCost::insert($money);
-
-                        if ($data['pay_type'] == 'offline'){
-                            $center_list = '有从'. $data['send_shi_name'].'发往'.$data['gather_shi_name'].'的整车订单';
-                            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+                        DB::beginTransaction();
+                        try{
+                            $id = TmsOrder::insert($data);
+                            TmsOrderDispatch::insert($inserttt);
+                            TmsOrderCost::insert($money);
+                            DB::commit();
+                            if ($data['pay_type'] == 'offline'){
+                                $center_list = '有从'. $data['send_shi_name'].'发往'.$data['gather_shi_name'].'的整车订单';
+                                $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
 //                            $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
 //                            $A = $this->send_push_msg($push_contnect);
-                            $this->sendPushMessage('订单信息','有新订单',$center_list);
+                                $this->sendPushMessage('订单信息','有新订单',$center_list);
+                            }
+                        }catch(\Exception $e){
+                            DB::rollBack();
+                            $msg['code'] = 302;
+                            $msg['msg']  = "操作失败";
+                            return $msg;
                         }
-
-
                     }
 
                     if($id){
@@ -2608,47 +2564,50 @@ class OrderController extends Controller{
                 $msg['msg'] = '此订单已取消';
                 return $msg;
             }
-            /***判断订单时线上支付还是货到付款，线上支付要退款 **/
-            if($wait_info->pay_type == 'online'){
-                $wallet = UserCapital::where('total_user_id',$user_info->total_user_id)->select(['self_id','money'])->first();
-                $wallet_update['money'] = $wait_info->total_money + $wallet->money;
-                $wallet_update['update_time'] = $now_time;
-                UserCapital::where('total_user_id',$user_info->total_user_id)->update($wallet_update);
-                $data['self_id'] = generate_id('wallet_');
-                $data['produce_type'] = 'refund';
-                $data['capital_type'] = 'wallet';
-                $data['money'] = $wait_info->total_money;
-                $data['create_time'] = $now_time;
-                $data['update_time'] = $now_time;
-                $data['now_money'] = $wallet_update['money'];
-                $data['now_money_md'] = get_md5($wallet_update['money']);
-                $data['wallet_status'] = 'SU';
-                $data['wallet_type'] = 'user';
-                $data['total_user_id'] = $user_info->total_user_id;
-                UserWallet::insert($data);
-            }
-            /** 修改订单状态**/
-            $update['order_status']      = 7;
-            $update['update_time']        =$now_time;
-            $id = TmsOrder::where($where)->update($update);
-            /** 修改运输单状态为已取消**/
-            $dispatch_list = TmsOrderDispatch::where('order_id',$order_id)->select('self_id')->get();
-            $dispatch_id_list = array_column($dispatch_list->toArray(),'self_id');
-            TmsOrderDispatch::whereIn('self_id',$dispatch_id_list)->update($update);
-            /** 取消订单应该删除应付费用**/
-            $money_where = [
-                ['order_id','=',$order_id],
-            ];
-            $money_update['delete_flag'] = 'N';
-            $money_update['update_time'] = $now_time;
-            $money_list = TmsOrderCost::where($money_where)->update($money_update);
+            DB::beginTransaction();
+            try {
+                /***判断订单时线上支付还是货到付款，线上支付要退款 **/
+                if($wait_info->pay_type == 'online'){
+                    $wallet = UserCapital::where('total_user_id',$user_info->total_user_id)->select(['self_id','money'])->first();
+                    $wallet_update['money'] = $wait_info->total_money + $wallet->money;
+                    $wallet_update['update_time'] = $now_time;
+                    UserCapital::where('total_user_id',$user_info->total_user_id)->update($wallet_update);
+                    $data['self_id'] = generate_id('wallet_');
+                    $data['produce_type'] = 'refund';
+                    $data['capital_type'] = 'wallet';
+                    $data['money'] = $wait_info->total_money;
+                    $data['create_time'] = $now_time;
+                    $data['update_time'] = $now_time;
+                    $data['now_money'] = $wallet_update['money'];
+                    $data['now_money_md'] = get_md5($wallet_update['money']);
+                    $data['wallet_status'] = 'SU';
+                    $data['wallet_type'] = 'user';
+                    $data['total_user_id'] = $user_info->total_user_id;
+                    UserWallet::insert($data);
+                }
+                /** 修改订单状态**/
+                $update['order_status']      = 7;
+                $update['update_time']        =$now_time;
+                $id = TmsOrder::where($where)->update($update);
+                /** 修改运输单状态为已取消**/
+                $dispatch_list = TmsOrderDispatch::where('order_id',$order_id)->select('self_id')->get();
+                $dispatch_id_list = array_column($dispatch_list->toArray(),'self_id');
+                TmsOrderDispatch::whereIn('self_id',$dispatch_id_list)->update($update);
+                /** 取消订单应该删除应付费用**/
+                $money_where = [
+                    ['order_id','=',$order_id],
+                ];
+                $money_update['delete_flag'] = 'N';
+                $money_update['update_time'] = $now_time;
+                $money_list = TmsOrderCost::where($money_where)->update($money_update);
 
-            //如果订单已被承接，通知司机订单已取消
-            if($id){
+                //如果订单已被承接，通知司机订单已取消
+                DB::commit();
                 $msg['code'] = 200;
                 $msg['msg'] = "操作成功";
                 return $msg;
-            }else{
+            }catch(\Exception $e){
+                DB::rollBack();
                 $msg['code'] = 302;
                 $msg['msg'] = "操作失败";
                 return $msg;
