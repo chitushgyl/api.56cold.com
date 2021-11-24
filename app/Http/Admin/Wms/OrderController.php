@@ -739,7 +739,7 @@ class OrderController extends CommonController{
         //$self_id='group_202007311841426065800243';
         $wms_order = WmsOutOrder::where('self_id',$self_id)->first();
         $update['update_time'] = $now_time;
-        $update['delete_flag'] = 'Y';
+        $update['delete_flag'] = 'N';
         DB::beginTransaction();
         try{
             $res = WmsOutOrder::where('self_id',$self_id)->update($update);
@@ -751,9 +751,8 @@ class OrderController extends CommonController{
             }
         }catch (\Exception $e){
             DB::rollBack();
-
-            $msg['code']=200;
-            $msg['msg']='删除成功';
+            $msg['code']=300;
+            $msg['msg']='删除失败';
         }
 
 
