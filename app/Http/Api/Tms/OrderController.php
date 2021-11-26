@@ -3225,8 +3225,1171 @@ class OrderController extends Controller{
         return $msg;
     }
 
-    public function test(){
-        $tel = '';
+    /**
+     * 顺风车   /api/order/addFreeRide
+     * */
+    public function addFreeRide(Request $request,Tms $tms)
+    {
+        $project_type = $request->get('project_type');
+        $now_time = date('Y-m-d H:i:s', time());
+        $table_name = 'tms_order';
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+//         $project_type = 'user';
+        $total_user_id = $user_info->total_user_id;
+//        $token_name     = $user_info->token_name;
+        $input = $request->all();
+
+//        dd($user_info,$project_type);
+        /** 接收数据*/
+        $self_id = $request->input('self_id');
+        $order_type = $request->input('order_type');//订单类型 vehicle  lcl   line  free_ride顺风车
+        $pick_flag = $request->input('pick_flag');//是否提货、装货
+        $send_flag = $request->input('send_flag');//是否配送、卸货
+        $pick_money = $request->input('pick_money');//提货、装货费
+        $send_money = $request->input('send_money');//配送、卸货费
+        $price = $request->input('price');//运输费
+        $line_price = $request->input('line_price') ?? 0;//运输费
+        $total_money = $request->input('total_money');//总计费用
+//        $good_name_n = $request->input('good_name');
+//        $good_number_n = $request->input('good_number');
+//        $good_weight_n = $request->input('good_weight');
+//        $good_volume_n = $request->input('good_volume');
+        $dispatcher = $request->input('dispatcher') ?? [];
+        $clod = $request->input('clod');
+        $more_money = $request->input('more_money') ? $request->input('more_money') - 0 : null;//多点费用
+        $gather_time = $request->input('gather_time') ?? null;
+        $send_time = $request->input('send_time') ?? null;
+//        $pay_type = $request->input('pay_type');
+        $car_type = $request->input('car_type') ?? ''; //车型
+        $remark = $request->input('remark') ?? ''; //备注
+        $app_flag = $request->input('app_flag');
+        $depart_time = $request->input('depart_time') ?? null; //干线发车时间
+        /*** 虚拟数据
+        //$input['self_id']   = $self_id='';
+        $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
+        $input['line_id']     = $line_id='line_202106031747275293691321';
+        $input['pick_flag']   = $pick_flag='Y';
+        $input['send_flag']   = $send_flag='Y';
+        $input['pick_money']  = $pick_money='0';
+        $input['price']       = $price='200';
+        $input['send_money']  = $send_money='0';
+        $input['total_money'] = $total_money='300';
+        $input['more_money']  = $more_money=20;//多点费用
+        $input['good_name']   = $good_name_n='GDFG';
+        $input['good_number'] = $good_number_n=20;
+        $input['good_weight'] = $good_weight_n=5000;
+        $input['good_volume'] = $good_volume_n=5;
+        $input['clod']        = $clod='refrigeration';
+        $input['gather_time']        = $gather_time='2021-05-02 15:00';
+        $input['send_time']        = $send_time='2021-04-30 15:00';
+        $input['pay_type']        = $pay_type='offline';
+        $input['car_type']        = $car_type='type_202102051755118039490396';
+        $input['remark']        = $remark='';
+        $input['depart_time'] = $depart_time = '2021-04-30 15:00';
+        $input['reduce_price'] = $reduce_price = '100';
+
+        $input['dispatcher']  = $dispatcher = [
+        '0'=>[
+        'send_address_id'=>'',
+        'send_qu'=>'154',
+        'send_qu_name'=>'昌平区',
+        'send_shi_name'=>'北京市',
+        'send_address'=>'小浪底001',
+        'send_contacts_id'=>'',
+        'send_address_longitude'=>'121.471732',
+        'send_address_latitude'=>'31.231518',
+        'send_name'=>'张三001',
+        'send_tel'=>'001',
+        'good_name'=>'产品名称001',
+        'good_number'=>'10',
+        'good_weight'=>'55',
+        'good_volume'=>'12',
+        'clod'=>'refrigeration',
+        'gather_address_id'=>'',
+        'gather_qu'=>'43',
+        'gather_qu_name'=>'东城区',
+        'gather_shi_name'=>'北京市',
+        'gather_address'=>'小浪底001_ga',
+        'gather_address_longitude'=>'121.471732',
+        'gather_address_latitude'=>'31.231518',
+        'gather_name'=>'张三',
+        'gather_tel'=>'123456',
+        ],
+        ];
+         **/
+        $rules = [
+            'order_type' => 'required',
+        ];
+        $message = [
+            'order_type.required' => '必须选择',
+        ];
+
+        switch ($project_type) {
+            case 'carriage':
+                $company_id = null;
+                $company_name = null;
+                $group_code = null;
+                $group_name = null;
+                $receiver_id = null;
+                break;
+            case 'TMS3PL':
+                $company_id = null;
+                $company_name = null;
+                $group_code = null;
+                $group_name = null;
+                $receiver_id = $user_info->group_code;
+                break;
+            default:
+                $company_id = null;
+                $company_name = null;
+                $group_code = null;
+                $group_name = null;
+                $receiver_id = null;
+                $total_user_id = null;
+                break;
+        }
+        $validator = Validator::make($input, $rules, $message);
+        if ($validator->passes()) {
+            if ($project_type == 'company') {
+                $where_group = [
+                    ['delete_flag', '=', 'Y'],
+                    ['self_id', '=', $group_code],
+                ];
+                $group_info = SystemGroup::where($where_group)->select('group_code', 'group_name')->first();
+            }
+            /** 处理一下发货地址  及联系人**/
+            foreach ($dispatcher as $k => $v){
+                $gather_address = $tms->address_contact($v['gather_address_id'],$v['gather_qu'],$v['gather_address'],$v['gather_name'],$v['gather_tel'],'',$user_info,$now_time);
+
+                if(empty($gather_address)){
+                    $msg['code'] = 303;
+                    $msg['msg'] = '地址不存在';
+                    return $msg;
+                }
+
+                $send_address=$tms->address_contact($v['send_address_id'],$v['send_qu'],$v['send_address'],$v['send_name'],$v['send_tel'],'',$user_info,$now_time);
+
+                if(empty($send_address)){
+                    $msg['code'] = 303;
+                    $msg['msg'] = '地址不存在';
+                    return $msg;
+                }
+                if (empty($v['clod'])) {
+                    $msg['code'] = 309;
+                    $msg['msg']  = '请选择温度！';
+                    return $msg;
+                }
+            }
+            /** 处理一下发货地址  及联系人 结束**/
+            $order_id = generate_id('order_');
+            $wheres['self_id'] = $self_id;
+            $old_info = TmsOrder::where($wheres)->first();
+
+            $data['order_type']                     = $order_type;
+            $data['gather_time']                    = $gather_time;
+            $data['gather_address_id']              = $gather_address->gather_address_id;
+            $data['gather_name']                    = $gather_address->gather_name;
+            $data['gather_tel']                     = $gather_address->gather_tel;
+            $data['gather_sheng']                   = $gather_address->gather_sheng;
+            $data['gather_sheng_name']              = $gather_address->gather_sheng_name;
+            $data['gather_shi']                     = $gather_address->gather_shi;
+            $data['gather_shi_name']                = $gather_address->gather_shi_name;
+            $data['gather_qu']                      = $gather_address->gather_qu;
+            $data['gather_qu_name']                 = $gather_address->gather_qu_name;
+            $data['gather_address']                 = $gather_address->gather_address;
+            $data['gather_address_longitude']       = $gather_address->gather_address_longitude;
+            $data['gather_address_latitude']        = $gather_address->gather_address_latitude;
+
+            $data['send_time']                      = $send_time;
+            $data['send_address_id']                = $send_address->send_address_id;
+            $data['send_name']                      = $send_address->send_name;
+            $data['send_tel']                       = $send_address->send_tel;
+            $data['send_sheng']                     = $send_address->send_sheng;
+            $data['send_sheng_name']                = $send_address->send_sheng_name;
+            $data['send_shi']                       = $send_address->send_shi;
+            $data['send_shi_name']                  = $send_address->send_shi_name;
+            $data['send_qu']                        = $send_address->send_qu;
+            $data['send_qu_name']                   = $send_address->send_qu_name;
+            $data['send_address']                   = $send_address->send_address;
+            $data['send_address_longitude']         = $send_address->send_address_longitude;
+            $data['send_address_latitude']          = $send_address->send_address_latitude;
+//                    $data['good_number']                = $good_number;
+//                    $data['good_weight']                = $good_weight;
+//                    $data['good_volume']                = $good_volume;
+            $data['pick_flag']                      = $pick_flag;
+            $data['send_flag']                      = $send_flag;
+            $data['total_money']                    = ($total_money - 0) * 100;
+//            $data['info'] = json_encode($dispatcher, JSON_UNESCAPED_UNICODE);
+//            $data['good_info'] = $good_info;
+            $data['clod']                           = json_encode($clod, JSON_UNESCAPED_UNICODE);
+            $data['pick_money']                     = ($pick_money - 0) * 100;
+            $data['send_money']                     = ($send_money - 0) * 100;
+            $data['price']                          = ($price - 0) * 100;
+            $data['more_money']                     = $more_money;
+//            $data['pay_type']                     = $pay_type;
+            $data['car_type']                       = $car_type;
+            $data['remark']                         = $remark;
+            $data['reduce_price']                   = $reduce_price;
+            /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
+            $inserttt = [];
+
+            /** 做一个调度数据出来*/
+            $list['order_type']                 = $order_type;
+            $list['order_id']                   = $order_id;
+            $list['company_id']                 = $company_id;
+            $list['company_name']               = $company_name;
+            $list['receiver_id']                = $receiver_id;
+            $list['group_code']                 = $group_code;
+            $list['group_name']                 = $group_name;
+            $list['total_user_id']              = $total_user_id;
+            $list['gather_time']                = $gather_time;
+
+            $list['gather_address_id']          = $gather_address->gather_address_id;
+            $list['gather_name']                = $gather_address->gather_name;
+            $list['gather_tel']                 = $gather_address->gather_tel;
+            $list['gather_sheng']               = $gather_address->gather_sheng;
+            $list['gather_sheng_name']          = $gather_address->gather_sheng_name;
+            $list['gather_shi']                 = $gather_address->gather_shi;
+            $list['gather_shi_name']            = $gather_address->gather_shi_name;
+            $list['gather_qu']                  = $gather_address->gather_qu;
+            $list['gather_qu_name']             = $gather_address->gather_qu_name;
+            $list['gather_address']             = $gather_address->gather_address;
+            $list['gather_address_longitude']   = $gather_address->gather_address_longitude;
+            $list['gather_address_latitude']    = $gather_address->gather_address_latitude;
+
+            $list['send_time']                  = $send_time;
+            $list['send_address_id']            = $send_address->send_address_id;
+            $list['send_name']                  = $send_address->send_name;
+            $list['send_tel']                   = $send_address->send_tel;
+            $list['send_sheng']                 = $send_address->send_sheng;
+            $list['send_sheng_name']            = $send_address->send_sheng_name;
+            $list['send_shi']                   = $send_address->send_shi;
+            $list['send_shi_name']              = $send_address->send_shi_name;
+            $list['send_qu']                    = $send_address->send_qu;
+            $list['send_qu_name']               = $send_address->send_qu_name;
+            $list['send_address']               = $send_address->send_address;
+            $list['send_address_longitude']     = $send_address->send_address_longitude;
+            $list['send_address_latitude']      = $send_address->send_address_latitude;
+
+            $list['line_gather_address_id']     = $gather_address->gather_address_id;
+//                    $list['line_gather_contacts_id']         = $dispatcher[0]['gather_contacts_id'];
+            $list['line_gather_name']           = $gather_address->gather_name;
+            $list['line_gather_tel']            = $gather_address->gather_tel;
+            $list['line_gather_sheng']          = $gather_address->gather_sheng;
+            $list['line_gather_sheng_name']     = $gather_address->gather_sheng_name;
+            $list['line_gather_shi']            = $gather_address->gather_shi;
+            $list['line_gather_shi_name']       = $gather_address->gather_shi_name;
+            $list['line_gather_qu']             = $gather_address->gather_qu;
+            $list['line_gather_qu_name']        = $gather_address->gather_qu_name;
+            $list['line_gather_address']        = $gather_address->gather_address;
+            $list['line_gather_address_longitude'] = $gather_address->gather_address_longitude;
+            $list['line_gather_address_latitude']  = $gather_address->gather_address_latitude;
+
+            $list['line_send_address_id']       = $send_address->send_address_id;
+            $list['line_send_name']             = $send_address->send_name;
+            $list['line_send_tel']              = $send_address->send_tel;
+            $list['line_send_sheng']            = $send_address->send_sheng;
+            $list['line_send_sheng_name']       = $send_address->send_sheng_name;
+            $list['line_send_shi']              = $send_address->send_shi;
+            $list['line_send_shi_name']         = $send_address->send_shi_name;
+            $list['line_send_qu']               = $send_address->send_qu;
+            $list['line_send_qu_name']          = $send_address->send_qu_name;
+            $list['line_send_address']          = $send_address->send_address;
+            $list['line_send_address_longitude']= $send_address->send_address_longitude;
+            $list['line_send_address_latitude'] = $send_address->send_address_latitude;
+
+            $list['on_line_flag'] = 'Y';
+            $list['on_line_money'] = $total_money * 100;
+//            $list['good_number'] = $good_number;
+//            $list['good_weight'] = $good_weight;
+//            $list['good_volume'] = $good_volume;
+            $list['dispatch_flag'] = 'Y';
+            $list['pick_flag'] = $pick_flag;
+            $list['send_flag'] = $send_flag;
+            $list['info'] = json_encode($dispatcher, JSON_UNESCAPED_UNICODE);
+//            $list['good_info'] = $good_info;
+            $list['clod'] = json_encode($clod, JSON_UNESCAPED_UNICODE);
+//            $list['pay_type'] = $pay_type;
+            $list['remark'] = $remark;
+            $list['car_type'] = $car_type;
+            $list['reduce_price'] = $reduce_price;
+            if ($pay_type == 'offline') {
+                $list['order_status'] = 2;
+            }
+//                    if ($project_type == 'customer'){
+//                        $list['order_status'] = 3;
+//                    }
+            if ($old_info) {
+
+            } else {
+                $list['self_id'] = generate_id('patch_');
+                $list['total_user_id'] = $total_user_id;
+//                        $list['create_user_id']   = $total_user_id;
+//                        $list['create_user_name'] = $token_name;
+                $list['create_time'] = $list['update_time'] = $now_time;
+            }
+            /** 存储费用 **/
+            if ($pay_type == 'offline') {
+                switch ($project_type) {
+                    case 'user':
+                        $money['fk_total_user_id'] = $user_info->total_user_id;
+                        $money['fk_type'] = 'USER';
+                        $money['ZIJ_total_user_id'] = $user_info->total_user_id;
+                        break;
+                    case 'customer':
+                        $money['shouk_group_code'] = $user_info->group_code;
+                        $money['shouk_type'] = 'GROUP_CODE';
+                        $money['fk_company_id'] = $user_info->company_id;
+                        $money['fk_type'] = 'COMPANY';
+                        $money['ZIJ_company_id'] = $user_info->company_id;
+                        break;
+                    case 'company':
+                        $money['fk_group_code'] = $user_info->group_code;
+                        $money['fk_type'] = 'GROUP_CODE';
+                        $money['ZIJ_group_code'] = $user_info->group_code;
+                        break;
+                }
+            } else {
+                switch ($project_type) {
+                    case 'user':
+                        $money['shouk_group_code'] = '1234';
+                        $money['shouk_type'] = 'PLATFORM';
+                        $money['fk_total_user_id'] = $user_info->total_user_id;
+                        $money['fk_type'] = 'USER';
+                        $money['ZIJ_total_user_id'] = $user_info->total_user_id;
+                        $money['delete_flag'] = 'N';
+                        break;
+                    case 'customer':
+                        $money['shouk_group_code'] = '1234';
+                        $money['shouk_type'] = 'PLATFORM';
+                        $money['fk_group_code'] = $user_info->group_code;
+                        $money['fk_type'] = 'GROUP_CODE';
+                        $money['ZIJ_company_id'] = $user_info->company_id;
+                        $money['delete_flag'] = 'N';
+                        break;
+                    case 'company':
+                        $money['shouk_group_code'] = '1234';
+                        $money['shouk_type'] = 'PLATFORM';
+                        $money['fk_group_code'] = $user_info->group_code;
+                        $money['fk_type'] = 'GROUP_CODE';
+                        $money['ZIJ_group_code'] = $user_info->group_code;
+                        $money['delete_flag'] = 'N';
+                        break;
+                }
+            }
+            $money['self_id'] = generate_id('order_money_');
+            $money['order_id'] = $order_id;
+            $money['dispatch_id'] = $list['self_id'];
+            $money['create_time'] = $now_time;
+            $money['update_time'] = $now_time;
+            $money['money'] = $total_money * 100;
+            $money['money_type'] = 'freight';
+            $money['type'] = 'in';
+            $money['settle_flag'] = 'W';
+            $inserttt[] = $list;
+            if ($old_info) {
+                $orderid = $self_id;
+                $data['update_time'] = $now_time;
+                $id = TmsOrder::where($wheres)->update($data);
+                // $operationing->access_cause='修改订单';
+                // $operationing->operation_type='update';
+            } else {
+                $data['self_id'] = $order_id;
+                $data['group_code'] = $group_code;
+                $data['group_name'] = $group_name;
+                $data['company_id'] = $company_id;
+                $data['company_name'] = $company_name;
+                $data['total_user_id'] = $total_user_id;
+//                        $data['create_user_name'] = $token_name;
+                $data['create_time'] = $data['update_time'] = $now_time;
+                $orderid = $data['self_id'];
+                if ($pay_type == 'offline') {
+                    $data['order_status'] = 2;
+                }
+//                        if ($project_type == 'customer'){
+//                            $data['order_status'] = 3;
+//                        }
+                $id = TmsOrder::insert($data);
+                TmsOrderDispatch::insert($inserttt);
+                TmsOrderCost::insert($money);
+
+                if($id){
+                    $msg['code'] = 200;
+                    $msg['msg']  = "操作成功";
+                    $msg['order_id'] = $orderid;
+                    $msg['order_id_show'] = substr($orderid,15);
+                    return $msg;
+                }else{
+                    $msg['code'] = 302;
+                    $msg['msg']  = "操作失败";
+                    return $msg;
+                }
+            }
+        }
+    }
+
+    /**
+     * 货主发布顺风车 /api/order/addUserFreeRide
+     * */
+    public function addUserFreeRide(Request $request,Tms $tms){
+        $project_type       =$request->get('project_type');
+        $now_time   = date('Y-m-d H:i:s',time());
+        $table_name = 'tms_order';
+        $user_info  = $request->get('user_info');//接收中间件产生的参数
+        $project_type = 'company';
+        $total_user_id  = $user_info->total_user_id;
+//        dd($user_info);
+        $input      =$request->all();
+
+        /** 接收数据*/
+        $self_id       = $request->input('self_id');
+        $order_type    = $request->input('order_type');//订单类型 vehicle  lcl   line
+        $line_id       = $request->input('line_id');//线路 id
+        $pick_flag     = $request->input('pick_flag');//是否提货、装货
+        $send_flag     = $request->input('send_flag');//是否配送、卸货
+        $price         = $request->input('price');//运输费
+        $line_price    = $request->input('line_price')??0;//运输费
+        $total_money   = $request->input('total_money');//总计费用
+        $good_name_n   = $request->input('good_name');
+        $good_number_n = $request->input('good_number');
+        $good_weight_n = $request->input('good_weight');
+        $good_volume_n = $request->input('good_volume');
+        $dispatcher    = $request->input('dispatcher') ?? [];
+        $clod          = $request->input('clod');
+        $gather_time    = $request->input('gather_time')??null;
+        $send_time    = $request->input('send_time')??null;
+        $pay_type    = $request->input('pay_type');
+        $remark    = $request->input('remark')??''; //备注
+        $reduce_price    = $request->input('reduce_price');//立减金额
+//       /*** 虚拟数据
+        //$input['self_id']   = $self_id='';
+        $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
+        $input['line_id']     = $line_id='line_202106031747275293691321';
+        $input['pick_flag']   = $pick_flag='Y';
+        $input['send_flag']   = $send_flag='Y';
+        $input['pick_money']  = $pick_money='0';
+        $input['price']       = $price='400';
+        $input['send_money']  = $send_money='0';
+        $input['total_money'] = $total_money='400';
+        $input['more_money']  = $more_money=20;//多点费用
+        $input['good_name']   = $good_name_n='冰淇淋';
+        $input['good_number'] = $good_number_n=2000;
+        $input['good_weight'] = $good_weight_n=2;
+        $input['good_volume'] = $good_volume_n=5;
+        $input['clod']        = $clod='refrigeration';
+        $input['gather_time']        = $gather_time='2021-08-27 15:00';
+        $input['send_time']        = $send_time='2021-08-26 15:00';
+        $input['pay_type']        = $pay_type='offline';
+        $input['car_type']        = $car_type='type_202102051755118034654564';
+        $input['remark']        = $remark='';
+        $input['depart_time'] = $depart_time = '2021-04-30 15:00';
+        $input['reduce_price'] = $reduce_price = '20';
+
+        $input['dispatcher']  = $dispatcher = [
+            '0'=>[
+                'send_address_id'=>'',
+                'send_qu'=>'154',
+                'send_qu_name'=>'嘉定区',
+                'send_shi_name'=>'上海市',
+                'send_address'=>'江桥镇金园四路333号',
+                'send_contacts_id'=>'',
+                'send_address_longitude'=>'',
+                'send_address_latitude'=>'',
+                'send_name'=>'王先生',
+                'send_tel'=>'15893289182',
+                'good_name'=>'冰淇淋',
+                'good_number'=>'2000',
+                'good_weight'=>'2',
+                'good_volume'=>'5',
+                'clod'=>'refrigeration',
+                'clod_name'=>'冷冻',
+                'gather_address_id'=>'',
+                'gather_qu'=>'154',
+                'gather_qu_name'=>'闵行区',
+                'gather_shi_name'=>'上海市',
+                'gather_address'=>'新虹街道绥宁路628-3号',
+                'gather_address_longitude'=>'',
+                'gather_address_latitude'=>'',
+                'gather_name'=>'张经理',
+                'gather_tel'=>'18623716061',
+            ],
+
+//             '1'=>[
+//                 'send_address_id'=>'',
+//                 'send_qu'=>'43',
+//                 'send_qu_name'=>'',
+//                 'send_shi_name'=>'',
+//                 'send_address'=>'小浪底002',
+//                 'send_address_longitude'=>'121.471732',
+//                 'send_address_latitude'=>'31.231518',
+//                 'send_name'=>'张三002',
+//                 'send_tel'=>'002',
+//                 'good_name'=>'产品名称002',
+//                 'good_number'=>'20',
+//                 'good_weight'=>'55',
+//                 'good_volume'=>'13',
+//                 'clod'=>'freeze',
+//                 'clod_name'=>'冷藏',
+//                 'gather_address_id'=>'',
+//                 'gather_qu'=>'43',
+//                 'gather_qu_name'=>'',
+//                 'gather_shi_name'=>'',
+//                 'gather_address'=>'小浪底002_ga',
+//                 'gather_address_longitude'=>'121.471732',
+//                 'gather_address_latitude'=>'31.231518',
+//                 'gather_name'=>'张三002_ga',
+//                 'gather_tel'=>'002_ga',
+//             ],
+
+//             '2'=>[
+//                 'send_address_id'=>'',
+//                 'send_qu'=>'43',
+//                 'send_qu_name'=>'',
+//                 'send_shi_name'=>'',
+//                 'send_address'=>'小浪底003',
+//                 'send_address_longitude'=>'121.471732',
+//                 'send_address_latitude'=>'31.231518',
+//                 'send_name'=>'张三003',
+//                 'send_tel'=>'003',
+//                 'good_name'=>'产品名称003',
+//                 'good_number'=>'50.22',
+//                 'good_weight'=>'55.22',
+//                 'good_volume'=>'14.22',
+//                 'clod'=>'freeze',
+//                 'clod_name'=>'冷藏',
+//                 'gather_address_id'=>'',
+//                 'gather_qu'=>'43',
+//                 'gather_qu_name'=>'',
+//                 'gather_shi_name'=>'',
+//                 'gather_address'=>'小浪底003_ga',
+//                 'gather_address_longitude'=>'121.471732',
+//                 'gather_address_latitude'=>'31.231518',
+//                 'gather_name'=>'张三003_ga',
+//                 'gather_tel'=>'123456_ga',
+//             ],
+        ];
+//        **/
+        $rules = [
+            'order_type'=>'required',
+        ];
+        $message = [
+            'order_type.required'=>'必须选择',
+        ];
+
+        switch ($project_type){
+            case 'user':
+                $company_id     = null;
+                $company_name   = null;
+                $group_code     = null;
+                $group_name     = null;
+                $receiver_id    = null;
+                $total_user_id  = $user_info->total_user_id;
+                break;
+            case 'customer':
+                $company_id     = null;
+                $company_name   = null;
+                $group_code     = $user_info->group_code;
+                $group_name     = $user_info->group_name;
+                $total_user_id  = null;
+                $receiver_id    = null;
+                break;
+            case 'TML3PL':
+                $company_id     = null;
+                $company_name   = null;
+                $group_code     = $user_info->group_code;
+                $group_name     = $user_info->group_name;
+                $total_user_id  = null;
+                $receiver_id    = null;
+                break;
+            default:
+                $company_id    = null;
+                $company_name    =null;
+                $group_code     = null;
+                $group_name     =null;
+                $receiver_id = null;
+                $total_user_id = null;
+                break;
+        }
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            if($project_type == 'company'){
+                $where_group=[
+                    ['delete_flag','=','Y'],
+                    ['self_id','=',$group_code],
+                ];
+                $group_info    =SystemGroup::where($where_group)->select('group_code','group_name')->first();
+            }
+            /***开始做二次效验**/
+            if ($order_type == 'vehicle' || $order_type == 'lcl') {
+                if (count($dispatcher) == 0) {
+                    $msg['code'] = 302;
+                    $msg['msg'] = '请填写订单信息！';
+                    return $msg;
+                }
+            }
+            /** 处理一下发货地址  及联系人**/
+            foreach ($dispatcher as $k => $v){
+                if ($project_type == 'company'){
+                    $gather_address = $tms->address_contact($v['gather_address_id'],$v['gather_qu'],$v['gather_address'],$v['gather_name'],$v['gather_tel'],$group_info,$user_info,$now_time);
+                }else{
+                    $gather_address = $tms->address_contact($v['gather_address_id'],$v['gather_qu'],$v['gather_address'],$v['gather_name'],$v['gather_tel'],'',$user_info,$now_time);
+                }
+                if(empty($gather_address)){
+                    $msg['code'] = 303;
+                    $msg['msg'] = '地址不存在';
+                    return $msg;
+                }
+
+                if ($project_type == 'company'){
+                    $send_address=$tms->address_contact($v['send_address_id'],$v['send_qu'],$v['send_address'],$v['send_name'],$v['send_tel'],$group_info,$user_info,$now_time);
+                }else{
+                    $send_address=$tms->address_contact($v['send_address_id'],$v['send_qu'],$v['send_address'],$v['send_name'],$v['send_tel'],'',$user_info,$now_time);
+                }
+                if(empty($send_address)){
+                    $msg['code'] = 303;
+                    $msg['msg'] = '地址不存在';
+                    return $msg;
+                }
+
+                if (empty($v['good_name'])) {
+                    $msg['code'] = 306;
+                    $msg['msg']  = '货物名称不能为空！';
+                    return $msg;
+                }
+
+                if (empty($v['good_number']) || $v['good_number'] <= 0) {
+                    $msg['code'] = 307;
+                    $msg['msg']  = '货物件数错误！';
+                    return $msg;
+                }
+
+                if (empty($v['good_weight']) || $v['good_weight'] <= 0) {
+                    $msg['code'] = 308;
+                    $msg['msg']  = '货物重量错误！';
+                    return $msg;
+                }
+
+                if (empty($v['good_volume']) || $v['good_volume'] <= 0) {
+                    $msg['code'] = 309;
+                    $msg['msg']  = '货物体积错误！';
+                    return $msg;
+                }
+
+                if (empty($v['clod'])) {
+                    $msg['code'] = 309;
+                    $msg['msg']  = '请选择温度！';
+                    return $msg;
+                }
+                $dispatcher[$k]['send_address_id']        = $send_address->self_id;
+                $dispatcher[$k]['send_sheng']             = $send_address->sheng;
+                $dispatcher[$k]['send_sheng_name']        = $send_address->sheng_name;
+                $dispatcher[$k]['send_shi']               = $send_address->shi;
+                $dispatcher[$k]['send_shi_name']          = $send_address->shi_name;
+                $dispatcher[$k]['send_qu']                = $send_address->qu;
+                $dispatcher[$k]['send_qu_name']           = $send_address->qu_name;
+                $dispatcher[$k]['send_address']           = $send_address->address;
+                $dispatcher[$k]['send_address_longitude'] = $send_address->longitude;
+                $dispatcher[$k]['send_address_latitude']  = $send_address->dimensionality;
+//                $dispatcher[$k]['send_contacts_id']       = $send_contacts->self_id;
+                $dispatcher[$k]['send_contacts_name']     = $send_address->contacts;
+                $dispatcher[$k]['send_contacts_tel']      = $send_address->tel;
+
+                $dispatcher[$k]['gather_address_id']        = $gather_address->self_id;
+                $dispatcher[$k]['gather_sheng']             = $gather_address->sheng;
+                $dispatcher[$k]['gather_sheng_name']        = $gather_address->sheng_name;
+                $dispatcher[$k]['gather_shi']               = $gather_address->shi;
+                $dispatcher[$k]['gather_shi_name']          = $gather_address->shi_name;
+                $dispatcher[$k]['gather_qu']                = $gather_address->qu;
+                $dispatcher[$k]['gather_qu_name']           = $gather_address->qu_name;
+                $dispatcher[$k]['gather_address']           = $gather_address->address;
+                $dispatcher[$k]['gather_address_longitude'] = $gather_address->longitude;
+                $dispatcher[$k]['gather_address_latitude']  = $gather_address->dimensionality;
+//                $dispatcher[$k]['gather_contacts_id']       = $gather_contacts->self_id;
+                $dispatcher[$k]['gather_contacts_name']     = $gather_address->contacts;
+                $dispatcher[$k]['gather_contacts_tel']      = $gather_address->tel;
+            }
+            /** 处理一下发货地址  及联系人 结束**/
+
+            /** 开始处理正式的数据*/
+            $lki    = [];
+            $lki2   = [];
+            $gather = [];               //定义一个收货地址的集合
+            $send   = [];                 //定义一个送货地址的集合
+            $good_name   = [];
+            $good_number = 0;
+            $good_weight = 0;
+            $good_volume = 0;
+            $clodss = [];
+
+            $abccxxxxx = [];
+            foreach ($dispatcher as $k => $v){
+                $gather[] = $v['gather_address_id'];
+                $send[] = $v['send_address_id'];
+                $good_number+=$v['good_number'];
+                $good_weight+=$v['good_weight'];
+                $good_volume+=$v['good_volume'];
+                $good_name[] = $v['good_name'];
+                $clodss[] = $v['clod'];
+                $abcc222['good_name']   = $v['good_name'];
+                $abcc222['good_number'] = $v['good_number'];
+                $abcc222['good_weight'] = $v['good_weight'];
+                $abcc222['good_volume'] = $v['good_volume'];
+                $abcc222['clod']        = $v['clod'];
+                $abccxxxxx[] = $abcc222;
+            }
+
+            if($pick_flag == 'N' && $send_flag == 'N' && $order_type == 'line'){
+                $abcc222 = [];
+                $clodss = [];
+                $abccxxxxx = [];
+                $abcc222['good_name']   = $good_name_n;
+                $abcc222['good_number'] = $good_number_n;
+                $abcc222['good_weight'] = $good_weight_n;
+                $abcc222['good_volume'] = $good_volume_n;
+                $abcc222['clod']        = $clod;
+                $abccxxxxx[] = $abcc222;
+                $good_number = $good_number_n;
+                $good_weight = $good_weight_n;
+                $good_volume = $good_volume_n;
+                $clodss[] = $clod;
+            }
+
+            $gather = array_unique($gather);
+            $send   = array_unique($send);
+            $clodss = array_unique($clodss);
+
+            foreach ($gather as $k => $v){
+                $lki[$k]['good_number'] = 0;
+                $lki[$k]['good_weight'] = 0;
+                $lki[$k]['good_volume'] = 0;
+                $abccxx = [];
+                $clod = [];
+                foreach ($dispatcher as $kk => $vv){
+                    if($v == $vv['gather_address_id']){
+                        $lki[$k]['good_number']+=$vv['good_number'];
+                        $lki[$k]['good_weight']+=$vv['good_weight'];
+                        $lki[$k]['good_volume']+=$vv['good_volume'];
+                        $lki[$k]['gather_address_id'] = $vv['gather_address_id'];
+
+                        $lki[$k]['gather_qu'] = $vv['gather_qu'];
+                        $lki[$k]['gather_qu_name'] = $vv['gather_qu_name'];
+                        $lki[$k]['gather_address'] = $vv['gather_address'];
+                        $lki[$k]['gather_address_longitude'] = $vv['gather_address_longitude'];
+                        $lki[$k]['gather_address_latitude'] = $vv['gather_address_latitude'];
+                        $lki[$k]['gather_sheng'] = $vv['gather_sheng'];
+                        $lki[$k]['gather_sheng_name'] = $vv['gather_sheng_name'];
+                        $lki[$k]['gather_shi'] = $vv['gather_shi'];
+                        $lki[$k]['gather_shi_name'] = $vv['gather_shi_name'];
+                        $lki[$k]['gather_contacts_name'] = $vv['gather_contacts_name'];
+                        $lki[$k]['gather_contacts_tel'] = $vv['gather_contacts_tel'];
+                        $abcc['good_name'] = $vv['good_name'];
+                        $abcc['good_number'] = $vv['good_number'];
+                        $abcc['good_weight'] = $vv['good_weight'];
+                        $abcc['good_volume'] = $vv['good_volume'];
+                        $abcc['clod']        = $vv['clod'];
+                        $abccxx[] = $abcc;
+                        $clod[] = $vv['clod'];
+                    }
+                }
+                $lki[$k]['clod'] = $clod;
+                $lki[$k]['good_josn'] = json_encode($abccxx,JSON_UNESCAPED_UNICODE);
+            }
+//            dd($lki);
+            $good_info = json_encode($abccxxxxx,JSON_UNESCAPED_UNICODE);
+
+            foreach ($send as $k => $v){
+                $lki2[$k]['good_number'] = 0;
+                $lki2[$k]['good_weight'] = 0;
+                $lki2[$k]['good_volume'] = 0;
+                $abccxx2 = [];
+                $clod2 = [];
+                foreach ($dispatcher as $kk => $vv){
+                    if($v == $vv['send_address_id']){
+                        $lki2[$k]['good_number']+=$vv['good_number'];
+                        $lki2[$k]['good_weight']+=$vv['good_weight'];
+                        $lki2[$k]['good_volume']+=$vv['good_volume'];
+                        $lki2[$k]['send_address_id'] = $vv['send_address_id'];
+
+                        $lki2[$k]['send_qu'] = $vv['send_qu'];
+                        $lki2[$k]['send_qu_name'] = $vv['send_qu_name'];
+                        $lki2[$k]['send_address'] = $vv['send_address'];
+                        $lki2[$k]['send_address_longitude'] = $vv['send_address_longitude'];
+                        $lki2[$k]['send_address_latitude'] = $vv['send_address_latitude'];
+                        $lki2[$k]['send_sheng'] = $vv['send_sheng'];
+                        $lki2[$k]['send_sheng_name'] = $vv['send_sheng_name'];
+                        $lki2[$k]['send_shi'] = $vv['send_shi'];
+                        $lki2[$k]['send_shi_name'] = $vv['send_shi_name'];
+                        $lki2[$k]['send_contacts_name'] = $vv['send_contacts_name'];
+                        $lki2[$k]['send_contacts_tel'] = $vv['send_contacts_tel'];
+                        $abcc2['good_name']  = $vv['good_name'];
+                        $abcc2['good_number'] = $vv['good_number'];
+                        $abcc2['good_weight'] = $vv['good_weight'];
+                        $abcc2['good_volume'] = $vv['good_volume'];
+                        $abcc2['clod']        = $vv['clod'];
+                        $abccxx2[] = $abcc2;
+                        $clod2[] = $vv['clod'];
+                    }
+                }
+
+                $lki2[$k]['good_josn'] = json_encode($abccxx2,JSON_UNESCAPED_UNICODE);
+                $lki2[$k]['clod'] = $clod2;
+            }
+
+            /***现在处理收货地址的控制**/
+            $order_id = generate_id('order_');
+            /***现在处理费用的部分控制**/
+            $money=[];
+            /** 货到付款 **/
+//            $param = TmsParam::where('type',2)->select('discount','type')->first();
+            $wheres['self_id'] = $self_id;
+            $old_info=TmsOrder::where($wheres)->first();
+
+            $data['order_type']                 = $order_type;
+            $data['gather_time']                = $gather_time;
+            $data['gather_address_id']          = $dispatcher[0]['gather_address_id'];
+
+            $data['gather_name']                = $dispatcher[0]['gather_contacts_name'];
+            $data['gather_tel']                 = $dispatcher[0]['gather_contacts_tel'];
+            $data['gather_sheng']               = $dispatcher[0]['gather_sheng'];
+            $data['gather_sheng_name']          = $dispatcher[0]['gather_sheng_name'];
+            $data['gather_shi']                 = $dispatcher[0]['gather_shi'];
+            $data['gather_shi_name']            = $dispatcher[0]['gather_shi_name'];
+            $data['gather_qu']                  = $dispatcher[0]['gather_qu'];
+            $data['gather_qu_name']             = $dispatcher[0]['gather_qu_name'];
+            $data['gather_address']             = $dispatcher[0]['gather_address'];
+            $data['gather_address_longitude']   = $dispatcher[0]['gather_address_longitude'];
+            $data['gather_address_latitude']    = $dispatcher[0]['gather_address_latitude'];
+            $data['send_time']                  = $send_time;
+            $data['send_address_id']            = $dispatcher[0]['send_address_id'];
+
+            $data['send_name']                  = $dispatcher[0]['send_contacts_name'];
+            $data['send_tel']                   = $dispatcher[0]['send_contacts_tel'];
+            $data['send_sheng']                 = $dispatcher[0]['send_sheng'];
+            $data['send_sheng_name']            = $dispatcher[0]['send_sheng_name'];
+            $data['send_shi']                   = $dispatcher[0]['send_shi'];
+            $data['send_shi_name']              = $dispatcher[0]['send_shi_name'];
+            $data['send_qu']                    = $dispatcher[0]['send_qu'];
+            $data['send_qu_name']               = $dispatcher[0]['send_qu_name'];
+            $data['send_address']               = $dispatcher[0]['send_address'];
+            $data['send_address_longitude']     = $dispatcher[0]['send_address_longitude'];
+            $data['send_address_latitude']      = $dispatcher[0]['send_address_latitude'];
+            $data['good_number']                = $good_number;
+            $data['good_weight']                = $good_weight;
+            $data['good_volume']                = $good_volume;
+            $data['pick_flag']                  = $pick_flag;
+            $data['send_flag']                  = $send_flag;
+            $data['total_money']                = ($total_money - 0) * 100;
+            $data['info']                       = json_encode($dispatcher,JSON_UNESCAPED_UNICODE);
+            $data['good_info']                  = $good_info;
+            $data['clod']                       = json_encode($clodss,JSON_UNESCAPED_UNICODE);
+//                    $data['pick_money']                 = ($pick_money - 0)*100;
+//                    $data['send_money']                 = ($send_money - 0)*100;
+            $data['price']                      = ($price - 0)*100;
+            $data['more_money']                 = $more_money;
+            $data['pay_type']                   = $pay_type;
+
+            $data['remark']                     = $remark;
+
+            /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
+            $inserttt=[];
+
+            /** 做一个调度数据出来*/
+            $list['order_type']                 = $order_type;
+            $list['order_id']                   = $order_id;
+            $list['company_id']                 = $company_id;
+            $list['company_name']               = $company_name;
+            $list['receiver_id']                = $receiver_id;
+            $list['group_code']                 = $group_code;
+            $list['group_name']                 = $group_name;
+            $list['total_user_id']              = $total_user_id;
+            $list['gather_time']                = $gather_time;
+            $list['gather_address_id']          = $dispatcher[0]['gather_address_id'];
+            $list['gather_name']                = $dispatcher[0]['gather_contacts_name'];
+            $list['gather_tel']                 = $dispatcher[0]['gather_contacts_tel'];
+            $list['gather_sheng']               = $dispatcher[0]['gather_sheng'];
+            $list['gather_sheng_name']          = $dispatcher[0]['gather_sheng_name'];
+            $list['gather_shi']                 = $dispatcher[0]['gather_shi'];
+            $list['gather_shi_name']            = $dispatcher[0]['gather_shi_name'];
+            $list['gather_qu']                  = $dispatcher[0]['gather_qu'];
+            $list['gather_qu_name']             = $dispatcher[0]['gather_qu_name'];
+            $list['gather_address']             = $dispatcher[0]['gather_address'];
+            $list['gather_address_longitude']   = $dispatcher[0]['gather_address_longitude'];
+            $list['gather_address_latitude']    = $dispatcher[0]['gather_address_latitude'];
+            $list['send_time']                  = $send_time;
+            $list['send_address_id']            = $dispatcher[0]['send_address_id'];
+
+            $list['send_name']                  = $dispatcher[0]['send_contacts_name'];
+            $list['send_tel']                   = $dispatcher[0]['send_contacts_tel'];
+            $list['send_sheng']                 = $dispatcher[0]['send_sheng'];
+            $list['send_sheng_name']            = $dispatcher[0]['send_sheng_name'];
+            $list['send_shi']                   = $dispatcher[0]['send_shi'];
+            $list['send_shi_name']              = $dispatcher[0]['send_shi_name'];
+            $list['send_qu']                    = $dispatcher[0]['send_qu'];
+            $list['send_qu_name']               = $dispatcher[0]['send_qu_name'];
+            $list['send_address']               = $dispatcher[0]['send_address'];
+            $list['send_address_longitude']     = $dispatcher[0]['send_address_longitude'];
+            $list['send_address_latitude']      = $dispatcher[0]['send_address_latitude'];
+
+            $list['line_gather_address_id']          = $dispatcher[0]['gather_address_id'];
+//                    $list['line_gather_contacts_id']         = $dispatcher[0]['gather_contacts_id'];
+            $list['line_gather_name']                = $dispatcher[0]['gather_contacts_name'];
+            $list['line_gather_tel']                 = $dispatcher[0]['gather_contacts_tel'];
+            $list['line_gather_sheng']               = $dispatcher[0]['gather_sheng'];
+            $list['line_gather_sheng_name']          = $dispatcher[0]['gather_sheng_name'];
+            $list['line_gather_shi']                 = $dispatcher[0]['gather_shi'];
+            $list['line_gather_shi_name']            = $dispatcher[0]['gather_shi_name'];
+            $list['line_gather_qu']                  = $dispatcher[0]['gather_qu'];
+            $list['line_gather_qu_name']             = $dispatcher[0]['gather_qu_name'];
+            $list['line_gather_address']             = $dispatcher[0]['gather_address'];
+            $list['line_gather_address_longitude']   = $dispatcher[0]['gather_address_longitude'];
+            $list['line_gather_address_latitude']    = $dispatcher[0]['gather_address_latitude'];
+            $list['line_send_address_id']            = $dispatcher[0]['send_address_id'];
+            $list['line_send_name']                  = $dispatcher[0]['send_contacts_name'];
+            $list['line_send_tel']                   = $dispatcher[0]['send_contacts_tel'];
+            $list['line_send_sheng']                 = $dispatcher[0]['send_sheng'];
+            $list['line_send_sheng_name']            = $dispatcher[0]['send_sheng_name'];
+            $list['line_send_shi']                   = $dispatcher[0]['send_shi'];
+            $list['line_send_shi_name']              = $dispatcher[0]['send_shi_name'];
+            $list['line_send_qu']                    = $dispatcher[0]['send_qu'];
+            $list['line_send_qu_name']               = $dispatcher[0]['send_qu_name'];
+            $list['line_send_address']               = $dispatcher[0]['send_address'];
+            $list['line_send_address_longitude']     = $dispatcher[0]['send_address_longitude'];
+            $list['line_send_address_latitude']      = $dispatcher[0]['send_address_latitude'];
+
+            $list['on_line_flag']               = 'Y';
+            $list['on_line_money']              = $total_money*100;
+            $list['good_number']                = $good_number;
+            $list['good_weight']                = $good_weight;
+            $list['good_volume']                = $good_volume;
+            $list['dispatch_flag']              = 'Y';
+            $list['pick_flag']                  = $pick_flag;
+            $list['send_flag']                  = $send_flag;
+            $list['info']                       = json_encode($dispatcher,JSON_UNESCAPED_UNICODE);
+            $list['good_info']                  = $good_info;
+            $list['clod']                       = json_encode($clodss,JSON_UNESCAPED_UNICODE);
+            $list['pay_type']                   = $pay_type;
+            $list['remark']                   = $remark;
+            $list['car_type']                   = $car_type;
+            $list['reduce_price']               = $reduce_price;
+            if ($pay_type == 'offline'){
+                $list['order_status'] = 2;
+            }
+
+            if($old_info){
+
+            }else{
+                $list['self_id']          = generate_id('patch_');
+                $list['total_user_id']    = $total_user_id;
+                $list['create_time']      = $list['update_time'] = $now_time;
+            }
+            /** 存储费用 **/
+            if ($pay_type == 'offline'){
+                switch ($project_type){
+                    case 'user':
+                        $money['fk_total_user_id']           = $user_info->total_user_id;
+                        $money['fk_type']                    = 'USER';
+                        $money['ZIJ_total_user_id']          = $user_info->total_user_id;
+                        break;
+                    case 'customer':
+                        $money['shouk_group_code']           = $user_info->group_code;
+                        $money['shouk_type']                 = 'GROUP_CODE';
+                        $money['fk_company_id']              = $user_info->company_id;
+                        $money['fk_type']                    = 'COMPANY';
+                        $money['ZIJ_company_id']             = $user_info->company_id;
+                        break;
+                    case 'company':
+                        $money['fk_group_code']              = $user_info->group_code;
+                        $money['fk_type']                    = 'GROUP_CODE';
+                        $money['ZIJ_group_code']             = $user_info->group_code;
+                        break;
+                }
+            }else{
+                switch ($project_type){
+                    case 'user':
+                        $money['shouk_group_code']           = '1234';
+                        $money['shouk_type']                 = 'PLATFORM';
+                        $money['fk_total_user_id']           = $user_info->total_user_id;
+                        $money['fk_type']                    = 'USER';
+                        $money['ZIJ_total_user_id']          = $user_info->total_user_id;
+                        $money['delete_flag']                = 'N';
+                        break;
+                    case 'customer':
+                        $money['shouk_group_code']           = '1234';
+                        $money['shouk_type']                 = 'PLATFORM';
+                        $money['fk_group_code']              = $user_info->group_code;
+                        $money['fk_type']                    = 'GROUP_CODE';
+                        $money['ZIJ_company_id']             = $user_info->company_id;
+                        $money['delete_flag']                = 'N';
+                        break;
+                    case 'company':
+                        $money['shouk_group_code']           = '1234';
+                        $money['shouk_type']                 = 'PLATFORM';
+                        $money['fk_group_code']              = $user_info->group_code;
+                        $money['fk_type']                    = 'GROUP_CODE';
+                        $money['ZIJ_group_code']             = $user_info->group_code;
+                        $money['delete_flag']                = 'N';
+                        break;
+                }
+            }
+            $money['self_id']                    = generate_id('order_money_');
+            $money['order_id']                   = $order_id;
+            $money['dispatch_id']                = $list['self_id'];
+            $money['create_time']                = $now_time;
+            $money['update_time']                = $now_time;
+            $money['money']                      = $total_money*100;
+            $money['money_type']                 = 'freight';
+            $money['type']                       = 'in';
+            $money['settle_flag']                = 'W';
+            $inserttt[] = $list;
+            if($old_info){
+                $orderid = $self_id;
+                $data['update_time'] = $now_time;
+                $id = TmsOrder::where($wheres)->update($data);
+            }else{
+                $data['self_id']          = $order_id;
+                $data['group_code']       = $group_code;
+                $data['group_name']       = $group_name;
+                $data['company_id']       = $company_id;
+                $data['company_name']       = $company_name;
+                $data['total_user_id']   = $total_user_id;
+                $data['create_time']      = $data['update_time'] = $now_time;
+                $orderid = $data['self_id'];
+                if ($pay_type == 'offline'){
+                    $data['order_status'] = 2;
+                }
+                $id = TmsOrder::insert($data);
+                TmsOrderDispatch::insert($inserttt);
+                TmsOrderCost::insert($money);
+
+            }
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg']  = "操作成功";
+                $msg['order_id'] = $orderid;
+                $msg['order_id_show'] = substr($orderid,15);
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg']  = "操作失败";
+                return $msg;
+            }
+            /***二次效验结束**/
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg'] = null;
+            foreach ($erro as $k => $v){
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v;
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 用户发布订单列表
+     * */
+    public function userFreeRideList(Request $request){
+        $pay_status     =config('tms.tms_order_status_type');
+        $dispatch_status     =config('tms.tms_dispatch_type');
+        $online_status     =config('tms.tms_online_type');
+        /** 接收中间件参数**/
+
+        $carriage_flag    =array_column(config('tms.carriage_flag'),'name','key');
+        $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
+        $tms_control_type = array_column(config('tms.tms_control_type'),'name','key');
+        $tms_line_type    = array_column(config('tms.tms_line_type'),'name','key');
+        /**接收数据*/
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
+        $use_flag       =$request->input('use_flag');
+        $group_code     =$request->input('group_code');
+        $startcity      =$request->input('startcity')??'';
+        $endcity        =$request->input('endcity')??'';
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
+
+        $where=[
+            ['on_line_flag','=','Y'],
+            ['pay_type','=','online'],
+            ['order_status','=',2]
+        ];
+        $where1 = [
+            ['on_line_flag','=','Y'],
+            ['pay_type','=','offline'],
+            ['order_status','=',2]
+        ];
+        if ($startcity){
+            $where[] = ['send_shi_name','=',$startcity];
+            $where1[] = ['send_shi_name','=',$startcity];
+        }
+        if ($endcity){
+            $where[] = ['gather_shi_name','=',$endcity];
+            $where1[] = ['send_shi_name','=',$startcity];
+        }
+        $select=['self_id','order_type','order_status','receiver_id','clod','gather_time','send_time','company_name','dispatch_flag','group_code','group_name','use_flag','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_sheng_name','send_shi_name'
+            ,'send_qu_name','send_address','total_money','good_info','good_number','good_weight','good_volume','carriage_group_name','on_line_money','line_gather_address_id','line_gather_contacts_id','line_gather_name','line_gather_tel',
+            'line_gather_sheng','line_gather_shi','line_gather_qu','line_gather_sheng_name','line_gather_shi_name','line_gather_qu_name' , 'line_gather_address',
+            'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi',
+            'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','total_user_id','car_type'
+        ];
+        $select1 = ['self_id','parame_name'];
+        $data['total']=TmsOrderDispatch::where($where)->orWhere($where1)->whereNull('receiver_id')->count(); //总的数据量
+        $data['items']=TmsOrderDispatch::with(['tmsCarType'=>function($query)use($select1){
+            $query->select($select1);
+        }])
+
+            ->where($where)->orWhere($where1)->whereNull('receiver_id')
+            ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
+            ->select($select)->get();
+        $data['group_show']='Y';
+
+        foreach ($data['items'] as $k=>$v) {
+            $v->order_type_show=$tms_order_type[$v->order_type]??null;
+            $v->total_money = number_format($v->total_money/100);
+            $v->on_line_money = number_format($v->on_line_money/100);
+            $temperture = json_decode($v->clod);
+            foreach ($temperture as $kk => $vv){
+                $temperture[$kk]    = $tms_control_type[$vv] ?? null;
+            }
+            $v->clod = implode(',',$temperture);
+            $v->order_type       = $tms_line_type[$v->order_type] ?? null;
+            $v->order_id_show    = substr($v->self_id,15);
+            $v->send_time        = date('m-d H:i',strtotime($v->send_time));
+            $v->gather_time      = date('m-d H:i',strtotime($v->gather_time));
+            if ($v->tmsCarType){
+                $v->car_type_show = $v->tmsCarType->parame_name;
+            }
+
+            $v->start_time_show = '装车时间 '.$v->send_time;
+            $v->end_time_show = '送达时间 '.$v->gather_time;
+            if ($v->tmsCarType){
+                $v->car_show = '车型 '.$v->tmsCarType->parame_name;
+            }
+            $v->temperture_show = '温度 '.$v->clod;
+            $v->background_color_show = '#0088F4';
+            $v->text_color_show = '#000000';
+
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+                $v->background_color_show = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->background_color_show = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+            }
+        }
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
+    }
+    /**
+     * 承运发布订单列表
+     * */
+    public function freeRideList(Request $request){
+
     }
 
 

@@ -151,6 +151,10 @@ Route::group([
         Route::any('/order/orderUnline','OrderController@orderUnline');
         Route::any('/order/order_cancel','OrderController@order_cancel');
         Route::any('/order/order_done','OrderController@order_done');
+        Route::any('/order/addFreeRide','OrderController@addFreeRide');//顺风车
+        Route::any('/order/addUserFreeRide','OrderController@addUserFreeRide');//顺风车
+        Route::any('/order/userFreeRideList','OrderController@userFreeRideList');//顺风车列表
+        Route::any('/order/freeRideList','OrderController@freeRideList');//顺风车列表
         /**TMS联系人管理 - 用户端**/
         Route::any('/contacts/contactsPage', 'ContactsController@contactsPage');
         Route::any('/contacts/addContacts','ContactsController@addContacts');
