@@ -155,6 +155,7 @@ Route::group([
         Route::any('/order/addUserFreeRide','OrderController@addUserFreeRide');//顺风车
         Route::any('/order/userFreeRideList','OrderController@userFreeRideList');//顺风车列表
         Route::any('/order/freeRideList','OrderController@freeRideList');//顺风车列表
+        Route::any('/order/get_distance','OrderController@get_distance');//顺风车列表
         /**TMS联系人管理 - 用户端**/
         Route::any('/contacts/contactsPage', 'ContactsController@contactsPage');
         Route::any('/contacts/addContacts','ContactsController@addContacts');

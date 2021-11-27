@@ -4392,6 +4392,59 @@ class OrderController extends Controller{
 
     }
 
+    /**
+     *获取当前位置距起终点距离
+     * /api/order/get_distance
+     * @param Array $start_city
+     * @param Array $end_city
+     * @param Array $user_local
+     * @return Array $data
+     * */
+    public function get_distance(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $start_city       = $request->input('start_city');
+        $end_city         = $request->input('end_city');
+        $user_local       = $request->input('user_local');
+
+        /*** 虚拟数据
+        $input['start_city']           = $start_city  =[["area"=>"徐汇区","city"=> "上海市","info"=> "植物园","pro"=> "上海市"],["area"=>"嘉定区","city"=> "上海市","info"=> "金沙江西路与金园一路交叉口","pro"=> "上海市"]];
+        $input['end_city']             = $end_city    =[["area"=>"江干区","city"=> "杭州市","info"=> "植物园","pro"=> "浙江省"]];
+        $input['user_local']           = $user_local  =["area"=>"松江区","city"=> "上海市","info"=> "九亭","pro"=> "九亭地铁站"];
+         **/
+        $a = 0;
+        foreach($start_city as $key => $value){
+            $start_action = bd_location(2,'',$value['city'],$value['area'],$value['info']);//经纬度
+            $end_action = bd_location(2,'',$user_local['city'],$user_local['area'],$user_local['info']);//经纬度
+            $list = direction($start_action['lat'], $start_action['lng'], $end_action['lat'], $end_action['lng']);
+            $finally = $list['distance']/1000;
+            $start_kilo[$a] = $this->mileage_interval(2,(int)$finally).'km';
+
+            $a++;
+        }
+        $b = 0;
+        foreach($end_city as $key => $value){
+            $start_action = bd_location(2,'',$value['city'],$value['area'],$value['info']);//经纬度
+            $end_action = bd_location(2,'',$user_local['city'],$user_local['area'],$user_local['info']);//经纬度
+            $list = direction($start_action['lat'], $start_action['lng'], $end_action['lat'], $end_action['lng']);
+            $finally = $list['distance']/1000;
+            $end_kilo[$b] = $this->mileage_interval(2,(int)$finally).'km';
+
+            $b++;
+        }
+//        dd($start_kilo,$end_kilo);
+        $data['start_kilo'] = $start_kilo;
+        $data['end_kilo'] = $end_kilo;
+        $msg['code'] = 200;
+        $msg['msg']  = '';
+        $msg['data'] = $data;
+        return $msg;
+
+    }
+
 
 
 
