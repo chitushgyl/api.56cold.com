@@ -4415,6 +4415,7 @@ class OrderController extends Controller{
         $input['end_city']             = $end_city    =[["area"=>"江干区","city"=> "杭州市","info"=> "植物园","pro"=> "浙江省"]];
         $input['user_local']           = $user_local  =["area"=>"松江区","city"=> "上海市","info"=> "九亭","pro"=> "九亭地铁站"];
          **/
+        $user_local = json_decode($user_local,true);
         $a = 0;
         foreach($start_city as $key => $value){
             $start_action = bd_location(2,'',$value['city'],$value['area'],$value['info']);//经纬度
