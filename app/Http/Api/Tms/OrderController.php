@@ -3259,7 +3259,7 @@ class OrderController extends Controller{
         $more_money = $request->input('more_money') ? $request->input('more_money') - 0 : null;//多点费用
         $gather_time = $request->input('gather_time') ?? null;
         $send_time = $request->input('send_time') ?? null;
-//        $pay_type = $request->input('pay_type');
+        $pay_type = $request->input('pay_type');
         $car_type = $request->input('car_type') ?? ''; //车型
         $remark = $request->input('remark') ?? ''; //备注
         $app_flag = $request->input('app_flag');
@@ -3387,32 +3387,32 @@ class OrderController extends Controller{
 
             $data['order_type']                     = $order_type;
             $data['gather_time']                    = $gather_time;
-            $data['gather_address_id']              = $gather_address->gather_address_id;
-            $data['gather_name']                    = $gather_address->gather_name;
-            $data['gather_tel']                     = $gather_address->gather_tel;
-            $data['gather_sheng']                   = $gather_address->gather_sheng;
-            $data['gather_sheng_name']              = $gather_address->gather_sheng_name;
-            $data['gather_shi']                     = $gather_address->gather_shi;
-            $data['gather_shi_name']                = $gather_address->gather_shi_name;
-            $data['gather_qu']                      = $gather_address->gather_qu;
-            $data['gather_qu_name']                 = $gather_address->gather_qu_name;
-            $data['gather_address']                 = $gather_address->gather_address;
-            $data['gather_address_longitude']       = $gather_address->gather_address_longitude;
-            $data['gather_address_latitude']        = $gather_address->gather_address_latitude;
+            $data['gather_address_id']              = $gather_address->self_id;
+            $data['gather_name']                    = $gather_address->contacts;
+            $data['gather_tel']                     = $gather_address->tel;
+            $data['gather_sheng']                   = $gather_address->sheng;
+            $data['gather_sheng_name']              = $gather_address->sheng_name;
+            $data['gather_shi']                     = $gather_address->shi;
+            $data['gather_shi_name']                = $gather_address->shi_name;
+            $data['gather_qu']                      = $gather_address->qu;
+            $data['gather_qu_name']                 = $gather_address->qu_name;
+            $data['gather_address']                 = $gather_address->address;
+            $data['gather_address_longitude']       = $gather_address->longitude;
+            $data['gather_address_latitude']        = $gather_address->dimensionality;
 
             $data['send_time']                      = $send_time;
-            $data['send_address_id']                = $send_address->send_address_id;
-            $data['send_name']                      = $send_address->send_name;
-            $data['send_tel']                       = $send_address->send_tel;
-            $data['send_sheng']                     = $send_address->send_sheng;
-            $data['send_sheng_name']                = $send_address->send_sheng_name;
-            $data['send_shi']                       = $send_address->send_shi;
-            $data['send_shi_name']                  = $send_address->send_shi_name;
-            $data['send_qu']                        = $send_address->send_qu;
-            $data['send_qu_name']                   = $send_address->send_qu_name;
-            $data['send_address']                   = $send_address->send_address;
-            $data['send_address_longitude']         = $send_address->send_address_longitude;
-            $data['send_address_latitude']          = $send_address->send_address_latitude;
+            $data['send_address_id']                = $send_address->self_id;
+            $data['send_name']                      = $send_address->contacts;
+            $data['send_tel']                       = $send_address->tel;
+            $data['send_sheng']                     = $send_address->sheng;
+            $data['send_sheng_name']                = $send_address->sheng_name;
+            $data['send_shi']                       = $send_address->shi;
+            $data['send_shi_name']                  = $send_address->shi_name;
+            $data['send_qu']                        = $send_address->qu;
+            $data['send_qu_name']                   = $send_address->qu_name;
+            $data['send_address']                   = $send_address->address;
+            $data['send_address_longitude']         = $send_address->longitude;
+            $data['send_address_latitude']          = $send_address->dimensionality;
 //                    $data['good_number']                = $good_number;
 //                    $data['good_weight']                = $good_weight;
 //                    $data['good_volume']                = $good_volume;
@@ -3429,7 +3429,7 @@ class OrderController extends Controller{
 //            $data['pay_type']                     = $pay_type;
             $data['car_type']                       = $car_type;
             $data['remark']                         = $remark;
-            $data['reduce_price']                   = $reduce_price;
+//            $data['reduce_price']                   = $reduce_price;
             /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
             $inserttt = [];
 
@@ -3444,59 +3444,59 @@ class OrderController extends Controller{
             $list['total_user_id']              = $total_user_id;
             $list['gather_time']                = $gather_time;
 
-            $list['gather_address_id']          = $gather_address->gather_address_id;
-            $list['gather_name']                = $gather_address->gather_name;
-            $list['gather_tel']                 = $gather_address->gather_tel;
-            $list['gather_sheng']               = $gather_address->gather_sheng;
-            $list['gather_sheng_name']          = $gather_address->gather_sheng_name;
-            $list['gather_shi']                 = $gather_address->gather_shi;
-            $list['gather_shi_name']            = $gather_address->gather_shi_name;
-            $list['gather_qu']                  = $gather_address->gather_qu;
-            $list['gather_qu_name']             = $gather_address->gather_qu_name;
-            $list['gather_address']             = $gather_address->gather_address;
-            $list['gather_address_longitude']   = $gather_address->gather_address_longitude;
-            $list['gather_address_latitude']    = $gather_address->gather_address_latitude;
+            $list['gather_address_id']          = $gather_address->self_id;
+            $list['gather_name']                = $gather_address->contacts;
+            $list['gather_tel']                 = $gather_address->tel;
+            $list['gather_sheng']               = $gather_address->sheng;
+            $list['gather_sheng_name']          = $gather_address->sheng_name;
+            $list['gather_shi']                 = $gather_address->shi;
+            $list['gather_shi_name']            = $gather_address->shi_name;
+            $list['gather_qu']                  = $gather_address->qu;
+            $list['gather_qu_name']             = $gather_address->qu_name;
+            $list['gather_address']             = $gather_address->address;
+            $list['gather_address_longitude']   = $gather_address->longitude;
+            $list['gather_address_latitude']    = $gather_address->dimensionality;
 
             $list['send_time']                  = $send_time;
-            $list['send_address_id']            = $send_address->send_address_id;
-            $list['send_name']                  = $send_address->send_name;
-            $list['send_tel']                   = $send_address->send_tel;
-            $list['send_sheng']                 = $send_address->send_sheng;
-            $list['send_sheng_name']            = $send_address->send_sheng_name;
-            $list['send_shi']                   = $send_address->send_shi;
-            $list['send_shi_name']              = $send_address->send_shi_name;
-            $list['send_qu']                    = $send_address->send_qu;
-            $list['send_qu_name']               = $send_address->send_qu_name;
-            $list['send_address']               = $send_address->send_address;
-            $list['send_address_longitude']     = $send_address->send_address_longitude;
-            $list['send_address_latitude']      = $send_address->send_address_latitude;
+            $list['send_address_id']            = $send_address->self_id;
+            $list['send_name']                  = $send_address->contacts;
+            $list['send_tel']                   = $send_address->tel;
+            $list['send_sheng']                 = $send_address->sheng;
+            $list['send_sheng_name']            = $send_address->sheng_name;
+            $list['send_shi']                   = $send_address->shi;
+            $list['send_shi_name']              = $send_address->shi_name;
+            $list['send_qu']                    = $send_address->qu;
+            $list['send_qu_name']               = $send_address->qu_name;
+            $list['send_address']               = $send_address->address;
+            $list['send_address_longitude']     = $send_address->longitude;
+            $list['send_address_latitude']      = $send_address->dimensionality;
 
-            $list['line_gather_address_id']     = $gather_address->gather_address_id;
+            $list['line_gather_address_id']     = $gather_address->self_id;
 //                    $list['line_gather_contacts_id']         = $dispatcher[0]['gather_contacts_id'];
-            $list['line_gather_name']           = $gather_address->gather_name;
-            $list['line_gather_tel']            = $gather_address->gather_tel;
-            $list['line_gather_sheng']          = $gather_address->gather_sheng;
-            $list['line_gather_sheng_name']     = $gather_address->gather_sheng_name;
-            $list['line_gather_shi']            = $gather_address->gather_shi;
-            $list['line_gather_shi_name']       = $gather_address->gather_shi_name;
-            $list['line_gather_qu']             = $gather_address->gather_qu;
-            $list['line_gather_qu_name']        = $gather_address->gather_qu_name;
-            $list['line_gather_address']        = $gather_address->gather_address;
-            $list['line_gather_address_longitude'] = $gather_address->gather_address_longitude;
-            $list['line_gather_address_latitude']  = $gather_address->gather_address_latitude;
+            $list['line_gather_name']           = $gather_address->contacts;
+            $list['line_gather_tel']            = $gather_address->tel;
+            $list['line_gather_sheng']          = $gather_address->sheng;
+            $list['line_gather_sheng_name']     = $gather_address->sheng_name;
+            $list['line_gather_shi']            = $gather_address->shi;
+            $list['line_gather_shi_name']       = $gather_address->shi_name;
+            $list['line_gather_qu']             = $gather_address->qu;
+            $list['line_gather_qu_name']        = $gather_address->qu_name;
+            $list['line_gather_address']        = $gather_address->address;
+            $list['line_gather_address_longitude'] = $gather_address->longitude;
+            $list['line_gather_address_latitude']  = $gather_address->dimensionality;
 
-            $list['line_send_address_id']       = $send_address->send_address_id;
-            $list['line_send_name']             = $send_address->send_name;
-            $list['line_send_tel']              = $send_address->send_tel;
-            $list['line_send_sheng']            = $send_address->send_sheng;
-            $list['line_send_sheng_name']       = $send_address->send_sheng_name;
-            $list['line_send_shi']              = $send_address->send_shi;
-            $list['line_send_shi_name']         = $send_address->send_shi_name;
-            $list['line_send_qu']               = $send_address->send_qu;
-            $list['line_send_qu_name']          = $send_address->send_qu_name;
-            $list['line_send_address']          = $send_address->send_address;
-            $list['line_send_address_longitude']= $send_address->send_address_longitude;
-            $list['line_send_address_latitude'] = $send_address->send_address_latitude;
+            $list['line_send_address_id']       = $send_address->self_id;
+            $list['line_send_name']             = $send_address->contacts;
+            $list['line_send_tel']              = $send_address->tel;
+            $list['line_send_sheng']            = $send_address->sheng;
+            $list['line_send_sheng_name']       = $send_address->sheng_name;
+            $list['line_send_shi']              = $send_address->shi;
+            $list['line_send_shi_name']         = $send_address->shi_name;
+            $list['line_send_qu']               = $send_address->qu;
+            $list['line_send_qu_name']          = $send_address->qu_name;
+            $list['line_send_address']          = $send_address->address;
+            $list['line_send_address_longitude']= $send_address->longitude;
+            $list['line_send_address_latitude'] = $send_address->dimensionality;
 
             $list['on_line_flag'] = 'Y';
             $list['on_line_money'] = $total_money * 100;
@@ -3512,7 +3512,7 @@ class OrderController extends Controller{
 //            $list['pay_type'] = $pay_type;
             $list['remark'] = $remark;
             $list['car_type'] = $car_type;
-            $list['reduce_price'] = $reduce_price;
+//            $list['reduce_price'] = $reduce_price;
             if ($pay_type == 'offline') {
                 $list['order_status'] = 2;
             }
@@ -3661,7 +3661,7 @@ class OrderController extends Controller{
         $pay_type    = $request->input('pay_type');
         $remark    = $request->input('remark')??''; //备注
         $reduce_price    = $request->input('reduce_price');//立减金额
-//       /*** 虚拟数据
+       /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
         $input['line_id']     = $line_id='line_202106031747275293691321';
@@ -3768,7 +3768,7 @@ class OrderController extends Controller{
 //                 'gather_tel'=>'123456_ga',
 //             ],
         ];
-//        **/
+        **/
         $rules = [
             'order_type'=>'required',
         ];
