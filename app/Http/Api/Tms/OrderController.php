@@ -3264,6 +3264,7 @@ class OrderController extends Controller{
         $remark = $request->input('remark') ?? ''; //备注
         $app_flag = $request->input('app_flag');
         $depart_time = $request->input('depart_time') ?? null; //干线发车时间
+        $user_type  = $request->input('user_type');
         /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
@@ -3429,6 +3430,7 @@ class OrderController extends Controller{
 //            $data['pay_type']                     = $pay_type;
             $data['car_type']                       = $car_type;
             $data['remark']                         = $remark;
+            $data['user_type']                      = $user_type;
 //            $data['reduce_price']                   = $reduce_price;
             /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
             $inserttt = [];
@@ -3512,6 +3514,7 @@ class OrderController extends Controller{
 //            $list['pay_type'] = $pay_type;
             $list['remark'] = $remark;
             $list['car_type'] = $car_type;
+            $list['user_type'] = $user_type;
 //            $list['reduce_price'] = $reduce_price;
             if ($pay_type == 'offline') {
                 $list['order_status'] = 2;
@@ -3662,6 +3665,7 @@ class OrderController extends Controller{
         $pay_type    = $request->input('pay_type');
         $remark    = $request->input('remark')??''; //备注
         $reduce_price    = $request->input('reduce_price');//立减金额
+        $user_type       = $request->input('user_type');
        /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
@@ -4090,7 +4094,7 @@ class OrderController extends Controller{
             $data['pay_type']                   = $pay_type;
 
             $data['remark']                     = $remark;
-
+            $data['user_type']                  = $user_type;
             /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
             $inserttt=[];
 
@@ -4169,8 +4173,8 @@ class OrderController extends Controller{
             $list['good_info']                  = $good_info;
             $list['clod']                       = json_encode($clodss,JSON_UNESCAPED_UNICODE);
             $list['pay_type']                   = $pay_type;
-            $list['remark']                   = $remark;
-            $list['car_type']                   = $car_type;
+            $list['remark']                     = $remark;
+            $list['user_type']                  = $user_type;
             $list['reduce_price']               = $reduce_price;
             if ($pay_type == 'offline'){
                 $list['order_status'] = 2;
@@ -4415,13 +4419,13 @@ class OrderController extends Controller{
             ['on_line_flag','=','Y'],
             ['order_type','=','lift'],
             ['order_status','=',2],
-            ['user_type','=','driver']
+            ['user_type','=','user']
         ];
         $where1 = [
             ['on_line_flag','=','Y'],
             ['order_type','=','lift'],
             ['order_status','=',2],
-            ['user_type','=','driver'],
+            ['user_type','=','user'],
         ];
         if ($startcity){
             $where[] = ['send_shi_name','=',$startcity];
