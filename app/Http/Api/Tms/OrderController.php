@@ -3650,6 +3650,7 @@ class OrderController extends Controller{
         $price         = $request->input('price');//运输费
         $line_price    = $request->input('line_price')??0;//运输费
         $total_money   = $request->input('total_money');//总计费用
+        $more_money    = $request->input('more_money');
         $good_name_n   = $request->input('good_name');
         $good_number_n = $request->input('good_number');
         $good_weight_n = $request->input('good_weight');
@@ -4288,7 +4289,7 @@ class OrderController extends Controller{
     }
 
     /**
-     * 用户发布订单列表
+     * 用户发布订单列表  /api/order/userFreeRideList
      * */
     public function userFreeRideList(Request $request){
         $pay_status     =config('tms.tms_order_status_type');
@@ -4312,13 +4313,115 @@ class OrderController extends Controller{
 
         $where=[
             ['on_line_flag','=','Y'],
-            ['pay_type','=','online'],
-            ['order_status','=',2]
+            ['order_type','=','lift'],
+            ['order_status','=',2],
+//            ['user_type','=','user']
         ];
         $where1 = [
             ['on_line_flag','=','Y'],
-            ['pay_type','=','offline'],
-            ['order_status','=',2]
+            ['order_type','=','lift'],
+            ['order_status','=',2],
+//            ['user_type','=','user']
+        ];
+        if ($startcity){
+            $where[] = ['send_shi_name','=',$startcity];
+            $where1[] = ['send_shi_name','=',$startcity];
+        }
+        if ($endcity){
+            $where[] = ['gather_shi_name','=',$endcity];
+            $where1[] = ['send_shi_name','=',$startcity];
+        }
+        $select=['self_id','order_type','order_status','receiver_id','clod','gather_time','send_time','company_name','dispatch_flag','group_code','group_name','use_flag','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_sheng_name','send_shi_name'
+            ,'send_qu_name','send_address','total_money','good_info','good_number','good_weight','good_volume','carriage_group_name','on_line_money','line_gather_address_id','line_gather_contacts_id','line_gather_name','line_gather_tel',
+            'line_gather_sheng','line_gather_shi','line_gather_qu','line_gather_sheng_name','line_gather_shi_name','line_gather_qu_name' , 'line_gather_address',
+            'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi',
+            'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','total_user_id','car_type'
+        ];
+        $select1 = ['self_id','parame_name'];
+        $data['total']=TmsOrderDispatch::where($where)->orWhere($where1)->whereNull('receiver_id')->count(); //总的数据量
+        $data['items']=TmsOrderDispatch::with(['tmsCarType'=>function($query)use($select1){
+            $query->select($select1);
+        }])
+
+            ->where($where)->orWhere($where1)->whereNull('receiver_id')
+            ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
+            ->select($select)->get();
+        $data['group_show']='Y';
+//        dd($data);
+        foreach ($data['items'] as $k=>$v) {
+            $v->order_type_show=$tms_order_type[$v->order_type]??null;
+            $v->total_money = number_format($v->total_money/100);
+            $v->on_line_money = number_format($v->on_line_money/100);
+//            $temperture = json_decode($v->clod);
+//            foreach ($temperture as $kk => $vv){
+//                $temperture[$kk]    = $tms_control_type[$vv] ?? null;
+//            }
+//            $v->clod = implode(',',$temperture);
+            $v->order_type       = $tms_line_type[$v->order_type] ?? null;
+            $v->order_id_show    = substr($v->self_id,15);
+            $v->send_time        = date('m-d H:i',strtotime($v->send_time));
+            $v->gather_time      = date('m-d H:i',strtotime($v->gather_time));
+            if ($v->tmsCarType){
+                $v->car_type_show = $v->tmsCarType->parame_name;
+            }
+
+            $v->start_time_show = '装车时间 '.$v->send_time;
+            $v->end_time_show = '送达时间 '.$v->gather_time;
+            if ($v->tmsCarType){
+                $v->car_show = '车型 '.$v->tmsCarType->parame_name;
+            }
+            $v->temperture_show = '温度 '.$v->clod;
+            $v->background_color_show = '#0088F4';
+            $v->text_color_show = '#000000';
+
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+                $v->background_color_show = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->background_color_show = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+            }
+        }
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
+    }
+    /**
+     * 承运发布订单列表
+     * */
+    public function freeRideList(Request $request){
+        $pay_status     =config('tms.tms_order_status_type');
+        $dispatch_status     =config('tms.tms_dispatch_type');
+        $online_status     =config('tms.tms_online_type');
+        /** 接收中间件参数**/
+
+        $carriage_flag    =array_column(config('tms.carriage_flag'),'name','key');
+        $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
+        $tms_control_type = array_column(config('tms.tms_control_type'),'name','key');
+        $tms_line_type    = array_column(config('tms.tms_line_type'),'name','key');
+        /**接收数据*/
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
+        $use_flag       =$request->input('use_flag');
+        $group_code     =$request->input('group_code');
+        $startcity      =$request->input('startcity')??'';
+        $endcity        =$request->input('endcity')??'';
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
+
+        $where=[
+            ['on_line_flag','=','Y'],
+            ['order_type','=','lift'],
+            ['order_status','=',2],
+            ['user_type','=','driver']
+        ];
+        $where1 = [
+            ['on_line_flag','=','Y'],
+            ['order_type','=','lift'],
+            ['order_status','=',2],
+            ['user_type','=','driver'],
         ];
         if ($startcity){
             $where[] = ['send_shi_name','=',$startcity];
@@ -4384,12 +4487,6 @@ class OrderController extends Controller{
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;
         return $msg;
-    }
-    /**
-     * 承运发布订单列表
-     * */
-    public function freeRideList(Request $request){
-
     }
 
     /**
