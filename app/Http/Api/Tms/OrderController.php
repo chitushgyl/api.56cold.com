@@ -3660,10 +3660,10 @@ class OrderController extends Controller{
         $good_volume_n = $request->input('good_volume');
         $dispatcher    = $request->input('dispatcher') ?? [];
         $clod          = $request->input('clod');
-        $gather_time    = $request->input('gather_time')??null;
-        $send_time    = $request->input('send_time')??null;
-        $pay_type    = $request->input('pay_type');
-        $remark    = $request->input('remark')??''; //备注
+        $gather_time   = $request->input('gather_time')??null;
+        $send_time     = $request->input('send_time')??null;
+        $pay_type      = $request->input('pay_type');
+        $remark        = $request->input('remark')??''; //备注
         $reduce_price    = $request->input('reduce_price');//立减金额
         $user_type       = $request->input('user_type');
        /*** 虚拟数据
@@ -4494,7 +4494,7 @@ class OrderController extends Controller{
     }
 
     /**
-     *获取当前位置距起终点距离
+     * 获取当前位置距起终点距离
      * /api/order/get_distance
      * @param Array $start_city
      * @param Array $end_city
@@ -4538,14 +4538,46 @@ class OrderController extends Controller{
             $b++;
         }
 //        dd($start_kilo,$end_kilo);
-        $data['start_kilo'] = $start_kilo;
-        $data['end_kilo'] = $end_kilo;
+        $data['end_kilo'] = $start_kilo;
+        $data['start_kilo'] = $end_kilo;
         $msg['code'] = 200;
         $msg['msg']  = '';
         $msg['data'] = $data;
         return $msg;
 
     }
+
+    /**
+     * 这个类太长了吧，但是我又不想分开写，还要写路由，想命名，好麻烦！将就着看吧
+     * 写的太乱了，好垃圾的代码....
+     * */
+
+
+    /**
+                          /---------------\
+                         /                 \
+                        /                   \
+                       /   XXXX     XXXX     \
+                       \   XXXX     XXXX     /
+                        \  XXX       XXX    /
+                         \         X       /
+                         --\     XXX     /--
+                          | |    XXX    | |
+                          | |           | |
+                          | I I I I I I I |
+                          |  I I I I I I  |
+                           \             /
+                              \-------/
+                    XXX                    XXX
+                   XXXXX                  XXXXX
+                   XXXXXXXXX         XXXXXXXXXX
+                           XXXXXX   XXXXXX
+                              XXXXXXX
+                          XXXXXX   XXXXXX
+                    XXXXXXXXX         XXXXXXXXXX
+                    XXXXX                  XXXXX
+                     XXX                    XXX
+     * */
 
 
 
