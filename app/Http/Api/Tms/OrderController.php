@@ -3326,12 +3326,19 @@ class OrderController extends Controller{
         ];
 
         switch ($project_type) {
+            case 'driver':
+                $company_id = null;
+                $company_name = null;
+                $group_code = null;
+                $group_name = null;
+                $receiver_id = $user_info->total_user_id;
+                break;
             case 'carriage':
                 $company_id = null;
                 $company_name = null;
                 $group_code = null;
                 $group_name = null;
-                $receiver_id = null;
+                $receiver_id = $user_info->group_code;
                 break;
             case 'TMS3PL':
                 $company_id = null;
@@ -3639,7 +3646,7 @@ class OrderController extends Controller{
         $now_time   = date('Y-m-d H:i:s',time());
         $table_name = 'tms_order';
         $user_info  = $request->get('user_info');//接收中间件产生的参数
-        $project_type = 'company';
+//        $project_type = 'company';
         $total_user_id  = $user_info->total_user_id;
 //        dd($user_info);
         $input      =$request->all();
