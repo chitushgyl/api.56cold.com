@@ -260,6 +260,7 @@ class DispatchController extends CommonController{
             $where=[
                 ['delete_flag','=','Y'],
                 ['receiver_id','=',$group_code],
+                ['order_type','!=','lift'],
             ];
             $select=['self_id','receiver_id','company_name','create_time','create_time','group_name','group_code','order_type','order_id',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status','car_type','receipt_flag','remark',
