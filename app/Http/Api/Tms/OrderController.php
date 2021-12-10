@@ -3180,7 +3180,7 @@ class OrderController extends Controller{
         }else{
             $discount_price = 0;
         }
-        if ($type == 'vehicle'){
+        if ($type == 'vehicle' || $type == 'lift'){
             $money_info1['name'] = '里程运费';
             $money_info2['name'] = '装货费';
             $money_info3['name'] = '卸货费';
