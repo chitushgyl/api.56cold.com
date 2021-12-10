@@ -18,6 +18,7 @@ use App\Models\User\UserCapital;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use PhpParser\Node\Stmt\DeclareDeclare;
+use App\Http\Controllers\TmsController as Tms;
 
 class TakeController extends Controller{
     /**
