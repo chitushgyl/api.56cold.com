@@ -185,6 +185,7 @@ Route::group([
     Route::any('/dispatch/carriageDone','DispatchController@carriageDone');
     Route::any('/dispatch/uploadReceipt','DispatchController@uploadReceipt');
     Route::any('/dispatch/liftOrder','DispatchController@liftOrder');
+    Route::any('/dispatch/liftDispatch','DispatchController@liftDispatch');
     Route::group([
         "middleware"=>['daily'],
     ], function(){

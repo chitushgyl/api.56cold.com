@@ -3673,6 +3673,7 @@ class OrderController extends Controller{
         $remark        = $request->input('remark')??''; //备注
         $reduce_price    = $request->input('reduce_price');//立减金额
         $user_type       = $request->input('user_type');
+        $carpool       = $request->input('carpool');
        /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
@@ -4102,6 +4103,7 @@ class OrderController extends Controller{
 
             $data['remark']                     = $remark;
             $data['user_type']                  = $user_type;
+            $data['carpool']                    = $carpool;
             /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
             $inserttt=[];
 
@@ -4183,6 +4185,7 @@ class OrderController extends Controller{
             $list['remark']                     = $remark;
             $list['user_type']                  = $user_type;
             $list['reduce_price']               = $reduce_price;
+            $list['carpool']                    = $carpool;
             if ($pay_type == 'offline'){
                 $list['order_status'] = 2;
             }

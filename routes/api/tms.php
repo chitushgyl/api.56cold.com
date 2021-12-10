@@ -191,6 +191,7 @@ Route::group([
         Route::any('/take/upload_receipt','TakeController@upload_receipt');
         Route::any('/take/order_cancel','TakeController@order_cancel');
         Route::any('/take/liftOrder','TakeController@liftOrder');
+        Route::any('/take/liftDispatch','TakeController@liftDispatch');
 
         /** TMS用户开票**/
         Route::any('/bill/order_list','BillController@order_list');
