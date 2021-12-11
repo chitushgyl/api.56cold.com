@@ -16,6 +16,7 @@ use App\Models\Tms\TmsOrderMoney;
 use App\Models\Tms\TmsReceipt;
 use App\Models\User\UserCapital;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpParser\Node\Stmt\DeclareDeclare;
 use App\Http\Controllers\TmsController as Tms;
@@ -1310,26 +1311,17 @@ class TakeController extends Controller{
      * */
     public function liftDispatch(Request $request,Tms $tms){
         $user_info = $request->get('user_info');//接收中间件产生的参数
-        $operationing   = $request->get('operationing');//接收中间件产生的参数
         $now_time       =date('Y-m-d H:i:s',time());
-        $table_name     ='tms_carriage';
-
-        $operationing->access_cause     ='创建调度';
-        $operationing->table            =$table_name;
-        $operationing->operation_type   ='create';
-        $operationing->now_time         =$now_time;
-        $operationing->type             ='add';
-
         $input              =$request->all();
 
         /** 接收数据*/
-        $dispatch_list      =$request->input('dispatch_list');
-        $carriage_flag      =$request->input('carriage_flag');
+        $dispatch_list      = $request->input('dispatch_list');
+        $carriage_flag      = $request->input('carriage_flag');
         $total_price 		= $request->input('total_price');//应付费用
         $car_info 			= $request->input('car_info');//司机车辆信息
+
         /*** 虚拟数据
         $input['dispatch_list']     =$dispatch_list='dispatch_202101311523511804451337,dispatch_202101311514279957651368';
-        //        $input['company_id']        =$company_id='company_202012291153523141320375'; //
         $input['carriage_flag']        =$carriage_flag='driver';  // 自己oneself，个体司机driver，承运商carriers 组合compose'
         $input['car_info']         =$car_info = [['car_id'=>'','type'=>'lease','car_number'=>'沪V12784','contacts'=>'刘伯温','tel'=>'19819819819','price'=>500,'company_id'='company_202102241023099922958143'],
         ['car_id'=>'','type'=>'oneself','car_number'=>'沪V44561','contacts'=>'赵匡胤','tel'=>'16868686868','price'=>100,'company_id'='']];
@@ -1337,11 +1329,12 @@ class TakeController extends Controller{
          * ***/
         $rules=[
             'dispatch_list'=>'required',
+            'car_info'=>'required',
         ];
         $message=[
             'dispatch_list.required'=>'必须选择最少一个可调度单',
+            'car_info.required'=>'请选择车辆',
         ];
-
 
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
@@ -1363,13 +1356,6 @@ class TakeController extends Controller{
                 }
             }
             $orderList=TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select1)->get();
-            if ($orderList){
-                $id_list = array_column($orderList->toArray(),'order_id');
-                $tmsOrder['order_status'] = 4;
-                $tmsOrder['update_time']  = $now_time;
-                TmsOrder::whereIn('self_id',$id_list)->update($tmsOrder);
-            }
-
             if(empty($wait_info)){
                 $msg['code'] = 304;
                 $msg['msg'] = '您选择的调度单为空';
@@ -1408,35 +1394,13 @@ class TakeController extends Controller{
                     $order_list['self_id']            =generate_id('driver_');
                     $order_list['carriage_id']        = $carriage_id;
                     $order_list['total_user_id']         = $user_info->total_user_id;
-                    $order_list['create_user_id']     = $user_info->admin_id;
-                    $order_list['create_user_name']   = $user_info->name;
                     $order_list['create_time']        =$order_list['update_time']=$now_time;
                     $order_list['car_id']   = $value['car_id'];
-                    $car_list_info = $tms->get_car($value['car_id'],$value['car_number'],$value['type'],$group_info,$user_info,$now_time);
-                    $order_list['car_id']   = $car_list_info->self_id;
-                    $order_list['car_number']   =  $car_list_info->car_number;
+                    $order_list['car_number']   =  $value['car_number'];
                     $order_list['contacts']   =  $value['contacts'];
                     $order_list['tel']   = $value['tel'];
                     $order_list['price'] = $value['price']*100;
                     $order_info[]=$order_list;
-                    $car_list[] = $car_list_info->car_possess;
-
-                    $money['self_id']                    = generate_id('order_money_');
-                    $money['shouk_driver_id']            = $order_list['self_id'];
-                    $money['shouk_type']                 = 'DRIVER';
-                    $money['fk_group_code']              = $group_info->group_code;
-                    $money['fk_type']                    = 'GROUP_CODE';
-                    $money['ZIJ_group_code']             = $group_info->group_code;
-                    $money['carriage_id']                = $carriage_id;
-                    $money['create_time']                = $now_time;
-                    $money['update_time']                = $now_time;
-                    $money['money']                      = $value['price']*100;
-                    $money['money_type']                 = 'freight';
-                    $money['type']                       = 'out';
-                    $money['driver_id']                  = $order_list['self_id'];
-                    $money['carriage_id']                = $carriage_id;
-                    $order_money[] = $money;
-
                 }
 
             if($cando == 'N'){
@@ -1449,48 +1413,37 @@ class TakeController extends Controller{
             $data['create_user_id']     = $user_info->admin_id;
             $data['create_user_name']   = $user_info->name;
             $data['create_time']        = $data['update_time']=$now_time;
-            $data['group_code']         = $group_info->group_code;
-            $data['group_name']         = $group_info->group_name;
+            $data['total_user_id']      = $user_info->total_user_id;
             $data['total_money']        = $total_price*100;
+            $data['carriage_flag']      = 'compose';
             $data['order_status']       = 2;
-
-
-            if ($carriage_flag == 'oneself' || $carriage_flag == 'driver'){
-                $count_car = array_unique($car_list);
-                if ($count_car >1){
-                    $data['carriage_flag']   =  'compose';
-                }
-            }else{
-                $data['carriage_flag']       =  $carriage_flag;
-            }
-            $id=TmsCarriage::insert($data);
-            TmsCarriageDispatch::insert($datalist);
-            TmsOrderCost::insert($order_money);
-            if ($carriage_flag == 'oneself' || $carriage_flag == 'driver'){
+            DB::beginTransaction();
+            try{
+                $id=TmsCarriage::insert($data);
+                TmsCarriageDispatch::insert($datalist);
+                TmsOrderCost::insert($order_money);
                 TmsCarriageDriver::insert($order_info);
-            }
 
-
-            $data_update['dispatch_flag']      ='N';
-            $data_update['order_status']       = 4;
-            $data_update['update_time']        =$now_time;
-            TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$dispatch_list))->update($data_update);
-
-
-            $operationing->table_id=$carriage_id;
-            $operationing->old_info=null;
-            $operationing->new_info=$data;
-
-            if($id){
+                $data_update['dispatch_flag']      ='N';
+                $data_update['order_status']       = 4;
+                $data_update['update_time']        =$now_time;
+                TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$dispatch_list))->update($data_update);
+                if ($orderList){
+                    $id_list = array_column($orderList->toArray(),'order_id');
+                    $tmsOrder['order_status'] = 4;
+                    $tmsOrder['update_time']  = $now_time;
+                    TmsOrder::whereIn('self_id',$id_list)->update($tmsOrder);
+                }
+                DB::commit();
                 $msg['code'] = 200;
                 $msg['msg'] = "操作成功";
                 return $msg;
-            }else{
+            }catch(\Exception $e){
+                DB::rollBack();
                 $msg['code'] = 302;
                 $msg['msg'] = "操作失败";
                 return $msg;
             }
-
         }else{
             //前端用户验证没有通过
             $erro=$validator->errors()->all();
