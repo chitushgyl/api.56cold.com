@@ -1348,8 +1348,8 @@ class TakeController extends Controller{
                 'good_info','good_number','good_weight','good_volume'];
             $select1 = ['order_id'];
             $wait_info=TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select)->get();
-            foreach($wait_info as $key => $value){
-                if ($value->carpool == 'N'){
+            foreach($wait_info as $key => $value ){
+                if ($value->carpool == 'N' && count($wait_info) > 1){
                     $msg['code'] = 304;
                     $msg['msg'] = '订单：'.$value->self_id.'不接受拼车，请重新调度';
                     return $msg;
