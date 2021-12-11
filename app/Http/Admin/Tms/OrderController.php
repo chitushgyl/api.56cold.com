@@ -4330,10 +4330,11 @@ class OrderController extends CommonController{
 }
 
     public function addUserFreeRide(Request $request,Tms $tms){
-        $project_type       =$request->get('project_type');
+
         $now_time   = date('Y-m-d H:i:s',time());
         $table_name = 'tms_order';
         $user_info  = $request->get('user_info');//接收中间件产生的参数
+        $project_type       =$user_info->type;
 //        $project_type = 'company';
         $total_user_id  = $user_info->total_user_id;
 //        dd($user_info);
