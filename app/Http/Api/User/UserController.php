@@ -501,6 +501,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['receiver_id','=',$user_info->group_code],
+                            ['order_type','!=','lift'],
                         ];
                         $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
 
@@ -536,6 +537,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['receiver_id','=',$user_info->group_code],
+                            ['order_type','!=','lift'],
                         ];
                         $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
 
@@ -578,6 +580,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['receiver_id','=',$user_info->total_user_id],
+                            ['order_type','!=','lift'],
                         ];
                         $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
 
