@@ -325,7 +325,7 @@ class DiscussController extends CommonController{
                 $data['self_id']          = generate_id('view_');
                 $data['group_code']       = $group_code;
                 $data['create_time']      = $data['update_time'] = $now_time;
-                if ($type == 'vehicle'){
+                if ($type == 'vehicle' || $type == 'lift'){
                     foreach(json_decode($carriage_id,true) as $key => $value){
                         $data['carriage_id']    = $value;
                         $id = TmsDiscuss::insert($data);

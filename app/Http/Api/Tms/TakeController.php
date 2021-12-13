@@ -1247,9 +1247,9 @@ class TakeController extends Controller{
                         if ($value->id == 120 ){
                             $button1[] = $value;
                         }
-                        if ($value->id == 121){
-                            $button1[] = $value;
-                        }
+//                        if ($value->id == 121){
+//                            $button1[] = $value;
+//                        }
                         if ($value->id == 122){
                             $button2[] = $value;
                         }
