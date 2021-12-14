@@ -2276,7 +2276,7 @@ class DispatchController extends CommonController{
             if ($v->id == 705){
                 $button_info5[] = $v;
             }
-            if($v->id ==  645){
+            if($v->id ==  764){
                 $button_info1[]=$v;
                 $button_info2[]=$v;
                 $button_info3[] = $v;
