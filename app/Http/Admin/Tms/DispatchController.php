@@ -485,7 +485,7 @@ class DispatchController extends CommonController{
             ];
             $select=['self_id','receiver_id','company_name','create_time','create_time','group_name',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status',
-                'send_sheng_name','send_shi_name','send_qu_name','send_address',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address','order_type',
                 'good_info','good_number','good_weight','good_volume'];
 
             $data['info']=TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$group_code))->select($select)->get();
@@ -1693,9 +1693,9 @@ class DispatchController extends CommonController{
     }
 
     /*
-     * 顺风车列表 /api/dispathc/liftOrder
+     * 顺风车列表 /tms/dispatch/createLift
      * */
-    public function liftOrder(Request $request){
+    public function createLift(Request $request){
         $group_info             = $request->get('group_info');
         $buttonInfo             = $request->get('buttonInfo');
 //        dd($buttonInfo);
@@ -1921,6 +1921,13 @@ class DispatchController extends CommonController{
             }
             return $msg;
         }
+    }
+
+    /**
+     *  /tms/dispatch/liftOrder
+     * */
+    public function liftOrder(Request $request){
+
     }
 
     /*

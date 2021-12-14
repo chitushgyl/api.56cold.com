@@ -186,6 +186,7 @@ Route::group([
     Route::any('/dispatch/carriageDone','DispatchController@carriageDone');
     Route::any('/dispatch/uploadReceipt','DispatchController@uploadReceipt');
     Route::any('/dispatch/liftOrder','DispatchController@liftOrder');
+    Route::any('/dispatch/createLift','DispatchController@createLift');
     Route::any('/dispatch/liftDispatch','DispatchController@liftDispatch');
     Route::any('/dispatch/liftPage','DispatchController@liftPage');
     Route::any('/dispatch/liftList','DispatchController@liftList');
