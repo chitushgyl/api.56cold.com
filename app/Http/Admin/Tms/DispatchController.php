@@ -90,6 +90,7 @@ class DispatchController extends CommonController{
             ['type'=>'=','name'=>'group_code','value'=>$group_code],
             ['type'=>'=','name'=>'order_status','value'=>$state],
             ['type'=>'=','name'=>'on_line_flag','value'=>$on_line_flag],
+            ['type'=>'!=','name'=>'order_type','value'=>'lift'],
         ];
 
 
@@ -2164,6 +2165,174 @@ class DispatchController extends CommonController{
             }
             return $msg;
         }
+    }
+
+    /**
+     * 可调度顺风车列表 /tms/dispatch/liftPage
+     * */
+    public function liftPage(Request $request){
+        $pay_status     =config('tms.tms_order_status_type');
+        $dispatch_status     =config('tms.tms_dispatch_type');
+        $online_status     =config('tms.tms_online_type');
+        /** 接收中间件参数**/
+        $group_info     = $request->get('group_info');//接收中间件产生的参数
+        $button_info    = $request->get('anniu');//接收中间件产生的参数
+
+
+        $carriage_flag    =array_column(config('tms.carriage_flag'),'name','key');
+        $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
+        $tms_order_inco_type         =array_column(config('tms.tms_order_inco_type'),'icon','key');
+        /**接收数据*/
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
+        $use_flag       =$request->input('use_flag');
+        $group_code     =$request->input('group_code');
+        $state          =$request->input('order_status');
+        $on_line_flag   =$request->input('online_flag');
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
+
+        $search=[
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
+            ['type'=>'all','name'=>'use_flag','value'=>$use_flag],
+            ['type'=>'=','name'=>'group_code','value'=>$group_code],
+            ['type'=>'=','name'=>'order_status','value'=>$state],
+            ['type'=>'=','name'=>'on_line_flag','value'=>$on_line_flag],
+            ['type'=>'=','name'=>'order_type','value'=>'lift'],
+        ];
+
+
+        $where=get_list_where($search);
+
+        $select=['self_id','order_type','order_status','company_name','dispatch_flag','group_code','group_name','use_flag','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_sheng_name','send_shi_name'
+            ,'send_qu_name','send_address','total_money','good_info','good_number','good_weight','good_volume','carriage_group_name','on_line_money','receiver_id','total_user_id','receipt_flag'];
+        $selectUser = ['self_id','tel'];
+        switch ($group_info['group_id']){
+            case 'all':
+                $data['total']=TmsOrderDispatch::where($where)->count(); //总的数据量
+                $data['items']=TmsOrderDispatch::with(['userReg' => function($query)use($select,$selectUser){
+                    $query->where('delete_flag','=','Y');
+                    $query->select($selectUser);
+                }])
+                    ->where($where);
+                $data['items'] = $data['items']
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='Y';
+                break;
+
+            case 'one':
+                $where1[]=['receiver_id','=',$group_info['group_code']];
+                $where[] = ['group_code','=',$group_info['group_code']];
+                $data['total']=TmsOrderDispatch::where($where)->count(); //总的数据量
+                $data['items']=TmsOrderDispatch::with(['userReg' => function($query)use($select,$selectUser){
+                    $query->where('delete_flag','=','Y');
+                    $query->select($selectUser);
+                }])
+                    ->where($where)->orWhere($where1);
+
+                $data['items'] = $data['items']
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='N';
+                break;
+
+            case 'more':
+                $data['total']=TmsOrderDispatch::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
+                $data['items']=TmsOrderDispatch::
+                with(['userReg' => function($query)use($select,$selectUser){
+                    $query->where('delete_flag','=','Y');
+                    $query->select($selectUser);
+                }])
+                    ->where($where)->whereIn('group_code',$group_info['group_code']);
+                $data['items'] = $data['items']
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='Y';
+                break;
+        }
+        $button_info1=[];
+        $button_info2=[];
+        $button_info3 = [];
+        $button_info4 = [];
+        $button_info5 = [];
+        foreach ($button_info as $k => $v){
+            if($v->id == 643){
+                $button_info1[]=$v;
+            }
+            if($v->id == 644){
+                $button_info2[]=$v;
+            }
+            if ($v->id == 704){
+                $button_info4[] = $v;
+            }
+            if ($v->id == 705){
+                $button_info5[] = $v;
+            }
+            if($v->id ==  645){
+                $button_info1[]=$v;
+                $button_info2[]=$v;
+                $button_info3[] = $v;
+                $button_info4[] = $v;
+                $button_info5[] = $v;
+            }
+
+
+        }
+//        dd($button_info1,$button_info2,$button_info3);
+        foreach ($data['items'] as $k=>$v) {
+            $v->button_info=$button_info;
+            $v->order_type_show=$tms_order_type[$v->order_type]??null;
+            $v->type_inco = img_for($tms_order_inco_type[$v->order_type],'no_json')??null;
+            $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
+            $v->pay_status_text=$pay_status[$v->order_status-1]['pay_status_text']??null;
+            if ($v->dispatch_flag == 'Y'){
+                $v->dispatch_use_flag = 1;
+            }else{
+                $v->dispatch_use_flag = 2;
+            }
+            $v->dispatch_status_color=$dispatch_status[$v->dispatch_use_flag-1]['dispatch_status_color']??null;
+            $v->dispatch_status_text=$dispatch_status[$v->dispatch_use_flag-1]['name']??null;
+            if ($v->on_line_flag == 'Y'){
+                $v->on_line_use_flag = 1;
+            }else{
+                $v->on_line_use_flag = 2;
+            }
+            $v->online_status_color=$online_status[$v->on_line_use_flag-1]['online_status_color']??null;
+            $v->online_status_text=$online_status[$v->on_line_use_flag-1]['name']??null;
+            $v->carriage_flag_show=$carriage_flag[$v->carriage_flag]??null;
+
+            if($v->dispatch_flag =='N' && $v->on_line_flag =='Y' && $v->order_status != 2){
+                $v->button_info=$button_info1;
+            }elseif($v->dispatch_flag =='Y' && $v->on_line_flag =='N' && ($v->order_status == 2 || $v->order_status == 1)){
+                $v->button_info=$button_info2;
+            }elseif($v->dispatch_flag =='N' && $v->on_line_flag =='N'){
+                $v->button_info=$button_info3;
+            }else{
+                $v->button_info=$button_info2;
+            }
+//            dd($button_info4);
+            if ($v->order_status == 4){
+                $v->button_info = $button_info4;
+            }
+            if ($v->order_status == 5 && $v->receipt_flag == 'N'){
+                $v->button_info = $button_info5;
+            }
+            $v->total_money = number_format($v->total_money/100,2);
+            $v->on_line_money = number_format($v->on_line_money/100,2);
+
+            if (empty($v->total_user_id)){
+                $v->object_show = $v->group_name;
+            }else{
+                $v->object_show = $v->userReg->tel;
+            }
+
+        }
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+
+        return $msg;
     }
 }
 ?>
