@@ -2334,5 +2334,21 @@ class DispatchController extends CommonController{
 
         return $msg;
     }
+
+    /**
+     * 顺风车订单列表list  /tms/dispatch/liftList
+     * */
+    public function liftList(Request $request){
+        $group_info             = $request->get('group_info');
+        $data['page_info']      =config('page.listrows');
+        $data['button_info']    =$request->get('anniu');
+        $order_state_type        =config('tms.3pl_dispatch_state');
+        $data['state_info']       =$order_state_type;
+
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
+    }
 }
 ?>
