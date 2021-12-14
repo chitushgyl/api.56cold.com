@@ -112,6 +112,7 @@ class BillController extends CommonController {
             $v->button_info=$button_info;
             $v->self_id_show = substr($v->self_id,15);
             $v->send_time    = date('m-d H:i',strtotime($v->send_time));
+            $v->good_info    = json_decode($v->good_info,true);
             if ($v->order_type == 'vehicle'){
                 if ($v->TmsCarType){
                     $v->car_type_show = $v->TmsCarType->parame_name;
