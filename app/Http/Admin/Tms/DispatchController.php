@@ -1727,7 +1727,7 @@ class DispatchController extends CommonController{
                 ['receiver_id','=',$group_code],
                 ['order_type','=','lift'],
             ];
-            $select=['self_id','receiver_id','company_name','create_time','create_time','group_name','group_code','order_type','order_id',
+            $select=['self_id','receiver_id','company_name','create_time','create_time','group_name','group_code','order_type','order_id','carpool',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status','car_type','receipt_flag','remark',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address','clod','on_line_money','company_id','total_user_id','delete_flag',
                 'good_info','good_number','good_weight','good_volume','total_money','send_time','gather_time','pay_type','pay_status','dispatch_flag'];
