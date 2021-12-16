@@ -131,8 +131,7 @@ class DispatchController extends CommonController{
 
             case 'more':
                 $data['total']=TmsOrderDispatch::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
-                $data['items']=TmsOrderDispatch::
-                with(['userReg' => function($query)use($select,$selectUser){
+                $data['items']=TmsOrderDispatch::with(['userReg' => function($query)use($select,$selectUser){
                     $query->where('delete_flag','=','Y');
                     $query->select($selectUser);
                 }])
@@ -2231,7 +2230,7 @@ class DispatchController extends CommonController{
             case 'one':
                 $where1[]=['receiver_id','=',$group_info['group_code']];
                 $where[] = ['group_code','=',$group_info['group_code']];
-                $data['total']=TmsOrderDispatch::where($where)->count(); //总的数据量
+                $data['total']=TmsOrderDispatch::where($where)->orWhere($where1)->count(); //总的数据量
                 $data['items']=TmsOrderDispatch::with(['userReg' => function($query)use($select,$selectUser){
                     $query->where('delete_flag','=','Y');
                     $query->select($selectUser);
@@ -2246,8 +2245,7 @@ class DispatchController extends CommonController{
 
             case 'more':
                 $data['total']=TmsOrderDispatch::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
-                $data['items']=TmsOrderDispatch::
-                with(['userReg' => function($query)use($select,$selectUser){
+                $data['items']=TmsOrderDispatch::with(['userReg' => function($query)use($select,$selectUser){
                     $query->where('delete_flag','=','Y');
                     $query->select($selectUser);
                 }])
