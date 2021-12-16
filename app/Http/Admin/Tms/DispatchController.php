@@ -2228,7 +2228,6 @@ class DispatchController extends CommonController{
                 break;
 
             case 'one':
-                dd($where);
                 $where1[]=['receiver_id','=',$group_info['group_code']];
                 $where[] = ['group_code','=',$group_info['group_code']];
                 $data['total']=TmsOrderDispatch::where($where1)->count(); //总的数据量
