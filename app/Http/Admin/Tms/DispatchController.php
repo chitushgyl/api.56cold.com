@@ -94,7 +94,7 @@ class DispatchController extends CommonController{
         ];
 
 
-        $where=get_list_where($search);
+        $where=$where1=get_list_where($search);
 
         $select=['self_id','order_type','order_status','company_name','dispatch_flag','group_code','group_name','use_flag','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_sheng_name','send_shi_name'
         ,'send_qu_name','send_address','total_money','good_info','good_number','good_weight','good_volume','carriage_group_name','on_line_money','receiver_id','total_user_id','receipt_flag'];
