@@ -961,7 +961,7 @@ class DispatchController extends CommonController{
             if(!empty($info->tmsCarriage)){
                 $car_info[] = $order_details11;
             }
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details[] = $order_details3;
                 $order_details[]= $order_details4;
                 $order_details[]= $order_details5;

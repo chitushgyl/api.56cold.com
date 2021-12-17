@@ -613,12 +613,12 @@ class UserController extends Controller{
                         if ($user_info->type == 'TMS3PL' ||$user_info->type == 'company' || $user_info->type == 'business' || $user_info->type == 'dispatcher'){
                             $v->title_show = $user_info->group_name;
                         }elseif($user_info->type == 'driver'){
-                            $v->title_show = '承运企业认证,免费开放更多使用权限.';
+                            $v->title_show = '免费开放企业权限+内部管理系统使用';
                         }else{
-                            $v->title_show = '企业客户认证,免费开放更多使用权限.';
+                            $v->title_show = '免费开放企业权限+内部管理系统使用';
                         }
                     }else{
-                        $v->title_show = '企业客户认证,免费开放更多使用权限.';
+                        $v->title_show = '免费开放企业权限+内部管理系统使用';
                     }
 
                     break;
