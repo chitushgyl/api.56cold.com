@@ -236,7 +236,12 @@ class OrderController extends Controller{
                 }
                 if ($v->TmsCarType){
                     $v->car_type_show = $v->TmsCarType->parame_name;
-                    $v->good_info_show = '车型 '.$v->car_type_show;
+                    if (!empty($v->car_type_show)){
+                        $v->good_info_show = '车型 '.$v->car_type_show;
+                    }else{
+                        $v->good_info_show = '';
+                    }
+
                 }
             }else{
                 $v->good_info_show = '货物 '.$v->good_number.'件'.$v->good_weight.'kg'.$v->good_volume.'方';
