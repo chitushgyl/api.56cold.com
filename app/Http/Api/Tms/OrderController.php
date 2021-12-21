@@ -2718,6 +2718,7 @@ class OrderController extends Controller{
         $send_address = $request->input('send_address');
         $picktype = $request->input('pick_flag')??null;
         $sendtype = $request->input('send_flag')??null;
+        $order_type = $request->input('order_type');
 
         /**虚拟数据
         $input['pick_flag'] = $picktype = 2;  // 'Y' 提货  'N' 自送
@@ -2847,6 +2848,10 @@ class OrderController extends Controller{
             $price['sendprice'] = $sendPrice;//卸货费
             $price['multistorePrice'] = $multistorePrice; // 多点提配费
             $price['maxprice'] = round($allmoney*1.1/100)*100;//预计最大费用
+            if ($order_type == 'lift'){
+                $price['allmoney'] = round($allmoney*0.7/100)*100; // 总费用
+                $price['maxprice'] = round($allmoney*1.1*0.7/100)*100;//预计最大费用
+            }
             $msg['info'] = $price;
             $msg['code'] = 200;
             $msg['msg']  = "数据拉取成功";
