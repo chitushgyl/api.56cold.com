@@ -2278,7 +2278,7 @@ class OrderController extends Controller{
                     $gather_info[] = $gather;
                 }
                 $vvv['clod'] =  $tms_control_type[$vvv['clod']];
-                if ($info->order_type == 'vehicle'){
+                if ($info->order_type == 'vehicle' || $info->order_type == 'lift'){
                     $order_info[$kkk]['good_weight'] = ($vvv['good_weight']/1000).'吨';
                 }
             }
@@ -2294,7 +2294,7 @@ class OrderController extends Controller{
             $info->price       = number_format($info->price/100, 2);
             $info->pick_money  = number_format($info->pick_money/100, 2);
             $info->send_money  = number_format($info->send_money/100, 2);
-            if ($info->order_type == 'vehicle'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lift'){
                 $info->good_weight = ($info->good_weight/1000).'吨';
             }
             $info->color = '#FF7A1A';
@@ -2312,7 +2312,7 @@ class OrderController extends Controller{
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
             $order_details4['color'] = '#000000';
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details3['name'] = '装车时间';
                 $order_details3['value'] = $info->send_time;
                 $order_details3['color'] = '#000000';
