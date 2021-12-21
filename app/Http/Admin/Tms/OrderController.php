@@ -324,7 +324,7 @@ class OrderController extends CommonController{
             }
             $v->self_id_show = substr($v->self_id,15);
             $v->send_time    = date('m-d H:i',strtotime($v->send_time));
-            if ($v->order_type == 'vehicle'){
+            if ($v->order_type == 'vehicle' || $v->order_type == 'lift'){
                 if ($v->TmsCarType){
                     $v->car_type_show = $v->TmsCarType->parame_name;
                 }
@@ -338,7 +338,7 @@ class OrderController extends CommonController{
                 $cold[$key] =$tms_control_type[$value];
             }
             $v->clod= $cold;
-            if($v->order_type == 'vehicle'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lift'){
                 $v->picktime_show = '装车时间 '.$v->send_time;
             }else{
                 $v->picktime_show = '提货时间 '.$v->send_time;
@@ -361,7 +361,7 @@ class OrderController extends CommonController{
             }else{
                 $v->state_font_color = '#FF807D';
             }
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->order_type_color = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){
@@ -659,7 +659,7 @@ class OrderController extends CommonController{
                 return $msg;
             }
 
-            if ($order_type == 'vehicle' || $order_type == 'lcl') {
+            if ($order_type == 'vehicle' || $order_type == 'lcl' || $order_type == 'lift') {
                 if (count($dispatcher) == 0) {
                     $msg['code'] = 302;
                     $msg['msg'] = '请填写订单信息！';
@@ -2147,7 +2147,7 @@ class OrderController extends CommonController{
                     $gather_info[] = $gather;
                 }
                 $vvv['clod'] =  $tms_control_type[$vvv['clod']];
-                if ($info->order_type == 'vehicle'){
+                if ($info->order_type == 'vehicle' || $info->order_type == 'lift'){
                     $order_info[$kkk]['good_weight'] = ($vvv['good_weight']/1000).'吨';
                 }
             }
@@ -2163,7 +2163,7 @@ class OrderController extends CommonController{
             $info->price       = number_format($info->price/100, 2);
             $info->pick_money  = number_format($info->pick_money/100, 2);
             $info->send_money  = number_format($info->send_money/100, 2);
-            if ($info->order_type == 'vehicle'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lift'){
                 $info->good_weight = ($info->good_weight/1000).'吨';
             }
             $info->color = '#FF7A1A';
@@ -2181,7 +2181,7 @@ class OrderController extends CommonController{
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
             $order_details4['color'] = '#000000';
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details3['name'] = '装车时间';
                 $order_details3['value'] = $info->send_time;
                 $order_details3['color'] = '#000000';
@@ -2235,7 +2235,7 @@ class OrderController extends CommonController{
             $order_details[] = $order_details1;
             $order_details[]= $order_details2;
 
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details[] = $order_details3;
                 $order_details[]= $order_details4;
                 $order_details[]= $order_details5;
@@ -4522,7 +4522,7 @@ class OrderController extends CommonController{
                 $group_info    =SystemGroup::where($where_group)->select('group_code','group_name')->first();
             }
             /***开始做二次效验**/
-            if ($order_type == 'vehicle' || $order_type == 'lcl') {
+            if ($order_type == 'vehicle' || $order_type == 'lcl' || $order_type == 'lift') {
                 if (count($dispatcher) == 0) {
                     $msg['code'] = 302;
                     $msg['msg'] = '请填写订单信息！';

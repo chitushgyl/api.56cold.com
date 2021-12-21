@@ -313,7 +313,7 @@ class DispatchController extends CommonController{
                             $value['good_info_show'] .= $v['good_name'] . ',';
                         }
                     }
-                if ($value->order_type == 'vehicle'){
+                if ($value->order_type == 'vehicle' || $value->order_type == 'lift'){
                     if ($value->tmsCarType){
                         $value->car_type_show = $value->tmsCarType->parame_name;
                     }
@@ -324,7 +324,7 @@ class DispatchController extends CommonController{
                 }
                 $value->temperture = implode(',',$temperture);
 
-                if($value->order_type == 'vehicle'){
+                if($value->order_type == 'vehicle' || $value->order_type == 'lift'){
                     $value->picktime_show = '装车时间 '.$value->send_time;
                 }else{
                     $value->picktime_show = '提货时间 '.$value->send_time;
@@ -347,7 +347,7 @@ class DispatchController extends CommonController{
                 }else{
                     $value->state_font_color = '#FF807D';
                 }
-                if($value->order_type == 'vehicle' || $value->order_type == 'lcl'){
+                if($value->order_type == 'vehicle' || $value->order_type == 'lcl' || $value->order_type == 'lift'){
                     $value->order_type_color = '#E4F3FF';
                     $value->order_type_font_color = '#0088F4';
                     if ($value->order_type == 'vehicle'){
@@ -876,7 +876,7 @@ class DispatchController extends CommonController{
             if($info->tmsCarriage){
                 $info->driver_price = $info->tmsCarriage->total_money;
             }
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_info = $info->info;
                 foreach ($order_info as $kkk => $vvv){
                     $order_info[$kkk]['good_weight'] = ($vvv['good_weight']/1000).'吨';
@@ -905,7 +905,7 @@ class DispatchController extends CommonController{
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
             $order_details4['color'] = '#000000';
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details3['name'] = '装车时间';
                 $order_details3['value'] = $info->send_time;
                 $order_details3['color'] = '#000000';
@@ -1777,7 +1777,7 @@ class DispatchController extends CommonController{
                         $value['good_info_show'] .= $v['good_name'] . ',';
                     }
                 }
-                if ($value->order_type == 'vehicle'){
+                if ($value->order_type == 'vehicle' || $value->order_type == 'lift'){
                     if ($value->tmsCarType){
                         $value->car_type_show = $value->tmsCarType->parame_name;
                     }
@@ -1788,7 +1788,7 @@ class DispatchController extends CommonController{
                 }
                 $value->temperture = implode(',',$temperture);
 
-                if($value->order_type == 'vehicle'){
+                if($value->order_type == 'vehicle' || $value->order_type == 'lift'){
                     $value->picktime_show = '装车时间 '.$value->send_time;
                 }else{
                     $value->picktime_show = '提货时间 '.$value->send_time;
@@ -1811,7 +1811,7 @@ class DispatchController extends CommonController{
                 }else{
                     $value->state_font_color = '#FF807D';
                 }
-                if($value->order_type == 'vehicle' || $value->order_type == 'lcl'){
+                if($value->order_type == 'vehicle' || $value->order_type == 'lcl' || $value->order_type == 'lift'){
                     $value->order_type_color = '#E4F3FF';
                     $value->order_type_font_color = '#0088F4';
                     if ($value->order_type == 'vehicle'){

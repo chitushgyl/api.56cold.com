@@ -114,7 +114,7 @@ class TakeController extends Controller{
             $v->temperture_show = '温度 '.$v->clod;
             $v->background_color_show = '#0088F4';
             $v->text_color_show = '#000000';
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->background_color_show = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){
@@ -211,7 +211,7 @@ class TakeController extends Controller{
                 $receipt_info = img_for($info->tmsReceipt->receipt,'more');
                 $info->receipt = $receipt_info;
             }
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_info = $info->info;
                 foreach ($order_info as $kkk => $vvv){
                     $order_info[$kkk]['good_weight'] = ($vvv['good_weight']/1000).'吨';
@@ -234,7 +234,7 @@ class TakeController extends Controller{
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
             $order_details4['color'] = '#000000';
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details3['name'] = '装车时间';
                 $order_details3['value'] = $info->send_time;
                 $order_details3['color'] = '#000000';
@@ -286,7 +286,7 @@ class TakeController extends Controller{
             $order_details[] = $order_details1;
 //            $order_details[]= $order_details2;
 
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl'){
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details[] = $order_details3;
                 $order_details[]= $order_details4;
                 $order_details[]= $order_details5;
@@ -375,7 +375,7 @@ class TakeController extends Controller{
             foreach ($temperture as $kk => $vv){
                 $temperture[$kk]    = $tms_control_type[$vv] ?? null;
             }
-            if ($v->order_type == 'vehicle'){
+            if ($v->order_type == 'vehicle' || $v->order_type == 'lift'){
                 if ($v->tmsCarType){
                     $v->car_type_show = $v->tmsCarType->parame_name;
                 }
@@ -385,7 +385,7 @@ class TakeController extends Controller{
             $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
             $v->pay_status_text=$pay_status[$v->order_status-1]['pay_status_text']??null;
 
-            if($v->order_type == 'vehicle'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lift'){
                 $v->picktime_show = '装车时间 '.$v->send_time;
             }else{
                 $v->picktime_show = '提货时间 '.$v->send_time;
@@ -408,7 +408,7 @@ class TakeController extends Controller{
             }else{
                 $v->state_font_color = '#FF807D';
             }
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->order_type_color = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){
@@ -1186,7 +1186,7 @@ class TakeController extends Controller{
             foreach ($temperture as $kk => $vv){
                 $temperture[$kk]    = $tms_control_type[$vv] ?? null;
             }
-            if ($v->order_type == 'vehicle'){
+            if ($v->order_type == 'vehicle' || $v->order_type == 'lift'){
                 if ($v->tmsCarType){
                     $v->car_type_show = $v->tmsCarType->parame_name;
                 }
@@ -1196,7 +1196,7 @@ class TakeController extends Controller{
             $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
             $v->pay_status_text=$pay_status[$v->order_status-1]['pay_status_text']??null;
 
-            if($v->order_type == 'vehicle'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lift'){
                 $v->picktime_show = '装车时间 '.$v->send_time;
             }else{
                 $v->picktime_show = '提货时间 '.$v->send_time;
@@ -1219,7 +1219,7 @@ class TakeController extends Controller{
             }else{
                 $v->state_font_color = '#FF807D';
             }
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->order_type_color = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){

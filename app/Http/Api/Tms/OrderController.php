@@ -3838,7 +3838,7 @@ class OrderController extends Controller{
                 $group_info    =SystemGroup::where($where_group)->select('group_code','group_name')->first();
             }
             /***开始做二次效验**/
-            if ($order_type == 'vehicle' || $order_type == 'lcl') {
+            if ($order_type == 'vehicle' || $order_type == 'lcl' || $order_type == 'lift') {
                 if (count($dispatcher) == 0) {
                     $msg['code'] = 302;
                     $msg['msg'] = '请填写订单信息！';
@@ -4393,7 +4393,7 @@ class OrderController extends Controller{
             $v->background_color_show = '#0088F4';
             $v->text_color_show = '#000000';
 
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->background_color_show = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){
@@ -4493,7 +4493,7 @@ class OrderController extends Controller{
             $v->background_color_show = '#0088F4';
             $v->text_color_show = '#000000';
 
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->background_color_show = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){
@@ -4782,7 +4782,7 @@ class OrderController extends Controller{
             }else{
                 $v->state_font_color = '#FF807D';
             }
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->order_type_color = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){
