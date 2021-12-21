@@ -227,7 +227,7 @@ class OrderController extends Controller{
             }else{
                 $v->state_font_color = '#FF807D';
             }
-            if($v->order_type == 'vehicle' || $v->order_type == 'lcl'){
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
                 $v->order_type_color = '#E4F3FF';
                 $v->order_type_font_color = '#0088F4';
                 if ($v->order_type == 'vehicle'){
