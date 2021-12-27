@@ -331,6 +331,11 @@ Route::group([
     ], function(){
 
     });
+
+    /** 数据中台**/
+    Route::any('/platformCenter/index','PlatformCenterController@index');
+    Route::any('/platformCenter/order_count','PlatformCenterController@order_count');
+    Route::any('/platformCenter/line_count','PlatformCenterController@line_count');
 });
 
 
