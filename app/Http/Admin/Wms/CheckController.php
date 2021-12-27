@@ -38,14 +38,14 @@ class CheckController extends CommonController{
         $use_flag       = $request->input('use_flag');
         $listrows       = $num;
         $firstrow       = ($page - 1) * $listrows;
-		
+
 
 		$group_code     = $request->input('group_code');
 		$company_id     = $request->input('company_id');
 		$warehouse_id   = $request->input('warehouse_id');
 		$area_id       	= $request->input('area_id');
 		$type       	= $request->input('type');
-		
+
         $search = [
             ['type' => '=', 'name' => 'delete_flag', 'value' => 'Y'],
             ['type' => 'all', 'name' => 'use_flag', 'value' => $use_flag],
@@ -127,7 +127,7 @@ class CheckController extends CommonController{
 
         $table_name     ='wms_stock';
 
-        
+
         $operationing->table            =$table_name;
         $operationing->operation_type   ='create';
         $operationing->now_time         =$now_time;
@@ -171,10 +171,15 @@ class CheckController extends CommonController{
                     'area','row','column','tier','now_num','good_unit','good_target_unit','good_scale','type','create_time'];
 
                 $info=WmsLibraryChange::where($where)->orderBy('create_time', 'desc')->select($select)->get();
+                if ((array)$info){
+                    $msg['code']=302;
+                    $msg['msg']="没有盘点数据";
+                    return $msg;
+                }
                 /** 现在根据查询到的数据去做一个导出的数据**/
 				//dd($info);
 				if($info){
-				
+
 					foreach ($info as $k=>$v){
 						$list=[];
 						$list['company_name']       =$v->company_name;
@@ -193,7 +198,7 @@ class CheckController extends CommonController{
 						$list['create_time']        =$v->create_time;
 						$data_execl[]=$list;
 					}
-                
+
                     $data['self_id']            =generate_id('stock_');		//优惠券表ID
                     $data['create_user_id']     =$user_info->admin_id;
                     $data['create_user_name']   =$user_info->name;
@@ -286,7 +291,7 @@ class CheckController extends CommonController{
 
 
 					}
-                
+
                     $data['self_id']            =generate_id('stock_');		//优惠券表ID
                     $data['create_user_id']     =$user_info->admin_id;
                     $data['create_user_name']   =$user_info->name;
@@ -331,7 +336,7 @@ class CheckController extends CommonController{
 						$list['describe']           =unit_do($v->good_unit , $v->good_target_unit, $v->good_scale, $v->now_num);
 						//$list['good_unit']          =$v->good_unit;
 						$list['production_date']    =$v->production_date;
-						$list['expire_time']        =$v->expire_time;						
+						$list['expire_time']        =$v->expire_time;
 						$list['type']               ='库存';
 						$list['create_time']        =$v->create_time;
 						$data_execl[]=$list;
@@ -376,7 +381,7 @@ class CheckController extends CommonController{
 
 						$wms_stock_list[]=$stock_list;
 					}
-                
+
                     $data['self_id']            =$idd;
                     $data['create_user_id']     =$user_info->admin_id;
                     $data['create_user_name']   =$user_info->name;
