@@ -254,7 +254,7 @@ class PlatformCenterController extends  CommonController{
         }
         $adr_info = SysAddress::where('level',1)->get();
 
-        $count = 0;
+        $count = count((array)$adr_info);
         foreach($adr_info as $key => $value){
             foreach($address as $kkk => $vvv){
                 if (strpos($vvv,$value->name) !== false){
@@ -271,6 +271,7 @@ class PlatformCenterController extends  CommonController{
         $msg['msg'] = '查询成功';
         $msg['driver_count'] = $driver_count;
         $msg['adr_info'] = array_slice($adr_info->toArray(),$first,$firstrow);
+        $msg['count']  = $count;
         return $msg;
     }
 
