@@ -248,7 +248,7 @@ class PlatformCenterController extends  CommonController{
                 $ip[] = $v->userReg->ip;
             }
         }
-        $ak ="SdRptW2rs3xsjHhVhQOy17QzP6Gexbp6";
+        $ak ="27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg";
         foreach($ip as $kk => $vv){
             $address[] = $this->get_user_addr($ak,$vv);
         }
