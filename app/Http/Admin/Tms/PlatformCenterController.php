@@ -254,7 +254,7 @@ class PlatformCenterController extends  CommonController{
         }
         $adr_info = SysAddress::where('level',1)->get();
 
-        $count = count((array)$adr_info);
+        $count = count($adr_info->toArray());
         foreach($adr_info as $key => $value){
             foreach($address as $kkk => $vvv){
                 if (strpos($vvv,$value->name) !== false){
