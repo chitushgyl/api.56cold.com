@@ -2,6 +2,7 @@
 namespace App\Http\Admin\tms;
 
 use App\Http\Controllers\CommonController;
+use App\Models\SysAddress;
 use App\Models\Tms\TmsLine;
 use App\Models\Tms\TmsOrder;
 use App\Models\User\UserIdentity;
@@ -224,7 +225,70 @@ class PlatformCenterController extends  CommonController{
     public function  driver_count(Request $request){
         $group_info = $request->get('group_info');
         $user_info = $request->get('user_info');
+        $date = dateTime();
+        //司机总人数
+        $driver_day_count = UserIdentity::where(['type'=>'carriage'])->count();
 
+        //今日新增
+        $day_where = [
+            ['create_time','>=',$date['start_time']],
+            ['create_time','<=',$date['end_time']],
+        ];
+        $driver_day_add = UserIdentity::where('type','carriage')->where($day_where)->count();
+        $info = UserIdentity::with(['userReg' => function($query){
+            $query->select('ip','self_id','tel','total_user_id');
+        }])
+            ->where('type','carriage')
+            ->select('total_user_id','type')
+            ->get();
+        foreach($info as $k => $v){
+            if($v->userReg){
+                $ip[] = $v->userReg->ip;
+            }
+        }
+        $ak ="SdRptW2rs3xsjHhVhQOy17QzP6Gexbp6";
+        foreach($ip as $kk => $vv){
+            $address[] = $this->get_user_addr($ak,$vv);
+        }
+        $adr_info = SysAddress::where('level',1)->get();
+
+        $count = 0;
+        foreach($adr_info as $key => $value){
+            foreach($address as $kkk => $vvv){
+                if (strpos($vvv,$value->name) !== false){
+                    $value->count += 1;
+                }else{
+                    $value->count = 0;
+                }
+            }
+        }
+        $driver_count['driver_day_count'] = $driver_day_count;
+        $driver_count['driver_day_add'] = $driver_day_add;
+
+        $msg['code'] = 200;
+        $msg['msg'] = '查询成功';
+        $msg['driver_count'] = $driver_count;
+        $msg['adr_info'] = $adr_info;
+        return $msg;
+    }
+
+    public function get_user_addr($ak,$ip){
+        $url = "http://api.map.baidu.com/location/ip?ak=$ak&ip=$ip";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($ch);
+        if(curl_errno($ch)) {
+            echo 'CURL ERROR Code: '.curl_errno($ch).', reason: '.curl_error($ch);
+        }
+        curl_close($ch);
+        $info = json_decode($output, true);
+        if($info['status'] == "0"){
+//            $addr_info = $info['content']['address_detail']['province'].' '.$info['content']['address_detail']['city'];
+            $addr_info = $info['content']['address_detail']['province'];
+        }
+
+        return $addr_info;
     }
 
 
