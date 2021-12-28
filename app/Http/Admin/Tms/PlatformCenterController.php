@@ -270,7 +270,7 @@ class PlatformCenterController extends  CommonController{
         $msg['code'] = 200;
         $msg['msg'] = '查询成功';
         $msg['driver_count'] = $driver_count;
-        $msg['adr_info'] = array_slice($adr_info,$first,$firstrow);
+        $msg['adr_info'] = array_slice($adr_info->toArray(),$first,$firstrow);
         return $msg;
     }
 
