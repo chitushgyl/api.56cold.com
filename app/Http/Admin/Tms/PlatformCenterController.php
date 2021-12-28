@@ -225,6 +225,8 @@ class PlatformCenterController extends  CommonController{
     public function  driver_count(Request $request){
         $group_info = $request->get('group_info');
         $user_info = $request->get('user_info');
+        $first		  = $request->input('page')??1;
+        $firstrow	  = $request->input('num')??7;
         $date = dateTime();
         //司机总人数
         $driver_day_count = UserIdentity::where(['type'=>'carriage'])->count();
@@ -268,7 +270,7 @@ class PlatformCenterController extends  CommonController{
         $msg['code'] = 200;
         $msg['msg'] = '查询成功';
         $msg['driver_count'] = $driver_count;
-        $msg['adr_info'] = $adr_info;
+        $msg['adr_info'] = array_slice($adr_info,$firstrow,$listrows);
         return $msg;
     }
 
