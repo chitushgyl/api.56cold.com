@@ -252,9 +252,9 @@ class PlatformCenterController extends  CommonController{
         foreach($ip as $kk => $vv){
             $address[] = $this->get_user_addr($ak,$vv);
         }
-        $adr_info = SysAddress::where('level',1)->get();
+        $adr_info = SysAddress::where('level',1)->get()->toArray();
 
-        $count = count($adr_info->toArray());
+        $count = count($adr_info);
         foreach($adr_info as $key => $value){
             foreach($address as $kkk => $vvv){
                 if (strpos($vvv,$value->name) !== false){
@@ -270,7 +270,7 @@ class PlatformCenterController extends  CommonController{
         $msg['code'] = 200;
         $msg['msg'] = '查询成功';
         $msg['driver_count'] = $driver_count;
-        $msg['adr_info'] = array_slice($adr_info->toArray(),$first,$firstrow);
+        $msg['adr_info'] = array_slice($adr_info,$first,$firstrow);
         $msg['count']  = $count;
         return $msg;
     }
