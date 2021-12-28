@@ -290,6 +290,8 @@ class PlatformCenterController extends  CommonController{
         if($info['status'] == "0"){
 //            $addr_info = $info['content']['address_detail']['province'].' '.$info['content']['address_detail']['city'];
             $addr_info = $info['content']['address_detail']['province'];
+        }else{
+            $addr_info = '';
         }
 
         return $addr_info;
