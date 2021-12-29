@@ -186,6 +186,7 @@ class PlatformCenterController extends  CommonController{
 
         $city_count['start_city'] = $start_city_count;
         $city_count['end_city'] = $end_city_count;
+        $city_count['line_count'] = $line_count;
 
         $msg['code'] = 200;
         $msg['msg']  = '查询成功！';
