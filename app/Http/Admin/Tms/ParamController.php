@@ -61,8 +61,8 @@ class ParamController extends CommonController{
                 break;
 
             case 'more':
-                $data['total']=TmsCar::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
-                $data['items']=TmsCar::where($where)->whereIn('group_code',$group_info['group_code'])
+                $data['total']=AppParam::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
+                $data['items']=AppParam::where($where)->whereIn('group_code',$group_info['group_code'])
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
