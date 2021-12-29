@@ -130,7 +130,7 @@ class ParamController extends CommonController{
             $data['type']          =$type;
 
             $wheres['self_id'] = $self_id;
-            $old_info=TmsCar::where($wheres)->first();
+            $old_info=AppParam::where($wheres)->first();
 
             if($old_info){
                 //dd(1111);
