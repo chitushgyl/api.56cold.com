@@ -337,6 +337,7 @@ Route::group([
     Route::any('/platformCenter/order_count','PlatformCenterController@order_count');
     Route::any('/platformCenter/line_count','PlatformCenterController@line_count');
     Route::any('/platformCenter/driver_count','PlatformCenterController@driver_count');
+    Route::any('/platformCenter/app_param_count','PlatformCenterController@app_param_count');
 
     Route::any('/param/paramList','ParamController@paramList');
     Route::any('/param/paramPage','ParamController@paramPage');

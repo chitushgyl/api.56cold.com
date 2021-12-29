@@ -3,6 +3,7 @@ namespace App\Http\Admin\tms;
 
 use App\Http\Controllers\CommonController;
 use App\Models\SysAddress;
+use App\Models\Tms\AppParam;
 use App\Models\Tms\TmsLine;
 use App\Models\Tms\TmsOrder;
 use App\Models\User\UserIdentity;
@@ -295,6 +296,39 @@ class PlatformCenterController extends  CommonController{
         }
 
         return $addr_info;
+    }
+
+
+    public function app_param_count(Request $request){
+        $group_info = $request->get('group_info');
+        $user_info = $request->get('user_info');
+        $user = AppParam::where('type','user')->first(
+            array(
+                \DB::raw('SUM(XiaoMi) as xiaomi'),
+                \DB::raw('SUM(OPPO) as oppo'),
+                \DB::raw('SUM(HUAWEI) as huawei'),
+                \DB::raw('SUM(vivo) as vivo'),
+                \DB::raw('SUM(Apple) as apple'),
+                \DB::raw('SUM(other) as other'),
+            )
+        )->toArray();
+//        dd($user);
+        $driver = AppParam::where('type','driver')->first(
+            array(
+                \DB::raw('SUM(XiaoMi) as xiaomi'),
+                \DB::raw('SUM(OPPO) as oppo'),
+                \DB::raw('SUM(HUAWEI) as huawei'),
+                \DB::raw('SUM(vivo) as vivo'),
+                \DB::raw('SUM(Apple) as apple'),
+                \DB::raw('SUM(other) as other'),
+            )
+        )->toArray();
+
+        $msg['code'] = 200;
+        $msg['msg'] = '查询成功';
+        $msg['user'] = $user;
+        $msg['driver'] = $driver;
+        return $msg;
     }
 
 
