@@ -249,13 +249,13 @@ class PlatformCenterController extends  CommonController{
                 $ip[] = $v->userReg->ip;
             }
         }
-        $ak ="27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg";
+        $ak ="PaC1MWoU0dYwg1ZHB6IgKEFOhy3PIpvc";
         foreach($ip as $kk => $vv){
             $address[] = $this->get_user_addr($ak,$vv);
         }
         $adr_info = SysAddress::where('level',1)->get();
 
-        $count = count($adr_info->toArray());
+//        $count = count($adr_info->toArray());
         foreach($adr_info as $key => $value){
             foreach($address as $kkk => $vvv){
                 if (strpos($vvv,$value->name) !== false){
@@ -271,8 +271,8 @@ class PlatformCenterController extends  CommonController{
         $msg['code'] = 200;
         $msg['msg'] = '查询成功';
         $msg['driver_count'] = $driver_count;
-        $msg['adr_info'] = array_slice($adr_info->toArray(),$firstrow,$listrows);
-        $msg['count']  = $count;
+        $msg['adr_info'] = $adr_info;
+//        $msg['count']  = $count;
         return $msg;
     }
 
