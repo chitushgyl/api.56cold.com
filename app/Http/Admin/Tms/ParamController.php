@@ -5,6 +5,9 @@ namespace App\Http\Admin\Tms;
 use App\Http\Controllers\CommonController;
 use App\Models\Tms\AppParam;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
+
 
 class ParamController extends CommonController{
 
@@ -28,16 +31,17 @@ class ParamController extends CommonController{
         /**接收数据*/
         $num            =$request->input('num')??10;
         $page           =$request->input('page')??1;
+        $type           =$request->input('type');
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
 
         $search=[
-
+            ['type'=>'=','name'=>'type','value'=>$type],
         ];
 
         $where=get_list_where($search);
 
-        $select=['self_id','XiaoMi','OPPO','vivo','HUAWEI','Apple','other','group_code','group_name','create_time','update_time'];
+        $select=['self_id','type','XiaoMi','OPPO','vivo','HUAWEI','Apple','other','group_code','group_name','create_time','update_time'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=AppParam::where($where)->count(); //总的数据量
@@ -93,6 +97,7 @@ class ParamController extends CommonController{
         $HUAWEI        =$request->input('HUAWEI');
         $Apple             =$request->input('Apple');
         $other             =$request->input('other');
+        $type             =$request->input('type');
 
         /*** 虚拟数据
         $input['self_id']        =$self_id='good_202007011336328472133661';
@@ -103,6 +108,7 @@ class ParamController extends CommonController{
         $input['HUAWEI']         =$HUAWEI=50;
         $input['Apple']          =$Apple=60;
         $input['other']          =$other=70;
+        $input['type']          =$type=70;
          **/
 
         $rules=[
@@ -121,6 +127,7 @@ class ParamController extends CommonController{
             $data['HUAWEI']         =$HUAWEI;
             $data['Apple']          =$Apple;
             $data['other']          =$other;
+            $data['type']          =$type;
 
             $wheres['self_id'] = $self_id;
             $old_info=TmsCar::where($wheres)->first();
