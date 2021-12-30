@@ -576,5 +576,31 @@ function getStr(){
     return $randstr;
 }
 
+/**
+ * 获取今天 本周 本月时间
+ * */
+function dateTime(){
+    $now_date = date('Y-m-d');
+    $start_time = $now_date.' 00:00:00';
+    $end_time = $now_date.' 23:59:59';
+
+    //本周
+    $start_week = date('Y-m-d H:i:s',mktime(0,0,0,date('m'),date('d')-date('w')+1,date('Y')));
+    $end_week = date('Y-m-d H:i:s',mktime(23,59,59,date('m'),date('d')-date('w')+7,date('Y')));
+
+    //本月
+    $start_month = date('Y-m-d H:i:s',mktime(0,0,0,date('m'),1,date('Y')));
+    $end_month = date('Y-m-d H:i:s',mktime(23,59,59,date('m'),date('t'),date('Y')));
+
+    $date['start_time']  = $start_time;
+    $date['end_time']    = $end_time;
+    $date['start_week']  = $start_week;
+    $date['end_week']    = $end_week;
+    $date['start_month'] = $start_month;
+    $date['end_month']   = $end_month;
+
+    return $date;
+}
+
 
 ?>

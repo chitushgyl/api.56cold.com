@@ -537,6 +537,7 @@ class OrderController extends CommonController{
         $remark        = $request->input('remark');
         $app_flag      = $request->input('app_flag');//app上下单   1 是 2 PC下单
         $payer         = $request->input('payer');//付款方：发货人 consignor  收货人receiver
+        $kilo          = $request->input('kilo');
         if (empty($price)){
             $price = $request->input('line_price');
         }
@@ -564,6 +565,7 @@ class OrderController extends CommonController{
         $input['pay_type']                  =$pay_type='offline';
         $input['gather_time']               = $gather_time = '2021-05-22';
         $input['send_time']                 = $send_time = '2021-05-20';
+        $input['kilo']                      = $kilo;
         $input['dispatcher']                = $dispatcher=[
             '0'=>[
                 'send_address_id'=>'',
@@ -1592,6 +1594,7 @@ class OrderController extends CommonController{
                     $data['car_type']                   = $car_type;
                     $data['remark']                     = $remark;
                     $data['app_flag']                   = $app_flag;
+                    $data['kilo']                       = $kilo;
                     if ($send_time) {
                         $data['send_time']              = $send_time;
                     }
@@ -1655,6 +1658,7 @@ class OrderController extends CommonController{
                     }
                     $list['car_type']                   = $car_type;
                     $list['payer']                      = $payer;
+                    $list['kilo']                       = $kilo;
                     if($old_info){
 
                     }else{
