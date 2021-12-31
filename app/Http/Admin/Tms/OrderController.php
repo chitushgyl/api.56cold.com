@@ -2562,6 +2562,7 @@ class OrderController extends CommonController{
         $depart_time    = $request->input('depart_time')??null; //干线发车时间
         $reduce_price   = $request->input('reduce_price');
         $payer          = $request->input('payer');//付款方：发货人     收货人 receiver
+        $kilo          = $request->input('kilometre');//付款方：发货人     收货人 receiver
         /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='line';  //vehicle  lcl   line
@@ -4110,6 +4111,7 @@ class OrderController extends CommonController{
                     $data['app_flag']                   = $app_flag;
                     $data['reduce_price']             = $reduce_price;
                     $data['payer']                      = $payer;
+                    $data['kilometre']                      = $kilo;
                     /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
                     $inserttt=[];
 
@@ -4191,6 +4193,7 @@ class OrderController extends CommonController{
                     $list['remark']                   = $remark;
                     $list['car_type']                   = $car_type;
                     $list['reduce_price']               = $reduce_price;
+                    $list['kilometre']               = $kilo;
                     if ($pay_type == 'offline'){
                         $list['order_status'] = 2;
                     }
