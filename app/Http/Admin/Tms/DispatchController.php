@@ -792,7 +792,7 @@ class DispatchController extends CommonController{
         $self_id=$request->input('self_id');
         $table_name='tms_order_dispatch';
         $select=['self_id','order_id','company_id','company_name','create_time','use_flag','delete_flag','group_code','group_name','order_type','order_status','gather_name','remark',
-            'gather_tel','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_name','send_tel','send_sheng_name','send_shi_name','send_qu_name','info',
+            'gather_tel','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_name','send_tel','send_sheng_name','send_shi_name','send_qu_name','info','kilometre',
             'send_address','total_money','good_info','good_number','good_weight','good_volume','dispatch_flag','carriage_group_id','carriage_group_name','on_line_flag','on_line_money',
             'pick_flag','send_flag','clod','total_money','gather_time','send_time','receiver_id','total_user_id','pay_type','pay_status'];
 //        $self_id='patch_202106231845194304919865';
@@ -899,8 +899,9 @@ class DispatchController extends CommonController{
             if ($info->group_code != $info->receiver_id || $info->total_user_id != $info->receiver_id){
                 $order_details1['value'] = '¥'.$info->on_line_money;
             }
-//            $order_details2['name'] = '是否付款';
-//            $order_details2['value'] = $info->pay_state;
+            $order_details2['name'] = '里程';
+            $order_details2['value'] = $info->kilometre.'km';
+            $order_details2['color'] = '#FF7A1A';
 
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
@@ -962,6 +963,9 @@ class DispatchController extends CommonController{
                 $car_info[] = $order_details11;
             }
             if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                if($info->kilometre){
+                    $order_details[] = $order_details2;
+                }
                 $order_details[] = $order_details3;
                 $order_details[]= $order_details4;
                 $order_details[]= $order_details5;

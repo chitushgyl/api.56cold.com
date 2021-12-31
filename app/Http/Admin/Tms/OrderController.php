@@ -537,7 +537,7 @@ class OrderController extends CommonController{
         $remark        = $request->input('remark');
         $app_flag      = $request->input('app_flag');//app上下单   1 是 2 PC下单
         $payer         = $request->input('payer');//付款方：发货人 consignor  收货人receiver
-        $kilo          = $request->input('kilo');
+        $kilo          = $request->input('kilometre');
         if (empty($price)){
             $price = $request->input('line_price');
         }
