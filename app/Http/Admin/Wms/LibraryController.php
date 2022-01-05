@@ -94,6 +94,7 @@ class LibraryController extends CommonController{
         $company_id       	=$request->input('company_id');
         $warehouse_id     	=$request->input('warehouse_id');
         $grounding_status   =$request->input('grounding_status');
+        $order_status       =$request->input('order_status');
         $listrows           =$num;
         $firstrow           =($page-1)*$listrows;
 
@@ -104,6 +105,7 @@ class LibraryController extends CommonController{
             ['type'=>'like','name'=>'company_id','value'=>$company_id],
             ['type'=>'like','name'=>'warehouse_id','value'=>$warehouse_id],
 			['type'=>'like','name'=>'group_code','value'=>$group_code],
+			['type'=>'=','name'=>'order_status','value'=>$order_status],
         ];
 
         $where=get_list_where($search);
@@ -1060,6 +1062,28 @@ class LibraryController extends CommonController{
             $msg['msg']="没有查询到数据";
             return $msg;
         }
+    }
+
+    /**
+     * 待入库
+     * 修改order_status 入库订单状态 W
+     * */
+    public function wait_library(Request $request){
+         $user_info = $request->get('user_info');
+         $group_info = $request->get('group_info');
+
+         $input = $request->all();
+         $area_id = $input('area_id');
+         $sign_id = $input('sign_id');//数组
+
+
+    }
+
+    /**
+     * 修改入库明细里
+     * */
+    public function grounding(Request $request){
+
     }
 }
 ?>
