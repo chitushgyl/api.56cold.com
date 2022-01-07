@@ -670,6 +670,7 @@ class LibraryController extends CommonController{
         $warehouse_id       =$request->input('warehouse_id');
         $company_id         =$request->input('company_id');
         $library_sige       =json_decode($request->input('library_sige'), true);
+        $voucher            = $request->input('voucher');
 	//dd($library_sige);
         /*** 虚拟数据
         $input['group_code']=$group_code='1234';
@@ -960,7 +961,7 @@ class LibraryController extends CommonController{
             $data['check_time']         =$now_time;
             $data['bulk']               =$bulk;
             $data['weight']             =$weight;
-
+            $data['voucher']            =img_for($voucher,'in');
            //dd($data);
             $id=WmsLibraryOrder::insert($data);
 
@@ -1069,21 +1070,177 @@ class LibraryController extends CommonController{
      * 修改order_status 入库订单状态 W
      * */
     public function wait_library(Request $request){
-         $user_info = $request->get('user_info');
-         $group_info = $request->get('group_info');
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_order';
 
-         $input = $request->all();
-         $area_id = $input('area_id');
-         $sign_id = $input('sign_id');//数组
+        $operationing->access_cause     ='修改入库状态';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $self_id = $input('self_id');
+        $order_status = $input('order_status');
+//        $sign_id = $input('sign_id');//数组
+        //第一步，验证数据
+        $rules=[
+            'self_id'=>'required',
+            'order_status'=>'required',
+        ];
+        $message=[
+            'self_id.required'=>'请选择入库订单',
+            'order_status.required'=>'请选择要做的操作',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $data['update_time'] = $now_time;
+            $data['order_status'] = $order_status;
+            $id =  WmsLibraryOrder::where('self_id',$self_id)->update($data);
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = '操作成功';
+                return $msg;
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '操作失败！';
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
 
 
     }
 
     /**
-     * 修改入库明细里
+     * 修改入库明细里商品信息
+     * */
+    public function editSku(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_sige';
+
+        $operationing->access_cause     ='修改入库商品信息';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $self_id          = $request->input('self_id');
+        $good_target_unit = $request->input('good_target_unit');
+        $now_num          = $request->input('now_num');
+        $good_lot         = $request->input('good_lot');
+        $order_id         = $request->input('order_id');
+        $external_sku_id  = $request->input('external_sku_id');
+        $rules = [
+
+        ];
+        $message = [
+
+        ];
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()){
+            $data['good_target_unit'] = $good_target_unit;
+            $data['good_lot'] = $good_lot;
+            $data['now_num'] = $now_num;
+            $data['update_time'] = $now_time;
+            $res = WmsLibrarySige::where('self_id',$self_id)->update($data);
+
+            $result =  WmsLibraryChange::where('order_id',$order_id)->where('external_sku_id',$external_sku_id)->update($data);
+            if ($res && $result){
+                $msg['code'] = 200;
+                $msg['msg'] = '修改成功';
+                return $msg;
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '修改失败';
+                return $msg;
+            }
+
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+    /**
+     * 上架
      * */
     public function grounding(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_sige';
 
+        $operationing->access_cause     ='上架';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $area_id = $input('area_id');
+        $warehouse_id = $input('sign_id');//数组
+        $sign_id = $input('warehouse_id');//数组
+        $warehouse_name = $input('warehouse_name');//数组
+        $warehouse_sign_id = $input('warehouse_sign_id');//数组
+
+        //第一步，验证数据
+        $rules=[
+            'area_id'=>'required',
+            'sign_id'=>'required',
+        ];
+        $message=[
+            'self_id.required'=>'请选择入库订单',
+            'order_status.required'=>'请选择要做的操作',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $data['update_time'] = $now_time;
+            $data['warehouse_id'] = $warehouse_id;
+            $data['warehouse_name'] = $warehouse_name;
+            $data['warehouse_sign_id'] = $warehouse_sign_id;
+            $data['area_id'] = $area_id;
+            $data['grounding_status'] = 'Y';
+            $id = WmsLibrarySige::whereIn('self_id',json_decode($sign_id,true))->update($data);
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = '操作成功';
+                return $msg;
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '操作失败！';
+                return $msg;
+            }
+
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
     }
 }
 ?>

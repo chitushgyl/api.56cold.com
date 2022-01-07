@@ -163,6 +163,9 @@ Route::group([
     Route::any('/library/getLibrary', 'LibraryController@getLibrary');
     Route::any('/library/details', 'LibraryController@details');
     Route::any('/library/import','LibraryController@import');
+    Route::any('/library/wait_library','LibraryController@wait_library');
+    Route::any('/library/editSku','LibraryController@editSku');
+    Route::any('/library/grounding','LibraryController@grounding');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
@@ -206,6 +209,7 @@ Route::group([
     Route::any('/order/statusOrder','OrderController@statusOrder');
     Route::any('/order/delOutOrder','OrderController@delOutOrder');
 	Route::any('/order/import', 'OrderController@import');
+	Route::any('/order/outOrder', 'OrderController@outOrder');
     Route::group([
         "middleware"=>['daily'],
     ], function(){

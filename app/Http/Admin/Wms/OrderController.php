@@ -126,7 +126,6 @@ class OrderController extends CommonController{
 					break;
 			}
 
-
         }
         $msg['code'] = 200;
         $msg['msg'] = "数据拉取成功";
@@ -134,7 +133,155 @@ class OrderController extends CommonController{
         //dd($msg);
         return $msg;
 
+    }
 
+    /**
+     * 手动添加出库订单
+     * */
+    public function outOrder(Request $request){
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $now_time           = date('Y-m-d H:i:s', time());
+        $table_name         ='wms_out_order';
+        $operationing       = $request->get('operationing');//接收中间件产生的参数
+        $operationing->access_cause     ='创建出库订单';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='add';
+
+        /** 接收数据*/
+        $input              = $request->all();
+        $company_id         = $request->input('company_id');
+        $warehouse_id       = $request->input('warehouse_id');
+        $shop_id            = $request->input('shop_id');
+        $goods              = $request->input('goods');
+        $delivery_time      = $request->input('delivery_time');
+        /***
+        $input['goods']=$goods=[
+        '0'=>[
+        'sku_id'=>'good_202012101444191651472251',
+        'warehouse_sign_id'=>'sign_202012101505370895284778',
+        'production_date'=>'2019-02-05',
+        'expire_time'=>'2019-02-05',
+        'now_num'=>'21',
+        'can_use'=>'Y',
+        ],
+        ];
+         * **/
+        $rules = [
+            'company_id' => 'required',
+            'shop_id' => 'required',
+        ];
+        $message = [
+            'company_id.required' => '请选择公司',
+            'shop_id.required' => '请选择门店',
+        ];
+        $validator = Validator::make($input, $rules, $message);
+
+        if ($validator->passes()) {
+            $where_company=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$company_id],
+            ];
+            $group_info = WmsGroup::where($where_company)->select('company_name','group_name','group_code')->first();
+            //dump($group_info);
+            if(empty($group_info)){
+                $msg['code'] = 302;
+                $msg['msg'] = '公司不存在';
+                return $msg;
+            }
+
+            //dump($group_info);
+
+            $where_warehouse=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$warehouse_id],
+            ];
+
+            $warehouse_info = WmsWarehouse::where($where_warehouse)->select('self_id','warehouse_name','group_name','group_code')->first();
+            if(empty($warehouse_info)){
+                $msg['code'] = 302;
+                $msg['msg'] = '仓库不存在';
+                return $msg;
+            }
+
+            $shop_info = WmsShop::where('self_id',$shop_id)->select('self_id','external_id','name','contacts','address','tel','group_code','group_name','company_id','company_name','','','','','','')->first();
+
+            $order_2['self_id']             =generate_id('order_');
+            $order_2['shop_id']             =$shop_info->self_id;
+            $order_2['shop_external_id']    =$shop_info->external_id;
+            $order_2['shop_name']           =$shop_info->name;
+            $order_2['shop_contacts']       =$shop_info->contacts;
+            $order_2['shop_address']        =$shop_info->address;
+            $order_2['shop_tel']            =$shop_info->tel;
+            $order_2['group_code']          =$shop_info->group_code;
+            $order_2['group_name']          =$shop_info->group_name;
+            $order_2['count']               =count($goods);
+            $order_2['warehouse_id']        =$warehouse_info->self_id;
+            $order_2['warehouse_name']      =$warehouse_info->warehouse_name;
+            $order_2['company_id']          =$shop_info->company_id;
+            $order_2['company_name']        =$shop_info->company_name;
+            $order_2['create_user_id']      =$user_info->admin_id;
+            $order_2['create_user_name']    =$user_info->name;
+            $order_2['create_time']         =$order_2['update_time']            =$now_time;
+            $order_2['delivery_time']       =$delivery_time;
+
+            $list=[];
+            foreach($goods as $k =>$v){
+
+                $where_sku=[
+                    ['delete_flag','=','Y'],
+                    ['external_sku_id','=',$v['external_sku_id']],
+                    ['company_id','=',$company_id],
+                ];
+                $select_ErpShopGoodsSku=['self_id','group_code','group_name','external_sku_id','wms_unit','good_name','wms_spec'];
+                $sku_info = ErpShopGoodsSku::where($where_sku)->select($select_ErpShopGoodsSku)->first();
+
+                //dd($vv);
+                $list['self_id']            =generate_id('list_');
+                $list['shop_id']            = $shop_id;
+                $list['shop_name']          = $shop_info->name;
+                $list['good_name']          = $sku_info->good_name;
+                $list['spec']               = $sku_info->wms_spec;
+                $list['num']                = $v['num'];
+                $list['group_code']         = $sku_info->group_code;
+                $list['group_name']         = $sku_info->group_name;
+                $list['order_id']           = $order_2['self_id'];
+                $list['sku_id']             = $sku_info->self_id;
+                $list['external_sku_id']    = $sku_info->external_sku_id;
+                $list['create_user_id']     = $user_info->admin_id;
+                $list['create_user_name']   = $user_info->name;
+                $list['create_time']        = $list['update_time']=$now_time;
+                $list['sanitation']         = $v['sanitation'];
+
+                $datalist[]=$list;
+                $count=count($goods);
+                WmsOutOrderList::insert($datalist);
+                $id= WmsOutOrder::insert($order_2);
+
+                if($id){
+                    $msg['code']=200;
+                    /** 告诉用户，你一共导入了多少条数据，其中比如插入了多少条，修改了多少条！！！*/
+                    $msg['msg']='操作成功，您一共导入'.$count.'条数据';
+
+                    return $msg;
+                }else{
+                    $msg['code']=301;
+                    $msg['msg']='操作失败';
+                    return $msg;
+                }
+
+            }
+        }else{
+            $erro = $validator->errors()->all();
+            $msg['msg'] = null;
+            foreach ($erro as $k => $v) {
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            $msg['code'] = 300;
+            return $msg;
+        }
 
     }
 
