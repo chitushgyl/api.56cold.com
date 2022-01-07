@@ -156,6 +156,7 @@ class OrderController extends CommonController{
         $shop_id            = $request->input('shop_id');
         $goods              = json_decode($request->input('goods'),true);
         $delivery_time      = $request->input('delivery_time');
+        $recipt_code      = $request->input('recipt_code');
         /***
         $input['goods']=$goods=[
         '0'=>[
@@ -253,7 +254,10 @@ class OrderController extends CommonController{
                 $list['create_user_name']   = $user_info->name;
                 $list['create_time']        = $list['update_time']=$now_time;
                 $list['sanitation']         = $v['sanitation'];
-
+                $list['recipt_code']        = $recipt_code;
+                $list['shop_code']          = $shop_info->shop_code;
+                $list['price']              = $v['price'];
+                $list['total_price']        = $v['total_price'];
                 $datalist[]=$list;
                 $count=count($goods);
                 WmsOutOrderList::insert($datalist);
