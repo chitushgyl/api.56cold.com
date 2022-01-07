@@ -200,11 +200,6 @@ class OrderController extends CommonController{
             ];
 
             $warehouse_info = WmsWarehouse::where($where_warehouse)->select('self_id','warehouse_name','group_name','group_code')->first();
-            if(empty($warehouse_info)){
-                $msg['code'] = 302;
-                $msg['msg'] = '仓库不存在';
-                return $msg;
-            }
 
             $shop_info = WmsShop::where('self_id',$shop_id)->select('self_id','external_id','name','contacts','address','tel','group_code','group_name','company_id','company_name')->first();
 
@@ -259,22 +254,22 @@ class OrderController extends CommonController{
                 $list['price']              = $v['price'];
                 $list['total_price']        = $v['total_price'];
                 $datalist[]=$list;
-                $count=count($goods);
-                WmsOutOrderList::insert($datalist);
-                $id= WmsOutOrder::insert($order_2);
 
-                if($id){
-                    $msg['code']=200;
-                    /** 告诉用户，你一共导入了多少条数据，其中比如插入了多少条，修改了多少条！！！*/
-                    $msg['msg']='操作成功，您一共导入'.$count.'条数据';
+            }
+            $count=count($goods);
+            WmsOutOrderList::insert($datalist);
+            $id= WmsOutOrder::insert($order_2);
 
-                    return $msg;
-                }else{
-                    $msg['code']=301;
-                    $msg['msg']='操作失败';
-                    return $msg;
-                }
+            if($id){
+                $msg['code']=200;
+                /** 告诉用户，你一共导入了多少条数据，其中比如插入了多少条，修改了多少条！！！*/
+                $msg['msg']='操作成功，您一共导入'.$count.'条数据';
 
+                return $msg;
+            }else{
+                $msg['code']=301;
+                $msg['msg']='操作失败';
+                return $msg;
             }
         }else{
             $erro = $validator->errors()->all();
