@@ -1081,8 +1081,8 @@ class LibraryController extends CommonController{
 
         $user_info          = $request->get('user_info');//接收中间件产生的参数
         $input              = $request->all();
-        $self_id = $input('self_id');
-        $order_status = $input('order_status');
+        $self_id = $request->input('self_id');
+        $order_status = $request->input('order_status');
 //        $sign_id = $input('sign_id');//数组
         //第一步，验证数据
         $rules=[
@@ -1196,11 +1196,11 @@ class LibraryController extends CommonController{
 
         $user_info          = $request->get('user_info');//接收中间件产生的参数
         $input              = $request->all();
-        $area_id = $input('area_id');
-        $warehouse_id = $input('sign_id');//数组
-        $sign_id = $input('warehouse_id');//数组
-        $warehouse_name = $input('warehouse_name');//数组
-        $warehouse_sign_id = $input('warehouse_sign_id');//数组
+        $area_id = $request->input('area_id');
+        $warehouse_id = $request->input('sign_id');//数组
+        $sign_id = $request->input('warehouse_id');//数组
+        $warehouse_name = $request->input('warehouse_name');//数组
+        $warehouse_sign_id = $request->input('warehouse_sign_id');//数组
 
         //第一步，验证数据
         $rules=[
