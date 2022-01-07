@@ -1014,7 +1014,7 @@ class LibraryController extends CommonController{
             ['delete_flag','=','Y'],
         ];
 
-        $select=['self_id','grounding_status','type','company_name','create_user_name','create_time','group_name','check_user_name','check_time','grounding_status','count','voucher','type','warehouse_name'];
+        $select=['self_id','grounding_status','type','company_name','create_user_name','create_time','group_name','check_user_name','check_time','grounding_status','count','voucher','type','warehouse_id','warehouse_name'];
 
 		$WmsLibrarySigeSelect=[
 		    'order_id',
@@ -1197,10 +1197,10 @@ class LibraryController extends CommonController{
         $user_info          = $request->get('user_info');//接收中间件产生的参数
         $input              = $request->all();
         $area_id = $request->input('area_id');
-        $warehouse_id = $request->input('sign_id');//数组
-        $sign_id = $request->input('warehouse_id');//数组
-        $warehouse_name = $request->input('warehouse_name');//数组
-        $warehouse_sign_id = $request->input('warehouse_sign_id');//数组
+        $sign_id = $request->input('sign_id');//
+        $warehouse_id = $request->input('warehouse_id');//
+        $warehouse_name = $request->input('warehouse_name');//
+        $warehouse_sign_id = $request->input('warehouse_sign_id');//
 
         //第一步，验证数据
         $rules=[
@@ -1208,8 +1208,8 @@ class LibraryController extends CommonController{
             'sign_id'=>'required',
         ];
         $message=[
-            'self_id.required'=>'请选择入库订单',
-            'order_status.required'=>'请选择要做的操作',
+            'area_id.required'=>'请选择入库订单',
+            'sign_id.required'=>'请选择要做的操作',
         ];
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
