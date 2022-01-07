@@ -154,7 +154,7 @@ class OrderController extends CommonController{
         $company_id         = $request->input('company_id');
         $warehouse_id       = $request->input('warehouse_id');
         $shop_id            = $request->input('shop_id');
-        $goods              = $request->input('goods');
+        $goods              = json_decode($request->input('goods'),true);
         $delivery_time      = $request->input('delivery_time');
         /***
         $input['goods']=$goods=[
@@ -205,7 +205,7 @@ class OrderController extends CommonController{
                 return $msg;
             }
 
-            $shop_info = WmsShop::where('self_id',$shop_id)->select('self_id','external_id','name','contacts','address','tel','group_code','group_name','company_id','company_name','','','','','','')->first();
+            $shop_info = WmsShop::where('self_id',$shop_id)->select('self_id','external_id','name','contacts','address','tel','group_code','group_name','company_id','company_name')->first();
 
             $order_2['self_id']             =generate_id('order_');
             $order_2['shop_id']             =$shop_info->self_id;
