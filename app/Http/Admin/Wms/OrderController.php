@@ -200,6 +200,11 @@ class OrderController extends CommonController{
             ];
 
             $warehouse_info = WmsWarehouse::where($where_warehouse)->select('self_id','warehouse_name','group_name','group_code')->first();
+            if(empty($warehouse_info)){
+                $msg['code'] = 302;
+                $msg['msg'] = '仓库不存在';
+                return $msg;
+            }
 
             $shop_info = WmsShop::where('self_id',$shop_id)->select('self_id','external_id','name','contacts','address','tel','group_code','group_name','company_id','company_name')->first();
 
@@ -256,6 +261,7 @@ class OrderController extends CommonController{
                 $datalist[]=$list;
 
             }
+
             $count=count($goods);
             WmsOutOrderList::insert($datalist);
             $id= WmsOutOrder::insert($order_2);
@@ -271,6 +277,7 @@ class OrderController extends CommonController{
                 $msg['msg']='操作失败';
                 return $msg;
             }
+
         }else{
             $erro = $validator->errors()->all();
             $msg['msg'] = null;
