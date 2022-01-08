@@ -167,11 +167,12 @@ Route::group([
     Route::any('/library/editSku','LibraryController@editSku');
     Route::any('/library/grounding','LibraryController@grounding');
     Route::any('/library/delSku','LibraryController@delSku');
+    Route::any('/library/addLibrary', 'LibraryController@addLibrary');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
 
-        Route::any('/library/addLibrary', 'LibraryController@addLibrary');
+
 		Route::any('/library/checkStatus', 'LibraryController@checkStatus');
     });
 
