@@ -1285,7 +1285,7 @@ class LibraryController extends CommonController{
             $id = WmsLibrarySige::where('self_id',$sige_id)->update($data);
 
             $order_list = WmsLibrarySige::where('order_id',$order_id)->get();
-            if(count($order_list) > 0){
+            if(count((array)$order_list) > 0){
 
             }else{
                 WmsLibraryOrder::where('self_id',$order_id)->update($data);
