@@ -977,7 +977,6 @@ class LibraryController extends CommonController{
 
             if($id){
                 WmsLibrarySige::insert($datalist);
-                dd($datalist);
                 $change->change($datalist,'preentry');
                 $money->moneyCompute($data,$datalist,$now_time,$company_info,$user_info,'in');
                 //计算费用
