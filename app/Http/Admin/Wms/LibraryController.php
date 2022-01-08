@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Admin\Wms;
+use App\Models\Wms\WmsLibraryChange;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
 use Illuminate\Support\Facades\Input;
@@ -1158,7 +1159,6 @@ class LibraryController extends CommonController{
             $data['now_num'] = $now_num;
             $data['update_time'] = $now_time;
             $res = WmsLibrarySige::where('self_id',$self_id)->update($data);
-
             $result =  WmsLibraryChange::where('order_id',$order_id)->where('external_sku_id',$external_sku_id)->update($data);
             if ($res && $result){
                 $msg['code'] = 200;
