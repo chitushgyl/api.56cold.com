@@ -671,7 +671,7 @@ class LibraryController extends CommonController{
         $warehouse_id       =$request->input('warehouse_id');
         $company_id         =$request->input('company_id');
         $library_sige       =json_decode($request->input('library_sige'), true);
-        $voucher            = $request->input('voucher');
+        $voucher            = json_decode($request->input('voucher'),true);
 	//dd($library_sige);
         /*** 虚拟数据
         $input['group_code']=$group_code='1234';
