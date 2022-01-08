@@ -923,6 +923,7 @@ class LibraryController extends CommonController{
                     $list['create_time']        =$now_time;
                     $list["update_time"]        =$now_time;
                     $list['create_user_id']     = $user_info->admin_id;
+                    dd($v);
                     $list['create_user_name']   = $v->name;
                     $list["grounding_status"]   ='N';
                     $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
