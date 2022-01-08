@@ -721,7 +721,7 @@ class LibraryController extends CommonController{
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()){
             //二次效验！！！！
-            $rulesssss=['sku_id'=>'商品名称','warehouse_sign_id'=>'仓库','production_date'=>'开始有效期','expire_time'=>'到期时间','now_num'=>'商品数量','can_use'=>'是否可用'];
+            $rulesssss=['sku_id'=>'商品名称','production_date'=>'开始有效期','expire_time'=>'到期时间','now_num'=>'商品数量','can_use'=>'是否可用'];
 
             $rule=array_keys($rulesssss);
             $rule_count=count($rule);
@@ -850,13 +850,13 @@ class LibraryController extends CommonController{
                 $getWmsWarehouse=WmsWarehouseSign::where($where2k)->select($warehouse_select)->first();
 
 //dd($getWmsWarehouse);
-                if(empty($getWmsWarehouse)){
-                    if($abcd<$errorNum){
-                        $strs .= '数据中的第'.$a."行库位不存在".'</br>';
-                        $cando='N';
-                        $abcd++;
-                    }
-                }
+//                if(empty($getWmsWarehouse)){
+//                    if($abcd<$errorNum){
+//                        $strs .= '数据中的第'.$a."行库位不存在".'</br>';
+//                        $cando='N';
+//                        $abcd++;
+//                    }
+//                }
 
                 /** 计算商品的有效期**/
                 $expire_time=null;
@@ -900,26 +900,29 @@ class LibraryController extends CommonController{
                     $list["wms_high"]           =$getGoods->wms_high;
                     $list["wms_weight"]         =$getGoods->wms_weight;
                     $list["good_info"]          =json_encode($getGoods,JSON_UNESCAPED_UNICODE);
-                    $list["warehouse_id"]       =$getWmsWarehouse->warehouse_id;
-                    $list["warehouse_name"]     =$getWmsWarehouse->warehouse_name;
-                    $list['warehouse_sign_id']  =$getWmsWarehouse->self_id;
-                    $list['area_id']            =$getWmsWarehouse->area_id;
-                    $list['area']               =$getWmsWarehouse->area;
-                    $list['row']                =$getWmsWarehouse->row;
-                    $list['column']             =$getWmsWarehouse->column;
-                    $list['tier']               =$getWmsWarehouse->tier;
+//                    $list["warehouse_id"]       =$getWmsWarehouse->warehouse_id;
+//                    $list["warehouse_name"]     =$getWmsWarehouse->warehouse_name;
+//                    $list['warehouse_sign_id']  =$getWmsWarehouse->self_id;
+//                    $list['area_id']            =$getWmsWarehouse->area_id;
+//                    $list['area']               =$getWmsWarehouse->area;
+//                    $list['row']                =$getWmsWarehouse->row;
+//                    $list['column']             =$getWmsWarehouse->column;
+//                    $list['tier']               =$getWmsWarehouse->tier;
                     $list["production_date"]    =$v['production_date'];
                     $list["expire_time"]        =$expire_time;
                     $list['spec']               =$getGoods->wms_spec;
                     $list['initial_num']        =$v['now_num'];
                     $list['now_num']            =$v['now_num'];
                     $list['storage_number']     =$v['now_num'];
-                    $list["group_code"]         =$getWmsWarehouse->group_code;
-                    $list["group_name"]         =$getWmsWarehouse->group_name;
+//                    $list["group_code"]         =$getWmsWarehouse->group_code;
+//                    $list["group_name"]         =$getWmsWarehouse->group_name;
+                    $list["group_code"]         =$warehouse_info->group_code;
+                    $list["group_name"]         =$warehouse_info->group_name;
+
                     $list['create_time']        =$now_time;
                     $list["update_time"]        =$now_time;
                     $list['create_user_id']     = $user_info->admin_id;
-                    $list['create_user_name']   = $user_info->name;
+                    $list['create_user_name']   = $v->name;
                     $list["grounding_status"]   ='N';
                     $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
                     $list['weight']             = $getGoods->wms_weight*$v['now_num'];
