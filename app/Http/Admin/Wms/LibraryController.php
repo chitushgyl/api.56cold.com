@@ -1279,21 +1279,25 @@ class LibraryController extends CommonController{
         ];
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
+            $show = 'Y';
             $data['delete_flag'] = 'N';
             $data['update_time'] = $now_time;
 
             $id = WmsLibrarySige::where('self_id',$sige_id)->update($data);
 
             $order_list = WmsLibrarySige::where('order_id',$order_id)->get();
+            dd($order_list);
             if(count((array)$order_list) > 0){
 
             }else{
                 WmsLibraryOrder::where('self_id',$order_id)->update($data);
                 WmsLibraryChange::where('order_id',$order_id)->where('external_sku_id',$external_sku_id)->update($data);
+                $show = 'N';
             }
             if($id){
                 $msg['code'] = 200;
                 $msg['msg'] = '操作成功！';
+                $msg['show'] = $show;
             }else{
                 $msg['code'] = 301;
                 $msg['msg'] = '操作失败！';
