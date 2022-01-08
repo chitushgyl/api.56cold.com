@@ -920,7 +920,7 @@ class LibraryController extends CommonController{
                     $list["update_time"]        =$now_time;
                     $list['create_user_id']     = $user_info->admin_id;
                     $list['create_user_name']   = $user_info->name;
-                    $list["grounding_status"]   ='Y';
+                    $list["grounding_status"]   ='N';
                     $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
                     $list['weight']             = $getGoods->wms_weight*$v['now_num'];
                     $bulk+=  $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
@@ -947,7 +947,7 @@ class LibraryController extends CommonController{
             $data['create_user_name']   = $user_info->name;
             $data['create_time']        =$now_time;
             $data["update_time"]        =$now_time;
-            $data["grounding_status"]   ='Y';
+            $data["grounding_status"]   ='N';
             $data["group_code"]         =$warehouse_info->group_code;
             $data["group_name"]         =$warehouse_info->group_name;
             $data["warehouse_id"]       =$warehouse_id;
@@ -963,6 +963,7 @@ class LibraryController extends CommonController{
             $data['bulk']               =$bulk;
             $data['weight']             =$weight;
             $data['voucher']            =img_for($voucher,'in');
+            $data['order_status']       = 'S';
            //dd($data);
             $id=WmsLibraryOrder::insert($data);
 
@@ -1243,6 +1244,67 @@ class LibraryController extends CommonController{
             }
             return $msg;
         }
+    }
+
+    /**
+     *入库未完成删除
+     * */
+    public function delSku(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_sige';
+
+        $operationing->access_cause     ='上架';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $sige_id = $request->input('sige_id');//列表数据self_id
+        $order_id = $request->input('order_id');//入库订单self_id
+        $external_sku_id = $request->input('external_sku_id');//商品编号
+
+        $rules=[
+            'sige_id'=>'required',
+        ];
+        $message=[
+            'sige_id.required'=>'请选择入库订单',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $data['delete_flag'] = 'N';
+            $data['update_time'] = $now_time;
+
+            $id = WmsLibrarySige::where('self_id',$sige_id)->update($data);
+
+            $order_list = WmsLibrarySige::where('order_id',$order_id)->get();
+            if(count($order_list) > 0){
+
+            }else{
+                WmsLibraryOrder::where('self_id',$order_id)->update($data);
+                WmsLibraryChange::where('order_id',$order_id)->where('external_sku_id',$external_sku_id)->update($data);
+            }
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = '操作成功！';
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '操作失败！';
+            }
+            return $msg;
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+
     }
 }
 ?>

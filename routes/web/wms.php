@@ -166,6 +166,7 @@ Route::group([
     Route::any('/library/wait_library','LibraryController@wait_library');
     Route::any('/library/editSku','LibraryController@editSku');
     Route::any('/library/grounding','LibraryController@grounding');
+    Route::any('/library/delSku','LibraryController@delSku');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
