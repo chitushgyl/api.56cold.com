@@ -1027,10 +1027,12 @@ class LibraryController extends CommonController{
 		    'order_id',
             'external_sku_id','good_name','spec','production_date','expire_time','initial_num as now_num','good_unit','good_target_unit','good_scale',
             'area','row','column','tier',
-            'can_use'
+            'can_use',
+            'delete_flag'
 		];
 
         $info=WmsLibraryOrder::with(['wmsLibrarySige' => function($query)use($WmsLibrarySigeSelect) {
+            $query->where('delete_flag','Y');
 		$query->select($WmsLibrarySigeSelect);
 		}])->where($where)
 		->select($select)->first();
