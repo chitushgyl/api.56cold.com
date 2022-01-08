@@ -1043,7 +1043,10 @@ class LibraryController extends CommonController{
 
             /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
             foreach ($info->wmsLibrarySige as $k => $v){
-                $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
+                if ($v->area && $v->row && $v->column){
+                    $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
+                }
+
 
                 $v->good_describe =unit_do($v->good_unit , $v->good_target_unit, $v->good_scale, $v->now_num);
 
@@ -1222,6 +1225,10 @@ class LibraryController extends CommonController{
         ];
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
+            $warehouse_sign_info = WmsWarehouseSign::where('self_id',$warehouse_sign_id)->first();
+            $data['area'] = $warehouse_sign_info->area;
+            $data['row']  = $warehouse_sign_info->row;
+            $data['column'] = $warehouse_sign_info->column;
             $data['update_time'] = $now_time;
             $data['warehouse_id'] = $warehouse_id;
             $data['warehouse_name'] = $warehouse_name;
