@@ -1106,7 +1106,7 @@ class LibraryController extends CommonController{
         if($validator->passes()) {
             $data['update_time'] = $now_time;
             $data['order_status'] = $order_status;
-            $id =  WmsLibraryOrder::where('self_id',$self_id)->update($data);
+            $id =  WmsLibraryOrder::whereIn('self_id',explode(',',$self_id))->update($data);
 
             if($id){
                 $msg['code'] = 200;
@@ -1314,6 +1314,25 @@ class LibraryController extends CommonController{
             return $msg;
         }
 
+    }
+
+    /**
+     * 未完成 已完成头部list
+     * */
+    public function libraryNlist(Request $request){
+        /** 接收中间件参数**/
+        $group_info     = $request->get('group_info');//接收中间件产生的参数
+
+        $data['page_info']      =config('page.listrows');
+//        $data['button_info']    =$request->get('anniu');
+
+
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+
+        //dd($msg);
+        return $msg;
     }
 }
 ?>
