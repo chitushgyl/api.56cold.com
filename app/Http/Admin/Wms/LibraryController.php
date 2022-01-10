@@ -361,7 +361,7 @@ class LibraryController extends CommonController{
                 $list=[];
                 /**现在可以开始做数据了**/
                 if($cando == 'Y'){
-                    $pull[]=$getWmsWarehouse->self_id;
+                    $pull[]='';
 
                     $list["self_id"]            =generate_id('LSID_');
                     $list["order_id"]           =$seld;
