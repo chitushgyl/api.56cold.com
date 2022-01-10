@@ -332,7 +332,8 @@ class LibraryController extends CommonController{
                 $warehouse_select=['warehouse_id','warehouse_name','self_id','area_id','area','row','column','tier','group_code','group_name'];
                 $getWmsWarehouse=WmsWarehouseSign::where($where2k)->select($warehouse_select)->first();
 
-
+                /**
+                 * 2022/1/10 修改 导入入库订单取消库位填写
                 if(empty($getWmsWarehouse)){
                     if($abcd<$errorNum){
                         $strs .= '数据中的第'.$a."行库位不存在".'</br>';
@@ -340,7 +341,7 @@ class LibraryController extends CommonController{
                         $abcd++;
                     }
                 }
-
+                 * */
                 /** 计算商品的有效期**/
                 $expire_time=null;
                 if($v['expire_time']){
