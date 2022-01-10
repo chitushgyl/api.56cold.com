@@ -1229,6 +1229,7 @@ class LibraryController extends CommonController{
             $data['area'] = $warehouse_sign_info->area;
             $data['row']  = $warehouse_sign_info->row;
             $data['column'] = $warehouse_sign_info->column;
+            $data['tier'] = $warehouse_sign_info->tier;
             $data['update_time'] = $now_time;
             $data['warehouse_id'] = $warehouse_id;
             $data['warehouse_name'] = $warehouse_name;
@@ -1341,5 +1342,16 @@ class LibraryController extends CommonController{
         //dd($msg);
         return $msg;
     }
+
+    /**
+     * 预约入库删除
+     * */
+    public function delLibraryOrder(Request $request){
+
+    }
+
+    /**
+     *
+     * */
 }
 ?>
