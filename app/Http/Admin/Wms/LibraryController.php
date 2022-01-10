@@ -111,7 +111,7 @@ class LibraryController extends CommonController{
 
         $where=get_list_where($search);
 
-        $select=['self_id','grounding_status','group_name','group_code','warehouse_name','warehouse_id','storehouse_user_name','check_user_name','count','type','company_name','company_id','create_user_name',
+        $select=['self_id','order_status','grounding_status','group_name','group_code','warehouse_name','warehouse_id','storehouse_user_name','check_user_name','count','type','company_name','company_id','create_user_name',
             'check_time','create_time'];
 
         switch ($group_info['group_id']){
