@@ -227,7 +227,11 @@ class LibraryController extends CommonController{
                 '商品英文名称' =>['N','Y','255','good_english_name'],
                 '生产日期' =>['Y','Y','50','production_date'],
                 '到期时间' =>['N','Y','50','expire_time'],
-                '库位' =>['Y','Y','50','sign'],
+                /**
+                 * 2022/1/10 修改 导入入库订单取消库位填写
+                 *  '库位' =>['Y','Y','50','sign'],
+                 * */
+
                 '实际库存' =>['Y','Y','20','now_num'],
             ];
             $ret=arr_check($shuzu,$info_check);
@@ -247,12 +251,14 @@ class LibraryController extends CommonController{
                 ['self_id','=',$warehouse_id],
             ];
             $warehouse_info = WmsWarehouse::where($where_check)->select('self_id','warehouse_name','group_code','group_name')->first();
+            /**
+             * 2022/1/10 修改 导入入库订单取消库位填写
             if(empty($warehouse_info)){
                 $msg['code'] = 304;
                 $msg['msg'] = '仓库不存在';
                 return $msg;
             }
-
+             * */
             $where_check2=[
                 ['delete_flag','=','Y'],
                 ['self_id','=',$company_id],
@@ -298,30 +304,34 @@ class LibraryController extends CommonController{
                 }
 
                 //查询库位是不是存在
-                $abc= explode('-',$v['sign']);
+                /**
+                 * 2022/1/10 修改 导入入库订单取消库位填写
+                 * $abc= explode('-',$v['sign']);
                 $where2k=[];
                 if(array_key_exists(0, $abc)){
-                    $where2k['area']=$abc[0];
+                $where2k['area']=$abc[0];
                 }
                 if(array_key_exists(1, $abc)){
-                    $where2k['row']=$abc[1];
+                $where2k['row']=$abc[1];
                 }
                 if(array_key_exists(2, $abc)){
-                    $where2k['column']=$abc[2];
+                $where2k['column']=$abc[2];
                 }
                 if(array_key_exists(3, $abc)){
-                    $where2k['tier']=$abc[3];
+                $where2k['tier']=$abc[3];
                 }
                 if($where2k){
-                    $where2k['warehouse_id']=$warehouse_id;
+                $where2k['warehouse_id']=$warehouse_id;
                 }
 
-                //DUMP($where2k);
+                $warehouse_select=['warehouse_id','warehouse_name','self_id','area_id','area','row','column','tier','group_code','group_name'];
+                $getWmsWarehouse=WmsWarehouseSign::where($where2k)->select($warehouse_select)->first();
+                 * */
+                $where2k['self_id']=$v['warehouse_sign_id'];
                 $warehouse_select=['warehouse_id','warehouse_name','self_id','area_id','area','row','column','tier','group_code','group_name'];
                 $getWmsWarehouse=WmsWarehouseSign::where($where2k)->select($warehouse_select)->first();
 
 
-                //DUMP($getWmsWarehouse);
                 if(empty($getWmsWarehouse)){
                     if($abcd<$errorNum){
                         $strs .= '数据中的第'.$a."行库位不存在".'</br>';
@@ -372,19 +382,21 @@ class LibraryController extends CommonController{
                     $list["production_date"]    =$v['production_date'];
                     $list["expire_time"]        =$expire_time;
                     $list["good_info"]          =json_encode($getGoods,JSON_UNESCAPED_UNICODE);
-                    $list["warehouse_id"]       =$getWmsWarehouse->warehouse_id;
-                    $list["warehouse_name"]     =$getWmsWarehouse->warehouse_name;
-                    $list['warehouse_sign_id']  =$getWmsWarehouse->self_id;
-                    $list['area_id']            =$getWmsWarehouse->area_id;
-                    $list['area']               =$getWmsWarehouse->area;
-                    $list['row']                =$getWmsWarehouse->row;
-                    $list['column']             =$getWmsWarehouse->column;
-                    $list['tier']               =$getWmsWarehouse->tier;
+//                    $list["warehouse_id"]       =$getWmsWarehouse->warehouse_id;
+//                    $list["warehouse_name"]     =$getWmsWarehouse->warehouse_name;
+//                    $list['warehouse_sign_id']  =$getWmsWarehouse->self_id;
+//                    $list['area_id']            =$getWmsWarehouse->area_id;
+//                    $list['area']               =$getWmsWarehouse->area;
+//                    $list['row']                =$getWmsWarehouse->row;
+//                    $list['column']             =$getWmsWarehouse->column;
+//                    $list['tier']               =$getWmsWarehouse->tier;
                     $list['initial_num']        =$v['now_num'];
                     $list['now_num']            =$v['now_num'];
                     $list['storage_number']     =$v['now_num'];
-                    $list["group_code"]         =$getWmsWarehouse->group_code;
-                    $list["group_name"]         =$getWmsWarehouse->group_name;
+//                    $list["group_code"]         =$getWmsWarehouse->group_code;
+//                    $list["group_name"]         =$getWmsWarehouse->group_name;
+                    $list["group_code"]         =$warehouse_info->group_code;
+                    $list["group_name"]         =$warehouse_info->group_name;
                     $list['create_time']        =$now_time;
                     $list["update_time"]        =$now_time;
                     $list['create_user_id']     = $user_info->admin_id;
@@ -434,7 +446,7 @@ class LibraryController extends CommonController{
 	        $data['voucher']                =img_for($voucher,'in');
             $data['bulk']                   =$bulk;
             $data['weight']                 =$weight;
-
+            $data['order_status']           = 'S';
             $operationing->table_id=$seld;
             $operationing->new_info=$data;
 
@@ -1375,7 +1387,7 @@ class LibraryController extends CommonController{
             try {
                 $id = WmsLibraryOrder::where('self_id',$self_id)->update($data);
 
-                WmsWarehouseSign::where('order_id',$self_id)->update($data);
+                WmsLibrarySige::where('order_id',$self_id)->update($data);
                 WmsLibraryChange::where('order_id',$self_id)->update($data);
                 DB::commit();
                 $msg['code'] = 200;
@@ -1426,9 +1438,9 @@ class LibraryController extends CommonController{
         ];
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
-            $data['can_use'] = 'N';
+            $data['can_use'] = $can_use;
             $data['update_time'] = $now_time;
-            $id = WmsWarehouseSign::where('order_id',$self_id)->update($data);
+            $id = WmsWarehouseSign::where('self_id',$self_id)->update($data);
 
             if($id){
                 $msg['code'] = 200;
