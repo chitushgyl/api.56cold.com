@@ -285,6 +285,7 @@ class LibraryController extends CommonController{
             $a=2;
             $seld=generate_id('SID_');
             foreach($info_wait as $k => $v){
+                $v['warehouse_sign_id'] = '';
                 $where100=[
                     ['external_sku_id','=',$v['external_sku_id']],
                     ['company_id','=',$company_id],
