@@ -3,6 +3,7 @@ namespace App\Http\Admin\Wms;
 use App\Models\Wms\WmsLibraryChange;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1347,11 +1348,107 @@ class LibraryController extends CommonController{
      * 预约入库删除
      * */
     public function delLibraryOrder(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_order';
 
+        $operationing->access_cause     ='预约入库删除';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='delete';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $self_id = $request->input('self_id');//列表数据self_id
+
+        $rules=[
+            'self_id'=>'required',
+        ];
+        $message=[
+            'self_id.required'=>'请选择入库订单',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $data['delete_flag'] = 'N';
+            $data['update_time'] = $now_time;
+            DB::beginTransaction();
+            try {
+                $id = WmsLibraryOrder::where('self_id',$self_id)->update($data);
+
+                WmsWarehouseSign::where('order_id',$self_id)->update($data);
+                WmsLibraryChange::where('order_id',$self_id)->update($data);
+                DB::commit();
+                $msg['code'] = 200;
+                $msg['msg'] = '操作成功！';
+                return $msg;
+            }catch (\Exception $e){
+                DB::rollBack();
+                $msg['code'] = 301;
+                $msg['msg'] = '操作失败！';
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
     }
 
     /**
-     *
+     * 冻结库内商品
      * */
+    public function freeLibrarySku(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_order';
+
+        $operationing->access_cause     ='预约入库删除';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='delete';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $self_id = $request->input('self_id');//列表数据self_id
+        $can_use = $request->input('can_use');//
+
+        $rules=[
+            'self_id'=>'required',
+        ];
+        $message=[
+            'self_id.required'=>'请选择入库订单',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $data['can_use'] = 'N';
+            $data['update_time'] = $now_time;
+            $id = WmsWarehouseSign::where('order_id',$self_id)->update($data);
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = '操作成功！';
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '操作失败！';
+            }
+            return $msg;
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
 }
 ?>
