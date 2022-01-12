@@ -1179,7 +1179,7 @@ class LibraryController extends CommonController{
         $name             = $request->input('name');
         $good_remark      = $request->input('good_remark');
         $grounding_type   = $request->input('grounding_type');
-        $sku_id   = $request->input('sku_id');
+        $sku_id           = $request->input('sku_id');
         $rules = [
 
         ];
@@ -1250,8 +1250,9 @@ class LibraryController extends CommonController{
 
                 $data['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$now_num;
                 $data['weight']             = $getGoods->wms_weight*$now_num;
+                $dataList[] = $data;
                 $res = WmsLibrarySige::insert($data);
-                $change->change($data,'preentry');
+                $change->change($dataList,'preentry');
             }
 
 
