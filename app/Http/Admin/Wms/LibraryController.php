@@ -1247,8 +1247,8 @@ class LibraryController extends CommonController{
                 $data["good_remark"]        =$good_remark;
                 $data["grounding_type"]     =$grounding_type;
 
-                $data['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
-                $data['weight']             = $getGoods->wms_weight*$v['now_num'];
+                $data['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$now_num;
+                $data['weight']             = $getGoods->wms_weight*$now_num;
                 $res = WmsLibrarySige::insert($data);
                 $change->change($data,'preentry');
             }
