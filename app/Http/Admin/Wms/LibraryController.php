@@ -1561,7 +1561,7 @@ class LibraryController extends CommonController{
             $data['area'] = '';
             $data['row']  = '';
             $data['column'] = '';
-            $data['tier'] = '';
+            $data['tier'] = 1;
             $data['update_time'] = $now_time;
             $data['warehouse_id'] = '';
             $data['warehouse_name'] = '';
