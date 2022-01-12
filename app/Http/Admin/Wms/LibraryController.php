@@ -1041,7 +1041,7 @@ class LibraryController extends CommonController{
         $select=['self_id','grounding_status','order_status','type','company_name','create_user_name','create_time','group_name','check_user_name','check_time','grounding_status','count','voucher','type','warehouse_id','warehouse_name'];
 
 		$WmsLibrarySigeSelect=[
-            'self_id','grounding_status',
+            'self_id','grounding_status','bulk','weight',
 		    'order_id',
             'external_sku_id','good_name','spec','production_date','expire_time','initial_num as now_num','good_unit','good_target_unit','good_scale',
             'area','row','column','tier',
