@@ -1254,7 +1254,7 @@ class LibraryController extends CommonController{
             }
 
 
-            if ($res && $result){
+            if ($res){
                 $msg['code'] = 200;
                 $msg['msg'] = '修改成功';
                 return $msg;
