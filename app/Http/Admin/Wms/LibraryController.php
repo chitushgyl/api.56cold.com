@@ -940,6 +940,9 @@ class LibraryController extends CommonController{
                     $list['create_user_id']     = $user_info->admin_id;
                     $list['create_user_name']   = $v['name'];
                     $list["grounding_status"]   ='N';
+                    $list["good_remark"]        =$v['good_remark'];
+                    $list["grounding_type"]     =$v['grounding_type'];
+
                     $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
                     $list['weight']             = $getGoods->wms_weight*$v['now_num'];
                     $bulk+=  $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
@@ -1153,12 +1156,12 @@ class LibraryController extends CommonController{
     /**
      * 修改入库明细里商品信息
      * */
-    public function editSku(Request $request){
+    public function editSku(Request $request,Change $change){
         $operationing   = $request->get('operationing');//接收中间件产生的参数
         $now_time       =date('Y-m-d H:i:s',time());
         $table_name     ='wms_library_sige';
 
-        $operationing->access_cause     ='修改入库商品信息';
+        $operationing->access_cause     ='添加/修改入库商品信息';
         $operationing->table            =$table_name;
         $operationing->operation_type   ='create';
         $operationing->now_time         =$now_time;
@@ -1171,6 +1174,11 @@ class LibraryController extends CommonController{
         $good_lot         = $request->input('good_lot');
         $order_id         = $request->input('order_id');
         $external_sku_id  = $request->input('external_sku_id');
+        $production_date  = $request->input('production_date');
+        $expire_time      = $request->input('expire_time');
+        $name             = $request->input('name');
+        $good_remark      = $request->input('good_remark');
+        $grounding_type   = $request->input('grounding_type');
         $rules = [
 
         ];
@@ -1183,9 +1191,69 @@ class LibraryController extends CommonController{
             $data['good_lot'] = $good_lot;
             $data['now_num'] = $now_num;
             $data['initial_num'] = $now_num;
-            $data['update_time'] = $now_time;
-            $res = WmsLibrarySige::where('self_id',$self_id)->update($data);
-            $result =  WmsLibraryChange::where('order_id',$order_id)->where('external_sku_id',$external_sku_id)->update($data);
+
+
+            $wheres['self_id'] = $self_id;
+            $old_info=WmsLibrarySige::where($wheres)->first();
+
+            if($old_info){
+                //dd(1111);
+                $data['update_time']=$now_time;
+                $res = WmsLibrarySige::where('self_id',$self_id)->update($data);
+                $result =  WmsLibraryChange::where('order_id',$order_id)->where('external_sku_id',$external_sku_id)->update($data);
+                $operationing->access_cause='修改货物信息';
+                $operationing->operation_type='update';
+
+
+            }else{
+
+                $where100['self_id']=$external_sku_id;
+                //查询商品是不是存在
+                $goods_select=['self_id','external_sku_id','company_id','company_name','good_name','good_english_name','wms_target_unit','wms_scale','wms_unit','wms_spec',
+                    'wms_length','wms_wide','wms_high','wms_weight','period','period_value','group_code'];
+                //dump($goods_select);
+
+                $getGoods=ErpShopGoodsSku::where($where100)->select($goods_select)->first();
+                $data["self_id"]            =generate_id('LSID_');
+                $data["order_id"]           =$order_id;
+                $data["sku_id"]             =$getGoods->self_id;
+                $data["external_sku_id"]    =$getGoods->external_sku_id;
+                $data["company_id"]         =$getGoods->company_id;
+                $data["company_name"]       =$getGoods->company_name;
+                $data["good_name"]          =$getGoods->good_name;
+                $data["good_english_name"]  =$getGoods->good_english_name;
+                $data["good_target_unit"]   =$getGoods->wms_target_unit;
+                $data["good_scale"]         =$getGoods->wms_scale;
+                $data["good_unit"]          =$getGoods->wms_unit;
+                $data["wms_length"]         =$getGoods->wms_length;
+                $data["wms_wide"]           =$getGoods->wms_wide;
+                $data["wms_high"]           =$getGoods->wms_high;
+                $data["wms_weight"]         =$getGoods->wms_weight;
+                $data["good_info"]          =json_encode($getGoods,JSON_UNESCAPED_UNICODE);
+
+                $data["production_date"]    =$production_date;
+                $data["expire_time"]        =$expire_time;
+                $data['spec']               =$getGoods->wms_spec;
+                $data['storage_number']     =$now_num;
+
+                $data["group_code"]         =$getGoods->group_code;
+                $data["group_name"]         =$getGoods->group_name;
+
+                $data['create_time']        =$now_time;
+                $data["update_time"]        =$now_time;
+                $data['create_user_id']     = $user_info->admin_id;
+                $data['create_user_name']   = $name;
+                $data["grounding_status"]   ='N';
+                $data["good_remark"]        =$good_remark;
+                $data["grounding_type"]     =$grounding_type;
+
+                $data['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
+                $data['weight']             = $getGoods->wms_weight*$v['now_num'];
+                $res = WmsLibrarySige::insert($data);
+                $change->change($data,'preentry');
+            }
+
+
             if ($res && $result){
                 $msg['code'] = 200;
                 $msg['msg'] = '修改成功';
@@ -1464,5 +1532,72 @@ class LibraryController extends CommonController{
             return $msg;
         }
     }
+
+    /**
+     * 取消上架
+     * */
+    public function cancelGrounding(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_sige';
+
+        $operationing->access_cause     ='取消上架';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='delete';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $sign_id = $request->input('sign_id');//
+        //第一步，验证数据
+        $rules=[
+            'sign_id'=>'required',
+        ];
+        $message=[
+            'sign_id.required'=>'请选择要做的操作',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $data['area'] = '';
+            $data['row']  = '';
+            $data['column'] = '';
+            $data['tier'] = '';
+            $data['update_time'] = $now_time;
+            $data['warehouse_id'] = '';
+            $data['warehouse_name'] = '';
+            $data['warehouse_sign_id'] = '';
+            $data['area_id'] = '';
+            $data['grounding_status'] = 'N';
+            $id = WmsLibrarySige::whereIn('self_id',json_decode($sign_id,true))->update($data);
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = '操作成功';
+                return $msg;
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '操作失败！';
+                return $msg;
+            }
+
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 入库未完成 添加商品
+     * */
+    public function addGood(Request $request){
+
+    }
+
 }
 ?>

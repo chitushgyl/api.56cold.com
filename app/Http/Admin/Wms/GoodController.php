@@ -610,7 +610,7 @@ class GoodController extends CommonController{
         ];
 
         //dd($where);
-        $data['info']=ErpShopGoodsSku::where($where)->select('self_id','external_sku_id','good_name','wms_spec')->get();
+        $data['info']=ErpShopGoodsSku::where($where)->select('self_id','external_sku_id','good_name','wms_spec','wms_unit')->get();
         $msg['code']=200;
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;
