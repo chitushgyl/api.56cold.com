@@ -666,7 +666,7 @@ class TotalController  extends CommonController{
         }])->where($where)
             ->select($total_select)->first();
 		*/
-
+        $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
 		$info=WmsTotal::with(['wmsOutOrder' => function($query)use($order_select,$order_list_select,$wms_out_sige_select,$good_select,$group_select,$shop_select){
 			$query->where('delete_flag','=','Y');
 			$query->select($order_select);
@@ -779,6 +779,7 @@ class TotalController  extends CommonController{
 						$list['good_describe']      =unit_do($vvv->good_unit , $vvv->good_target_unit, $vvv->good_scale, $vvv->num);
 						$list['price']              =$vvv->price;
 						$list['total_money']        =$vvv->price * $vvv->num;
+                        $list['control']            = $tms_control_type[$warehouseType->wmsWarm->control]?? null;
 						$order[]=$list;
 						$abc['info']=$order;
 

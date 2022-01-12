@@ -1512,7 +1512,7 @@ class LibraryController extends CommonController{
         if($validator->passes()) {
             $data['can_use'] = $can_use;
             $data['update_time'] = $now_time;
-            $id = WmsWarehouseSign::where('self_id',$self_id)->update($data);
+            $id = WmsLibrarySige::where('self_id',$self_id)->update($data);
 
             if($id){
                 $msg['code'] = 200;
