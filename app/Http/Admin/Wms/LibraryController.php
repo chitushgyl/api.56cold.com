@@ -1179,6 +1179,7 @@ class LibraryController extends CommonController{
         $name             = $request->input('name');
         $good_remark      = $request->input('good_remark');
         $grounding_type   = $request->input('grounding_type');
+        $sku_id   = $request->input('sku_id');
         $rules = [
 
         ];
@@ -1207,7 +1208,7 @@ class LibraryController extends CommonController{
 
             }else{
 
-                $where100['self_id']=$external_sku_id;
+                $where100['self_id']=$sku_id;
                 //查询商品是不是存在
                 $goods_select=['self_id','external_sku_id','company_id','company_name','good_name','good_english_name','wms_target_unit','wms_scale','wms_unit','wms_spec',
                     'wms_length','wms_wide','wms_high','wms_weight','period','period_value','group_code'];
@@ -1592,12 +1593,6 @@ class LibraryController extends CommonController{
         }
     }
 
-    /**
-     * 入库未完成 添加商品
-     * */
-    public function addGood(Request $request){
-
-    }
 
 }
 ?>
