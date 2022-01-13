@@ -49,6 +49,7 @@ class OrderController extends CommonController{
         $company_name       =$request->input('company_name');
         $warehouse_name     =$request->input('warehouse_name');
         $total_flag         =$request->input('total_flag');
+        $status            =$request->input('status');
         $listrows           = $num;
         $firstrow           = ($page - 1) * $listrows;
 
@@ -58,6 +59,7 @@ class OrderController extends CommonController{
             ['type'=>'all','name'=>'total_flag','value'=>$total_flag],
             ['type'=>'like','name'=>'company_name','value'=>$company_name],
             ['type'=>'like','name'=>'warehouse_name','value'=>$warehouse_name],
+            ['type'=>'=','name'=>'status','value'=>$status],
         ];
 
         $where = get_list_where($search);
@@ -114,15 +116,15 @@ class OrderController extends CommonController{
             }
 			switch ($v->status) {
 				case '1':
-				$v->status_show='待发货';
+				$v->status_show='待出库';
 					break;
 
 				case '2':
-				$v->status_show='运输中';
+				$v->status_show='未完成';
 					break;
 
 				case '3':
-				$v->status_show='已送达';
+				$v->status_show='已完成';
 					break;
 			}
 

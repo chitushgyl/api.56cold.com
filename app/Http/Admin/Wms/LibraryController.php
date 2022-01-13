@@ -941,7 +941,7 @@ class LibraryController extends CommonController{
                     $list['create_user_name']   = $v['name'];
                     $list["grounding_status"]   ='N';
                     $list["good_remark"]        =$v['good_remark'];
-                    $list["grounding_type"]     =$v['grounding_type'];
+                    $list["in_library_state"]     =$v['in_library_state'];
 
                     $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
                     $list['weight']             = $getGoods->wms_weight*$v['now_num'];
@@ -1041,12 +1041,8 @@ class LibraryController extends CommonController{
         $select=['self_id','grounding_status','order_status','type','company_name','create_user_name','create_time','group_name','check_user_name','check_time','grounding_status','count','voucher','type','warehouse_id','warehouse_name'];
 
 		$WmsLibrarySigeSelect=[
-            'self_id','grounding_status','bulk','weight',
-		    'order_id',
-            'external_sku_id','good_name','spec','production_date','expire_time','initial_num as now_num','good_unit','good_target_unit','good_scale',
-            'area','row','column','tier',
-            'can_use',
-            'delete_flag'
+            'self_id','grounding_status','bulk','weight','in_library_state','grounding_type','good_remark','good_lot','order_id','external_sku_id','good_name','spec',
+            'production_date','expire_time','initial_num as now_num','good_unit','good_target_unit','good_scale','area','row','column','tier','can_use', 'delete_flag'
 		];
 
         $info=WmsLibraryOrder::with(['wmsLibrarySige' => function($query)use($WmsLibrarySigeSelect) {
@@ -1178,7 +1174,7 @@ class LibraryController extends CommonController{
         $expire_time      = $request->input('expire_time');
         $name             = $request->input('name');
         $good_remark      = $request->input('good_remark');
-        $grounding_type   = $request->input('grounding_type');
+        $in_library_state   = $request->input('in_library_state');
         $sku_id           = $request->input('sku_id');
         $rules = [
 
@@ -1246,7 +1242,7 @@ class LibraryController extends CommonController{
                 $data['create_user_name']   = $name;
                 $data["grounding_status"]   ='N';
                 $data["good_remark"]        =$good_remark;
-                $data["grounding_type"]     =$grounding_type;
+                $data["in_library_state"]     =$in_library_state;
 
                 $data['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$now_num;
                 $data['weight']             = $getGoods->wms_weight*$now_num;
@@ -1298,6 +1294,7 @@ class LibraryController extends CommonController{
         $warehouse_id = $request->input('warehouse_id');//
         $warehouse_name = $request->input('warehouse_name');//
         $warehouse_sign_id = $request->input('warehouse_sign_id');//
+        $grounding_type = $request->input('grounding_type');//
 
         //第一步，验证数据
         $rules=[
@@ -1321,6 +1318,7 @@ class LibraryController extends CommonController{
             $data['warehouse_sign_id'] = $warehouse_sign_id;
             $data['area_id'] = $area_id;
             $data['grounding_status'] = 'Y';
+            $data['grounding_type'] = $grounding_type;
             $id = WmsLibrarySige::whereIn('self_id',json_decode($sign_id,true))->update($data);
             if($id){
                 $msg['code'] = 200;
