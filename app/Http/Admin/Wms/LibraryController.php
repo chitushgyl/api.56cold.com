@@ -1318,7 +1318,7 @@ class LibraryController extends CommonController{
             $change['warehouse_id'] = $data['warehouse_id'] = $warehouse_id;
             $change['warehouse_name'] = $data['warehouse_name'] = $warehouse_name;
             $change['warehouse_sign_id'] = $data['warehouse_sign_id'] = $warehouse_sign_id;
-            $change['area_id'] = $data['area_id'] = $area_id;
+            $data['area_id'] = $area_id;
             $data['grounding_status'] = 'Y';
             $data['grounding_type'] = $grounding_type;
             DB::beginTransaction();
