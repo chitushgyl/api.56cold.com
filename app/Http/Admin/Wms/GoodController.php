@@ -463,7 +463,6 @@ class GoodController extends CommonController{
                 '箱重（KG）' =>['N','Y','20','wms_weight'],
                 '有效期' =>['N','Y','5','period_value'],
                 '有效期单位' =>['N','Y','10','period'],
-                '单价' =>['N','Y','10','sale_price'],
             ];
 
             $ret=arr_check($shuzu,$info_check);
@@ -542,7 +541,6 @@ class GoodController extends CommonController{
                     $list['period_value']       = $v['period_value'];
                     $list['period']             = $period[$v['period']];
                     $list['type']               = 'wms';
-                    $list['sale_price']         = $v['sale_price'];
                     $list['company_id']         = $info->self_id;
                     $list['company_name']       = $info->company_name;
                     $list['group_code']         = $info->group_code;

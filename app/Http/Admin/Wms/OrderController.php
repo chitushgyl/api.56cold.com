@@ -651,8 +651,6 @@ class OrderController extends CommonController{
 	}
 
 
-
-
     /***    出库订单      /wms/order/getOrder
      */
     public function getOrder(Request $request){

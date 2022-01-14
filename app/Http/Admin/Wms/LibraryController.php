@@ -941,6 +941,7 @@ class LibraryController extends CommonController{
                     $list['create_user_name']   = $v['name'];
                     $list["grounding_status"]   ='N';
                     $list["good_remark"]        =$v['good_remark'];
+                    $list["good_lot"]           =$v['good_lot'];
                     $list["in_library_state"]     =$v['in_library_state'];
 
                     $list['bulk']               = $getGoods->wms_length*$getGoods->wms_wide*$getGoods->wms_high*$v['now_num'];
