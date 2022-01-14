@@ -1324,7 +1324,7 @@ class LibraryController extends CommonController{
             DB::beginTransaction();
             try {
                 $id = WmsLibrarySige::whereIn('self_id',json_decode($sign_id,true))->update($data);
-                foreach (json_decode($sign_id,ture) as $key => $value){
+                foreach (json_decode($sign_id,true) as $key => $value){
                     WmsLibraryChange::where('order_id',$order_id)->where('library_sige_id',$value)->update($change);
                 }
                 DB::commit();
