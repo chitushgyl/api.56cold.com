@@ -1290,6 +1290,7 @@ class LibraryController extends CommonController{
 
         $user_info          = $request->get('user_info');//接收中间件产生的参数
         $input              = $request->all();
+        $order_id           = $request->input('order_id');
         $area_id = $request->input('area_id');
         $sign_id = $request->input('sign_id');//
         $warehouse_id = $request->input('warehouse_id');//
@@ -1309,28 +1310,33 @@ class LibraryController extends CommonController{
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
             $warehouse_sign_info = WmsWarehouseSign::where('self_id',$warehouse_sign_id)->first();
-            $data['area'] = $warehouse_sign_info->area;
-            $data['row']  = $warehouse_sign_info->row;
-            $data['column'] = $warehouse_sign_info->column;
-            $data['tier'] = $warehouse_sign_info->tier;
-            $data['update_time'] = $now_time;
-            $data['warehouse_id'] = $warehouse_id;
-            $data['warehouse_name'] = $warehouse_name;
-            $data['warehouse_sign_id'] = $warehouse_sign_id;
-            $data['area_id'] = $area_id;
+            $change['area'] = $data['area'] = $warehouse_sign_info->area;
+            $change['row'] =$data['row']  = $warehouse_sign_info->row;
+            $change['column'] = $data['column'] = $warehouse_sign_info->column;
+            $change['tier'] = $data['tier'] = $warehouse_sign_info->tier;
+            $change['update_time'] = $data['update_time'] = $now_time;
+            $change['warehouse_id'] = $data['warehouse_id'] = $warehouse_id;
+            $change['warehouse_name'] = $data['warehouse_name'] = $warehouse_name;
+            $change['warehouse_sign_id'] = $data['warehouse_sign_id'] = $warehouse_sign_id;
+            $change['area_id'] = $data['area_id'] = $area_id;
             $data['grounding_status'] = 'Y';
             $data['grounding_type'] = $grounding_type;
-            $id = WmsLibrarySige::whereIn('self_id',json_decode($sign_id,true))->update($data);
-            if($id){
+            DB::beginTransaction();
+            try {
+                $id = WmsLibrarySige::whereIn('self_id',json_decode($sign_id,true))->update($data);
+                foreach (json_decode($sign_id,ture) as $key => $value){
+                    WmsLibraryChange::where('order_id',$order_id)->where('library_sige_id',$value)->update($change);
+                }
+                DB::commit();
                 $msg['code'] = 200;
                 $msg['msg'] = '操作成功';
                 return $msg;
-            }else{
+            }catch(\Exception $e){
+                DB::rollBack();
                 $msg['code'] = 301;
                 $msg['msg'] = '操作失败！';
                 return $msg;
             }
-
         }else{
             //前端用户验证没有通过
             $erro=$validator->errors()->all();
