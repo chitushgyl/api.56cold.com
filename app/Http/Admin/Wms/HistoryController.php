@@ -38,6 +38,9 @@ class HistoryController  extends CommonController{
         $group_code          =$request->input('group_code');
 		$company_id			 =$request->input('company_id');
 		$warehouse_sign_id	 =$request->input('warehouse_sign_id');
+        $company_name	 =$request->input('company_name');
+        $warehouse_name	 =$request->input('warehouse_name');
+        $good_name	 =$request->input('good_name');
 
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
@@ -51,6 +54,9 @@ class HistoryController  extends CommonController{
 			['type'=>'like','name'=>'company_id','value'=>$company_id],
             ['type'=>'like','name'=>'group_code','value'=>$group_code],
 			['type'=>'like','name'=>'warehouse_sign_id','value'=>$warehouse_sign_id],
+			['type'=>'like','name'=>'company_name','value'=>$company_name],
+			['type'=>'like','name'=>'warehouse_name','value'=>$warehouse_name],
+			['type'=>'like','name'=>'good_name','value'=>$good_name],
         ];
 
         $where=get_list_where($search);
