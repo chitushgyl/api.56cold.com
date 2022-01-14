@@ -56,7 +56,7 @@ class HistoryController  extends CommonController{
         $where=get_list_where($search);
 
         $select=['self_id','group_code','group_name','warehouse_name','warehouse_id','warehouse_sign_id','company_id','company_name','type','create_user_name','create_user_id',
-				'external_sku_id','sku_id','good_name','spec','area','row','column','tier','good_lot','produce_time','expire_time','libaray_sige_id',
+				'external_sku_id','sku_id','good_name','spec','area','row','column','tier','good_lot','produce_time','expire_time','library_sige_id',
 				'initial_num','now_num','change_num','describe','good_unit','good_target_unit','good_scale'];
 
         switch ($group_info['group_id']){
