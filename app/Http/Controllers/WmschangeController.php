@@ -37,6 +37,7 @@ class WmschangeController extends Controller{
             $list["company_id"]         =$v['company_id'];
             $list["company_name"]       =$v['company_name'];
             $list['type']               =$type;
+            $list['library_sige_id']    =$v['self_id'];
 	    //dd($list);
             switch ($type){
                 case 'preentry':
