@@ -34,31 +34,43 @@ class GoodqueryController extends CommonController{
         $use_flag       =$request->input('use_flag');
         $group_code     =$request->input('group_code');
         $warm_name      =$request->input('warm_name');
-        $min_warm       =$request->input('min_warm');
-        $max_warm      =$request->input('max_warm');
+        $company_name      =$request->input('company_name');
+        $warehouse_name      =$request->input('warehouse_name');
+        $warehouse_sign_id       =$request->input('warehouse_sign_id');
+        $external_sku_id       =$request->input('external_sku_id');
+        $good_name      =$request->input('good_name');
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
         $search=[
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ['type'=>'=','name'=>'type','value'=>'WMS'],
-//            ['type'=>'=','name'=>'group_code','value'=>$group_code],
-//            ['type'=>'like','name'=>'warm_name','value'=>$warm_name],
-//            ['type'=>'>=','name'=>'min_warm','value'=>$min_warm],
-//            ['type'=>'<=','name'=>'max_warm','value'=>$max_warm],
+            ['type'=>'like','name'=>'good_name','value'=>$good_name],
+            ['type'=>'=','name'=>'group_code','value'=>$group_code],
+            ['type'=>'like','name'=>'company_name','value'=>$company_name],
+            ['type'=>'like','name'=>'external_sku_id','value'=>$external_sku_id],
+
+        ];
+
+        $search1=[
+            ['type'=>'like','name'=>'warehouse_name','value'=>$warehouse_name],
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
+            ['type'=>'>','name'=>'now_num','value'=>0],
+            ['type'=>'=','name'=>'warehouse_sign_id','value'=>$warehouse_sign_id],
         ];
 
         $where=get_list_where($search);
+        $where1 = get_list_where($search1);
         $select=['self_id','good_name','good_english_name','wms_unit','wms_target_unit','wms_scale','wms_spec',
-            'group_name','use_flag','company_name'];
+            'group_name','use_flag','company_name','external_sku_id'];
 
-        $Signselect=['sku_id','production_date','expire_time','can_use','warehouse_name','area','row','column','tier','now_num'];
+        $Signselect=['sku_id','production_date','expire_time','can_use','warehouse_name','area','row','column','tier','now_num','warehouse_sign_id'];
 //        dd($select);
         switch ($group_info['group_id']){
             case 'all':
                 $data['total']=ErpShopGoodsSku::where($where)->count(); //总的数据量
-                $data['items']=ErpShopGoodsSku::with(['wmsLibrarySige' => function($query)use($Signselect) {
-                    $query->where('delete_flag','=','Y');
-                    $query->where('now_num','>','0');
+                $data['items']=ErpShopGoodsSku::with(['wmsLibrarySige' => function($query)use($Signselect,$where1) {
+                    $query->where($where1);
+//                    $query->where('now_num','>','0');
                     $query->select($Signselect);
                 }])->where($where)
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
@@ -69,9 +81,8 @@ class GoodqueryController extends CommonController{
             case 'one':
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=ErpShopGoodsSku::where($where)->count(); //总的数据量
-                $data['items']=ErpShopGoodsSku::with(['wmsLibrarySige' => function($query)use($Signselect) {
-                    $query->where('delete_flag','=','Y');
-                    $query->where('now_num','>','0');
+                $data['items']=ErpShopGoodsSku::with(['wmsLibrarySige' => function($query)use($Signselect,$where1) {
+                    $query->where($where1);
                     $query->select($Signselect);
                 }])->where($where)
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
@@ -81,9 +92,8 @@ class GoodqueryController extends CommonController{
 
             case 'more':
                 $data['total']=ErpShopGoodsSku::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
-                $data['items']=ErpShopGoodsSku::with(['wmsLibrarySige' => function($query)use($Signselect) {
-                    $query->where('delete_flag','=','Y');
-                    $query->where('now_num','>','0');
+                $data['items']=ErpShopGoodsSku::with(['wmsLibrarySige' => function($query)use($Signselect,$where1) {
+                    $query->where($where1);
                     $query->select($Signselect);
                 }])->where($where)->whereIn('group_code',$group_info['group_code'])
                 ->select($select)
