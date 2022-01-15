@@ -584,7 +584,7 @@ class OrderController extends CommonController{
             ['delete_flag','=','Y'],
         ];
         $order_select = ['self_id','shop_name','status','create_user_name','create_time','group_name','warehouse_name','company_name','total_flag','total_time','delivery_time'];
-        $order_list_select= ['self_id','good_name','spec','sanitation','num','order_id','external_sku_id','quehuo','quehuo_num'];
+        $order_list_select= ['self_id','good_name','spec','sanitation','num','order_id','external_sku_id','quehuo','quehuo_num','sanitation','remarks','price','total_price','out_library_state'];
         $wms_out_sige_select= ['order_list_id','num','area','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','good_english_name'];
 
         $info=wmsOutOrder::with(['wmsOutOrderList'=>function($query)use($order_list_select,$wms_out_sige_select){
