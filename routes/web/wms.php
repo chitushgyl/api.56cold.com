@@ -216,6 +216,7 @@ Route::group([
     Route::any('/order/delOutOrder','OrderController@delOutOrder');
 	Route::any('/order/import', 'OrderController@import');
 	Route::any('/order/outOrder', 'OrderController@outOrder');
+	Route::any('/order/outOrderDone', 'OrderController@outOrderDone');
     Route::group([
         "middleware"=>['daily'],
     ], function(){

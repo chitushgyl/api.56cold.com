@@ -921,5 +921,41 @@ class OrderController extends CommonController{
         return $msg;
     }
 
+    /**
+     * 完成出库
+     * */
+    public function outOrderDone(Request $request){
+        $now_time=date('Y-m-d H:i:s',time());
+        $operationing = $request->get('operationing');//接收中间件产生的参数
+        $table_name='wms_out_order';
+        $medol_name='WmsOutOrder';
+        $self_id=$request->input('self_id');
+        $flag='delFlag';
+        //$self_id='group_202007311841426065800243';
+        $update['update_time'] = $now_time;
+        $update['status'] = 3;
+
+        $res = WmsOutOrder::where('self_id',$self_id)->update($update);
+        if ($res){
+            $msg['code']=200;
+            $msg['msg']='删除成功';
+        }else{
+            $msg['code']=300;
+            $msg['msg']='删除失败';
+        }
+
+
+
+        $operationing->access_cause='删除';
+        $operationing->table=$table_name;
+        $operationing->table_id=$self_id;
+        $operationing->now_time=$now_time;
+        $operationing->old_info=$wms_order;
+        $operationing->new_info=(object)$update;
+        $operationing->operation_type=$flag;
+
+        return $msg;
+    }
+
 }
 ?>
