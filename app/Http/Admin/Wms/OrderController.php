@@ -998,7 +998,7 @@ class OrderController extends CommonController{
             $data['num'] = $num;
             $data['price'] = $price;
             $data['total_price'] = $num*$price;
-            $data['delivery_time'] = $delivery_time;
+//            $data['delivery_time'] = $delivery_time;
             $data['remark'] = $remark;
             $data['out_library_state'] = $out_library_state;
             $data['$sanitation'] = $sanitation;
