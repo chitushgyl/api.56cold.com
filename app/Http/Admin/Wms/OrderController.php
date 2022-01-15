@@ -943,9 +943,6 @@ class OrderController extends CommonController{
             $msg['code']=300;
             $msg['msg']='操作失败';
         }
-
-
-
         $operationing->access_cause='删除';
         $operationing->table=$table_name;
         $operationing->table_id=$self_id;
@@ -955,6 +952,156 @@ class OrderController extends CommonController{
         $operationing->operation_type=$flag;
 
         return $msg;
+    }
+
+    /**
+     * 添加/编辑出库订单商品
+     * */
+    public function addOutorderSku(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_library_sige';
+
+        $operationing->access_cause     ='添加/修改出库商品信息';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+
+        $user_info        = $request->get('user_info');//接收中间件产生的参数
+        $input            = $request->all();
+        $self_id          = $request->input('self_id'); //商品列表self_id
+        $order_id         = $request->input('order_id');// 大订单self_id
+        $shop_id          = $request->input('shop_id');//门店self_id
+        $shop_name        = $request->input('shop_name');//门店名称
+        $external_sku_id  = $request->input('external_sku_id');//商品编号
+        $good_name        = $request->input('good_name');//商品名称
+        $num              = $request->input('num');//数量
+        $name             = $request->input('name');//制单人
+        $out_library_state= $request->input('out_library_state');//出库状态
+        $sku_id           = $request->input('sku_id');//商品self_id
+        $price            = $request->input('price');//金额
+        $total_price      = $request->input('total_price');//总价
+        $delivery_time    = $request->input('delivery_time');//发货时间
+        $sanitation       = $request->input('sanitation');//卫检
+        $remark           = $request->input('remark');//备注
+        $rules = [
+
+        ];
+        $message = [
+
+        ];
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()){
+            $wheres['self_id'] = $self_id;
+            $old_info=WmsOutOrderList::where($wheres)->first();
+
+            $data['num'] = $num;
+            $data['price'] = $price;
+            $data['total_price'] = $num*$price;
+            $data['delivery_time'] = $delivery_time;
+            $data['remark'] = $remark;
+            $data['out_library_state'] = $out_library_state;
+            $data['$sanitation'] = $sanitation;
+            if ($old_info){
+                $data['update_time']=$now_time;
+                $res = WmsOutOrderList::where('self_id',$self_id)->update($data);
+//                $result =  WmsLibraryChange::where('order_id',$order_id)->where('external_sku_id',$external_sku_id)->update($data);
+                $operationing->access_cause='修改货物信息';
+                $operationing->operation_type='update';
+            }else{
+                $data['self_id'] = generate_id('list_');
+                $data['order_id'] = $order_id;
+                $data['shop_id'] = $shop_id;
+                $data['shop_name'] = $shop_name;
+                $data['good_name'] = $good_name;
+                $data['external_sku_id'] = $external_sku_id;
+                $data['create_user_id'] = $user_info->admin_id;
+                $data['create_user_name'] = $name;
+                $data['sku_id'] = $sku_id;
+                $res = WmsOutOrderList::insert($data);
+            }
+            if ($res){
+                $msg['code']=200;
+                $msg['msg']='操作成功';
+            }else{
+                $msg['code']=302;
+                $msg['msg']='操作失败';
+            }
+            return $msg;
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 删除出库订单商品
+     * */
+    public function delOutorderSku(Request $request){
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='wms_out_order';
+
+        $operationing->access_cause     ='删除';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='delete';
+        $operationing->now_time         =$now_time;
+
+        $user_info          = $request->get('user_info');//接收中间件产生的参数
+        $input              = $request->all();
+        $self_id = $request->input('self_id');//列表数据self_id
+        $order_id = $request->input('order_id');//入库订单self_id
+
+
+        $rules=[
+            'self_id'=>'required',
+            'order_id'=>'required',
+        ];
+        $message=[
+            'self_id.required'=>'请选择入库订单',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $show = 'Y';
+            $data['delete_flag'] = 'N';
+            $data['update_time'] = $now_time;
+
+            $id = WmsOutOrderList::where('self_id',$self_id)->update($data);
+
+            $order_list = WmsOutOrderList::where('order_id',$order_id)->where('delete_flag','Y')->get()->toArray();
+            if(count($order_list) > 0){
+
+            }else{
+                WmsOutOrder::where('self_id',$order_id)->update($data);
+                $show = 'N';
+            }
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = '操作成功！';
+                $msg['show'] = $show;
+            }else{
+                $msg['code'] = 301;
+                $msg['msg'] = '操作失败！';
+            }
+            return $msg;
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
     }
 
 }
