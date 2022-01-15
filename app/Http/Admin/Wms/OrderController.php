@@ -1001,7 +1001,7 @@ class OrderController extends CommonController{
 //            $data['delivery_time'] = $delivery_time;
             $data['remarks'] = $remark;
             $data['out_library_state'] = $out_library_state;
-            $data['$sanitation'] = $sanitation;
+            $data['sanitation'] = $sanitation;
             if ($old_info){
                 $data['update_time']=$now_time;
                 $res = WmsOutOrderList::where('self_id',$self_id)->update($data);
