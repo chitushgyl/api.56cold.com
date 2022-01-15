@@ -938,10 +938,10 @@ class OrderController extends CommonController{
         $res = WmsOutOrder::where('self_id',$self_id)->update($update);
         if ($res){
             $msg['code']=200;
-            $msg['msg']='删除成功';
+            $msg['msg']='操作成功';
         }else{
             $msg['code']=300;
-            $msg['msg']='删除失败';
+            $msg['msg']='操作失败';
         }
 
 
@@ -950,7 +950,7 @@ class OrderController extends CommonController{
         $operationing->table=$table_name;
         $operationing->table_id=$self_id;
         $operationing->now_time=$now_time;
-        $operationing->old_info=$wms_order;
+        $operationing->old_info=null;
         $operationing->new_info=(object)$update;
         $operationing->operation_type=$flag;
 
