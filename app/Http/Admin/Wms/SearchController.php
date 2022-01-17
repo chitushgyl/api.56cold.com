@@ -351,6 +351,7 @@ class SearchController extends CommonController{
                     $andd["good_target_unit"]   =$v->good_target_unit;
                     $andd["good_scale"]         =$v->good_scale;
                     $andd["good_unit"]          =$v->good_unit;
+                    $andd["good_log"]          =$v->good_lot;
 
                     $old_change[]=$andd;
 		    //dump($andd);
@@ -366,7 +367,8 @@ class SearchController extends CommonController{
                     $list["good_target_unit"]   =$v->good_target_unit;
                     $list["good_scale"]         =$v->good_scale;
                     $list["good_unit"]          =$v->good_unit;
-                    $list["good_info"]          =$v->good_info;
+                    $list["good_unit"]          =$v->good_unit;
+                    $list["good_lot"]          =$v->good_lot;
                     $list["grounding_status"]   ="Y";
                     $list["warehouse_id"]       =$v->warehouse_id;
                     $list["warehouse_name"]     =$v->warehouse_name;
