@@ -186,12 +186,12 @@ Route::group([
     Route::any('/search/searchPage', 'SearchController@searchPage');
     Route::any('/search/createMove', 'SearchController@createMove');
     Route::any('/search/details', 'SearchController@details');
-
+    Route::any('/search/addMove', 'SearchController@addMove');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
 		Route::any('/search/mistakeRevise', 'SearchController@mistakeRevise');
-		Route::any('/search/addMove', 'SearchController@addMove');
+
     });
 
 
