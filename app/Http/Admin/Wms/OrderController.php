@@ -578,7 +578,7 @@ class OrderController extends CommonController{
     public function details(Request $request){
         $self_id=$request->input('self_id');
 //        $self_id='order_202012221122071857614366';
-
+        $out_store_status  =array_column(config('wms.out_store_status'),'name','key');
         $where=[
             ['self_id','=',$self_id],
             ['delete_flag','=','Y'],
@@ -603,7 +603,7 @@ class OrderController extends CommonController{
             $quhuo_list=[];
             $out_list=[];
             foreach ($info->wmsOutOrderList as $k=>$v){
-
+                    $v->out_library_state_show  = $out_store_status[$v->out_library_state] ?? null;
                 if($v->quehuo == 'Y'){
                     $data['quehuo_flag']         ='Y';
                     $list2['shop_name']          =$info->shop_name;
@@ -984,6 +984,7 @@ class OrderController extends CommonController{
         $delivery_time    = $request->input('delivery_time');//发货时间
         $sanitation       = $request->input('sanitation');//卫检
         $remark           = $request->input('remark');//备注
+        $wms_spec           = $request->input('wms_spec');//备注
         $rules = [
 
         ];
@@ -1002,6 +1003,7 @@ class OrderController extends CommonController{
             $data['remarks'] = $remark;
             $data['out_library_state'] = $out_library_state;
             $data['sanitation'] = $sanitation;
+            $data['spec'] = $wms_spec;
             if ($old_info){
                 $data['update_time']=$now_time;
                 $res = WmsOutOrderList::where('self_id',$self_id)->update($data);
@@ -1018,6 +1020,9 @@ class OrderController extends CommonController{
                 $data['create_user_id'] = $user_info->admin_id;
                 $data['create_user_name'] = $name;
                 $data['sku_id'] = $sku_id;
+                $data['create_time'] = $data['update_time'] = $now_time;
+                $data['group_name']  = $user_info->group_name;
+                $data['group_code']  = $user_info->group_code;
                 $res = WmsOutOrderList::insert($data);
             }
             if ($res){

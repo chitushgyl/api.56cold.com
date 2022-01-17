@@ -1029,7 +1029,7 @@ class LibraryController extends CommonController{
     public function  details(Request $request,Details $details){
         $wms_order_type      = config('wms.wms_order_type');
         $wms_order_type_show  =array_column($wms_order_type,'name','key');
-
+        $in_store_status  =array_column(config('wms.in_store_status'),'name','key');
         $self_id=$request->input('self_id');
 
         //$self_id='SID_2020120415135553691290';
@@ -1064,7 +1064,7 @@ class LibraryController extends CommonController{
 
 
                 $v->good_describe =unit_do($v->good_unit , $v->good_target_unit, $v->good_scale, $v->now_num);
-
+                $v->in_library_state_show = $in_store_status[$v->in_library_state]??null;
             }
 
             $data['info']=$info;
