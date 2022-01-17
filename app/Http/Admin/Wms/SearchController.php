@@ -302,7 +302,7 @@ class SearchController extends CommonController{
         $old_change=[];
         $new_change=[];
 
-        $select=['self_id','group_name','warehouse_id','warehouse_name','company_name',
+        $select=['self_id','group_name','warehouse_id','warehouse_name','company_name','good_lot',
             'good_name','good_english_name','spec','sku_id','good_unit','good_target_unit','good_scale','good_info',
             'warehouse_sign_id','area','row','column','tier','production_date','expire_time','now_num','can_use',
             'order_id','external_sku_id','company_id','group_code','storage_number','wms_length','wms_wide','wms_high','wms_weight'];
