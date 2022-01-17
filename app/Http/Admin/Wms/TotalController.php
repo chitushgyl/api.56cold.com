@@ -408,6 +408,7 @@ class TotalController  extends CommonController{
                     $out['good_target_unit']    =$vv['good_target_unit'];
                     $out['good_scale']          =$vv['good_scale'];
                     $out['good_unit']           =$vv['good_unit'];
+                    $out['good_lot']           =$vv['good_lot'];
 					$out['group_code']          =$vv['group_code'];
 					$out['group_name']          =$vv['group_name'];
 					$out['warehouse_id']        =$vv['warehouse_id'];
