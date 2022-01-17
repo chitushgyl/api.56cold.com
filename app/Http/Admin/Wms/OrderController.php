@@ -159,6 +159,7 @@ class OrderController extends CommonController{
         $goods              = json_decode($request->input('goods'),true);
         $delivery_time      = $request->input('delivery_time');
         $recipt_code      = $request->input('recipt_code');
+        $out_library_state      = $request->input('out_library_state');
         /***
         $input['goods']=$goods=[
         '0'=>[
@@ -260,6 +261,7 @@ class OrderController extends CommonController{
                 $list['shop_code']          = $shop_info->shop_code;
                 $list['price']              = $v['price'];
                 $list['total_price']        = $v['total_price'];
+                $list['out_library_state']        = $out_library_state;
                 $datalist[]=$list;
 
             }
@@ -520,6 +522,7 @@ class OrderController extends CommonController{
                         $list['shop_code']          = $v['shop_code'];
                         $list['price']              = $v['price'];
                         $list['total_price']        = $v['total_price'];
+                        $list['out_library_state']        = 'normal';
 //                        $list['int_cold']           = $v['int_cold'];
 //                        $list['int_freeze']         = $v['int_freeze'];
 //                        $list['int_normal']         = $v['int_normal'];
@@ -985,6 +988,8 @@ class OrderController extends CommonController{
         $sanitation       = $request->input('sanitation');//卫检
         $remark           = $request->input('remark');//备注
         $wms_spec           = $request->input('wms_spec');//备注
+        $group_code           = $request->input('group_code');//备注
+        $group_name           = $request->input('group_name');//备注
         $rules = [
 
         ];
@@ -1021,8 +1026,8 @@ class OrderController extends CommonController{
                 $data['create_user_name'] = $name;
                 $data['sku_id'] = $sku_id;
                 $data['create_time'] = $data['update_time'] = $now_time;
-                $data['group_name']  = $user_info->group_name;
-                $data['group_code']  = $user_info->group_code;
+                $data['group_name']  = $group_name;
+                $data['group_code']  = $group_code;
                 $res = WmsOutOrderList::insert($data);
             }
             if ($res){
