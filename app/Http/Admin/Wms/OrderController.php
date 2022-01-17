@@ -260,6 +260,7 @@ class OrderController extends CommonController{
                 $list['shop_code']          = $shop_info->shop_code;
                 $list['price']              = $v['price'];
                 $list['total_price']        = $v['total_price'];
+                $list['remarks']            = $v['remark'];
                 $list['out_library_state']  = $v['out_library_state'];
                 $datalist[]=$list;
 
