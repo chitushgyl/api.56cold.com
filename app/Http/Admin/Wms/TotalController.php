@@ -327,12 +327,13 @@ class TotalController  extends CommonController{
 
                 $money->moneyCompute($data,$datalist,$now_time,$company_info,$user_info,'total');
 
-
+                DB::commit();
                 /** 告诉用户，你一共导入了多少条数据，其中比如插入了多少条，修改了多少条！！！*/
                 $msg['msg']='操作成功，您一共总拣了'.$count.'个订单';
 
                 return $msg;
             }catch (\Exception $e){
+                DB::rollBack();
                 $msg['code']=301;
                 $msg['msg']='操作失败';
                 return $msg;
