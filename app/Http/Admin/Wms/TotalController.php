@@ -314,17 +314,6 @@ class TotalController  extends CommonController{
 //            $data['int_normal'] = $int_normal_num;
                 WmsOutOrder::whereIn('self_id', $total)->update($temp);
                 $id = WmsTotal::insert($data);
-            }catch (\Exception $e){
-                $msg['code']=301;
-                $msg['msg']='操作失败';
-                return $msg;
-            }
-			$operationing->table_id=$data['self_id'];
-            $operationing->old_info=null;
-            $operationing->new_info=$data;
-
-            /** 这里回数据出来***/
-            if($id){
                 $msg['code']=200;
 
                 $where_pack2=[
@@ -343,6 +332,18 @@ class TotalController  extends CommonController{
                 $msg['msg']='操作成功，您一共总拣了'.$count.'个订单';
 
                 return $msg;
+            }catch (\Exception $e){
+                $msg['code']=301;
+                $msg['msg']='操作失败';
+                return $msg;
+            }
+			$operationing->table_id=$data['self_id'];
+            $operationing->old_info=null;
+            $operationing->new_info=$data;
+
+            /** 这里回数据出来***/
+            if($id){
+
             }else{
                 $msg['code']=301;
                 $msg['msg']='操作失败';
