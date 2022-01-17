@@ -408,7 +408,6 @@ class TotalController  extends CommonController{
                     $out['good_target_unit']    =$vv['good_target_unit'];
                     $out['good_scale']          =$vv['good_scale'];
                     $out['good_unit']           =$vv['good_unit'];
-                    $out['good_lot']           =$vv['good_lot'];
 					$out['group_code']          =$vv['group_code'];
 					$out['group_name']          =$vv['group_name'];
 					$out['warehouse_id']        =$vv['warehouse_id'];
@@ -453,6 +452,7 @@ class TotalController  extends CommonController{
 					$library_change["create_user_name"]     =$user_info->name;
 					$library_change["create_time"]          =$now_time;
 					$library_change["update_time"]          =$now_time;
+					$library_change["good_lot"]             =$vv['good_lot'];
 
                     //DD($library_change);
 					$wms_library_change[]=$library_change;
