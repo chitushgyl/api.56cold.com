@@ -395,6 +395,7 @@ class LibraryController extends CommonController{
                     $list['initial_num']        =$v['now_num'];
                     $list['now_num']            =$v['now_num'];
                     $list['storage_number']     =$v['now_num'];
+                    $list['in_library_state']   ='normal';
 //                    $list["group_code"]         =$getWmsWarehouse->group_code;
 //                    $list["group_name"]         =$getWmsWarehouse->group_name;
                     $list["group_code"]         =$warehouse_info->group_code;
