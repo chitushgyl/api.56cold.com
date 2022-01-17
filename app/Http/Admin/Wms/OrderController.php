@@ -159,7 +159,6 @@ class OrderController extends CommonController{
         $goods              = json_decode($request->input('goods'),true);
         $delivery_time      = $request->input('delivery_time');
         $recipt_code      = $request->input('recipt_code');
-        $out_library_state      = $request->input('out_library_state');
         /***
         $input['goods']=$goods=[
         '0'=>[
@@ -261,7 +260,7 @@ class OrderController extends CommonController{
                 $list['shop_code']          = $shop_info->shop_code;
                 $list['price']              = $v['price'];
                 $list['total_price']        = $v['total_price'];
-                $list['out_library_state']        = $out_library_state;
+                $list['out_library_state']  = $v['out_library_state'];
                 $datalist[]=$list;
 
             }
