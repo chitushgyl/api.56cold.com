@@ -11,7 +11,7 @@ class WmschangeController extends Controller{
 //dd($datalist);
             $list=[];
             $list["self_id"]            =generate_id('change_');
-            if($type == 'out'){
+            if($type != 'preentry'){
                 $list["warehouse_id"]       =$v['warehouse_id'];
                 $list["warehouse_name"]     =$v['warehouse_name'];
                 $list['warehouse_sign_id']  =$v['warehouse_sign_id'];
