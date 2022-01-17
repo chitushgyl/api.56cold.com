@@ -461,9 +461,9 @@ class LibraryController extends CommonController{
                 foreach ($new_list as $value){
                     WmsLibrarySige::insert($value);
                 }
-                if($data["grounding_status"]=='Y'){
+//                if($data["grounding_status"]=='Y'){
                     $change->change($datalist,'preentry');
-                }
+//                }
                 $msg['code']=200;
                 /** 告诉用户，你一共导入了多少条数据，其中比如插入了多少条，修改了多少条！！！*/
                 $msg['msg']='操作成功，您一共导入'.$count.'条数据';
