@@ -242,7 +242,7 @@ class TotalController  extends CommonController{
                             ['sku_id', '=', $v['sku_id']],
                             ['now_num', '>', 0],
                             ['can_use', '=', 'Y'],
-                            ['grounding_status', '=', 'Y'],
+//                            ['grounding_status', '=', 'Y'],
                             ['delete_flag', '=', 'Y'],
                             ['expire_time', '>', $v['sanitation']]
                         ];
@@ -251,7 +251,7 @@ class TotalController  extends CommonController{
                             ['sku_id', '=', $v['sku_id']],
                             ['now_num', '>', 0],
                             ['can_use', '=', 'Y'],
-                            ['grounding_status', '=', 'Y'],
+//                            ['grounding_status', '=', 'Y'],
                             ['delete_flag', '=', 'Y'],
                             ['expire_time', '>', substr($now_time, 0, -9)]
                         ];
