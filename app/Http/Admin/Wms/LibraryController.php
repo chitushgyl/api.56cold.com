@@ -374,6 +374,7 @@ class LibraryController extends CommonController{
                     $list["good_target_unit"]   =$getGoods->wms_target_unit;
                     $list["good_scale"]         =$getGoods->wms_scale;
                     $list["good_unit"]          =$getGoods->wms_unit;
+                    $list["good_lot"]           ='';
                     $list["company_name"]       =$getGoods->company_name;
                     $list["good_name"]          =$getGoods->good_name;
                     $list['spec']               =$getGoods->wms_spec;
