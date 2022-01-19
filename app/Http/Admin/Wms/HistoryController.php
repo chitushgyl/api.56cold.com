@@ -97,7 +97,11 @@ class HistoryController  extends CommonController{
 			$abc=unit_do($v->good_unit , $v->good_target_unit, $v->good_scale, $v->change_num);
 //            dump($v->good_unit);dump($v->good_target_unit);dump($v->good_scale);dump($v->change_num);
 			$v->type_show=$wms_order_type_show[$v->type]??null;
-            $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
+            if($v->area && $v->row && $v->column){
+                $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
+            }else{
+                $v->sign = '';
+            }
             if($v->initial_num >$v->now_num){
                 $v->change_num='减少'.$v->change_num;
 				$v->good_describe ='减少'.$abc;
