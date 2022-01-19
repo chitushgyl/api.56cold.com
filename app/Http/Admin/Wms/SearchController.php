@@ -91,7 +91,7 @@ class SearchController extends CommonController{
         foreach ($data['items'] as $k=>$v) {
             $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
             $v->good_describe =unit_do($v->good_unit , $v->good_target_unit, $v->good_scale, $v->now_num);
-            $v->inin_library_state_show =$in_store_status[$v->in_library_state];
+            $v->inin_library_state_show =$in_store_status[$v->in_library_state]??null;
             $v->button_info=$button_info;
 
         }
