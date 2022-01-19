@@ -50,6 +50,7 @@ class WmschangeController extends Controller{
                     $list['initial_num']        ='0';
                     $list['now_num']            =$v['now_num'];
                     $list['change_num']         =$list['now_num']-$list['initial_num'];
+                    $list['use_flag']           ='N';
                     break;
 
                 case 'change':
@@ -85,6 +86,7 @@ class WmschangeController extends Controller{
                     $list['initial_num']        =$v['initial_num'];             //66
                     $list['change_num']         =$v['shiji_num'];
                     $list['now_num']            =$v['initial_num']-$v['shiji_num'];
+                    $list['use_flag']           ='N';
                     break;
 
             }

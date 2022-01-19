@@ -1127,8 +1127,10 @@ class LibraryController extends CommonController{
         if($validator->passes()) {
             $data['update_time'] = $now_time;
             $data['order_status'] = $order_status;
+            $update['use_flag'] = 'Y';
+            $update['update_time'] = $now_time;
             $id =  WmsLibraryOrder::whereIn('self_id',explode(',',$self_id))->update($data);
-
+              WmsLibraryChange::whereIn('order_id',explode(',',$self_id))->update($update);
             if($id){
                 $msg['code'] = 200;
                 $msg['msg'] = '操作成功';

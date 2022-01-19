@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Admin\Wms;
+use App\Models\Wms\WmsLibraryChange;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
 use Illuminate\Support\Facades\DB;
@@ -937,15 +938,24 @@ class OrderController extends CommonController{
         //$self_id='group_202007311841426065800243';
         $update['update_time'] = $now_time;
         $update['status'] = 3;
+        $data['use_flag'] = 'Y';
+        $data['update_time'] = $now_time;
+        DB::beginTransaction();
+        try{
+            $res = WmsOutOrder::whereIn('self_id',json_decode($self_id,true))->update($update);
+//            foreach (json_decode($self_id,true) as $key => $value){
+                WmsLibraryChange::whereIn('order_id',json_decode($self_id,true))->update($data);
+//            }
 
-        $res = WmsOutOrder::where('self_id',$self_id)->update($update);
-        if ($res){
+            DB::commit();
             $msg['code']=200;
             $msg['msg']='操作成功';
-        }else{
+        }catch(\Exception $e){
+            DB::rollBack();
             $msg['code']=300;
             $msg['msg']='操作失败';
         }
+
         $operationing->access_cause='删除';
         $operationing->table=$table_name;
         $operationing->table_id=$self_id;
