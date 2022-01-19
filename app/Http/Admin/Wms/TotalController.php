@@ -781,7 +781,7 @@ class TotalController  extends CommonController{
 						$list['expire_time']        =$vvv->expire_time;
 						$list['good_describe']      =unit_do($vvv->good_unit , $vvv->good_target_unit, $vvv->good_scale, $vvv->num);
 						$list['price']              =$vvv->price;
-						$list['total_money']        =$vvv->price * $vvv->num;
+						$list['total_money']        =(float)$vvv->price * $vvv->num;
                         $list['control']            = $tms_control_type[$warehouseType->wmsWarm->control]?? null;
 						$order[]=$list;
 						$abc['info']=$order;
