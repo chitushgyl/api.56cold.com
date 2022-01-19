@@ -942,9 +942,9 @@ class OrderController extends CommonController{
         $data['update_time'] = $now_time;
         DB::beginTransaction();
         try{
-            $res = WmsOutOrder::whereIn('self_id',json_decode($self_id,true))->update($update);
+            $res = WmsOutOrder::whereIn('self_id',explode(',',$self_id))->update($update);
 //            foreach (json_decode($self_id,true) as $key => $value){
-                WmsLibraryChange::whereIn('order_id',json_decode($self_id,true))->update($data);
+                WmsLibraryChange::whereIn('order_id',explode(',',$self_id))->update($data);
 //            }
 
             DB::commit();
