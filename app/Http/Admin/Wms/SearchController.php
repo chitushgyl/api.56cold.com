@@ -28,7 +28,7 @@ class SearchController extends CommonController{
         /** 接收中间件参数**/
         $group_info     = $request->get('group_info');//接收中间件产生的参数
         $button_info    = $request->get('anniu');//接收中间件产生的参数
-
+        $in_store_status  =array_column(config('wms.in_store_status'),'name','key');
         /**接收数据*/
         $num                =$request->input('num')??10;
         $page               =$request->input('page')??1;
@@ -58,7 +58,7 @@ class SearchController extends CommonController{
 
         //DUMP($where);
         $select=['self_id','group_name','warehouse_name','company_name','good_name','good_english_name','external_sku_id','spec','area','row','column','tier',
-            'production_date','expire_time','now_num','can_use','good_unit','good_target_unit','good_scale'];
+            'production_date','expire_time','now_num','can_use','good_unit','good_target_unit','good_scale','in_library_state'];
 
         switch ($group_info['group_id']){
             case 'all':
@@ -91,6 +91,7 @@ class SearchController extends CommonController{
         foreach ($data['items'] as $k=>$v) {
             $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
             $v->good_describe =unit_do($v->good_unit , $v->good_target_unit, $v->good_scale, $v->now_num);
+            $v->inin_library_state_show =$in_store_status[$v->in_library_state];
             $v->button_info=$button_info;
 
         }
