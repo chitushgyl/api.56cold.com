@@ -294,6 +294,8 @@ Route::group([
     Route::any('/settle/addGathering','SettleController@addGathering');
     Route::any('/settle/updateMoney','SettleController@updateMoney');
 
+
+    Route::any('/crondtab/updateSkuState','CrondtabController@updateSkuState');
 });
 
 
