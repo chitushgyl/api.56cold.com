@@ -89,7 +89,12 @@ class SearchController extends CommonController{
 
 
         foreach ($data['items'] as $k=>$v) {
-            $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
+            if ($v->area && $v->row && $v->column){
+                $v->sign=$v->area.'-'.$v->row.'-'.$v->column.'-'.$v->tier;
+            }else{
+                $v->sign = '';
+            }
+
             $v->good_describe =unit_do($v->good_unit , $v->good_target_unit, $v->good_scale, $v->now_num);
             $v->in_library_state_show =$in_store_status[$v->in_library_state]??null;
             $v->button_info=$button_info;
