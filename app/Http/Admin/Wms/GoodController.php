@@ -72,7 +72,7 @@ class GoodController extends CommonController{
             case 'all':
                 $data['total']=ErpShopGoodsSku::where($where)->count(); //总的数据量
                 $data['items']=ErpShopGoodsSku::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -81,7 +81,7 @@ class GoodController extends CommonController{
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=ErpShopGoodsSku::where($where)->count(); //总的数据量
                 $data['items']=ErpShopGoodsSku::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='N';
                 break;
@@ -89,7 +89,7 @@ class GoodController extends CommonController{
             case 'more':
                 $data['total']=ErpShopGoodsSku::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
                 $data['items']=ErpShopGoodsSku::where($where)->whereIn('group_code',$group_info['group_code'])
-                    ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;

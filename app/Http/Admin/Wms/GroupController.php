@@ -66,7 +66,7 @@ class GroupController extends CommonController{
             case 'all':
                 $data['total']=WmsGroup::where($where)->count(); //总的数据量
                 $data['items']=WmsGroup::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('create_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;
@@ -75,7 +75,7 @@ class GroupController extends CommonController{
                 $where[]=['group_code','=',$group_info['group_code']];
                 $data['total']=WmsGroup::where($where)->count(); //总的数据量
                 $data['items']=WmsGroup::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('create_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='N';
                 break;
@@ -83,7 +83,7 @@ class GroupController extends CommonController{
             case 'more':
                 $data['total']=WmsGroup::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
                 $data['items']=WmsGroup::where($where)->whereIn('group_code',$group_info['group_code'])
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('create_time', 'desc')
                     ->select($select)->get();
                 $data['group_show']='Y';
                 break;

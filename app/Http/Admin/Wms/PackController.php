@@ -61,7 +61,7 @@ class PackController extends CommonController{
             case 'all':
                 $data['total'] = WmsPack::where($where)->count(); //总的数据量
                 $data['items'] = WmsPack::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show'] = 'Y';
                 break;
@@ -70,7 +70,7 @@ class PackController extends CommonController{
                 $where[] = ['group_code', '=', $group_info['group_code']];
                 $data['total'] = WmsPack::where($where)->count(); //总的数据量
                 $data['items'] = WmsPack::where($where)
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show'] = 'N';
                 break;
@@ -78,7 +78,7 @@ class PackController extends CommonController{
             case 'more':
                 $data['total'] = WmsPack::where($where)->whereIn('group_code', $group_info['group_code'])->count(); //总的数据量
                 $data['items'] = WmsPack::where($where)->whereIn('group_code', $group_info['group_code'])
-                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->offset($firstrow)->limit($listrows)->orderBy('self_id','desc')->orderBy('update_time', 'desc')
                     ->select($select)->get();
                 $data['group_show'] = 'Y';
                 break;
