@@ -627,6 +627,7 @@ class OrderController extends CommonController{
 						$list['good_english_name']  =$vv->good_english_name;
                         $list['spec']               =$v->spec;
                         $list['num']                =$vv->num;
+                        $list['good_unit']          =$vv->good_unit;
                         $list['sign']               =$vv->area.'-'.$vv->row.'-'.$vv->column.'-'.$vv->tier;
                         $list['production_date']    =$vv->production_date;
                         $list['expire_time']        =$vv->expire_time;
