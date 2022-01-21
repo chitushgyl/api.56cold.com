@@ -617,6 +617,7 @@ class OrderController extends CommonController{
                     $list2['good_name']          =$v->good_name;
                     $list2['spec']               =$v->spec;
                     $list2['num']                =$v->quehuo_num;
+                    $list2['good_unit']          =$v->good_unit;
                     $quhuo_list[]=$list2;
                 }
                 //dd($v->toArray());
