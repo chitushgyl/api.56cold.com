@@ -248,6 +248,7 @@ class OrderController extends CommonController{
                 $list['good_name']          = $sku_info->good_name;
                 $list['spec']               = $sku_info->wms_spec;
                 $list['num']                = $v['num'];
+                $list['good_unit']          = $v['wms_unit'];
                 $list['group_code']         = $sku_info->group_code;
                 $list['group_name']         = $sku_info->group_name;
                 $list['order_id']           = $order_2['self_id'];
@@ -510,6 +511,7 @@ class OrderController extends CommonController{
                         $list['good_name']          = $sku_info->good_name;
                         $list['spec']               = $sku_info->wms_spec;
                         $list['num']                = $v['num'];
+                        $list['good_unit']          = $sku_info->wms_unit;
                         $list['group_code']         = $sku_info->group_code;
                         $list['group_name']         = $sku_info->group_name;
                         $list['order_id']           = $orderdata[$v['shop_external_id']]['self_id'];
@@ -588,7 +590,7 @@ class OrderController extends CommonController{
             ['delete_flag','=','Y'],
         ];
         $order_select = ['self_id','shop_id','shop_name','status','create_user_name','create_time','group_name','warehouse_name','company_name','total_flag','total_time','delivery_time'];
-        $order_list_select= ['self_id','good_name','spec','sanitation','num','order_id','external_sku_id','quehuo','quehuo_num','sanitation','remarks','price','total_price','out_library_state'];
+        $order_list_select= ['self_id','good_name','good_unit','spec','sanitation','num','order_id','external_sku_id','quehuo','quehuo_num','sanitation','remarks','price','total_price','out_library_state'];
         $wms_out_sige_select= ['order_list_id','num','area','row','column','tier','production_date','expire_time','good_unit','good_target_unit','good_scale','good_english_name'];
 
         $info=wmsOutOrder::with(['wmsOutOrderList'=>function($query)use($order_list_select,$wms_out_sige_select){
