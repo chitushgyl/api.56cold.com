@@ -1594,7 +1594,7 @@ class OrderController extends CommonController{
                     $data['car_type']                   = $car_type;
                     $data['remark']                     = $remark;
                     $data['app_flag']                   = $app_flag;
-                    $data['kilo']                       = $kilo;
+                    $data['kilometre']                  = $kilo;
                     if ($send_time) {
                         $data['send_time']              = $send_time;
                     }
@@ -1658,7 +1658,7 @@ class OrderController extends CommonController{
                     }
                     $list['car_type']                   = $car_type;
                     $list['payer']                      = $payer;
-                    $list['kilo']                       = $kilo;
+                    $list['kilometre']                  = $kilo;
                     if($old_info){
 
                     }else{
