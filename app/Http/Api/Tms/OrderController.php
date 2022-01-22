@@ -4564,8 +4564,8 @@ class OrderController extends Controller{
             $b++;
         }
 //        dd($start_kilo,$end_kilo);
-        $data['start_kilo'] = $start_kilo;
-        $data['end_kilo'] = $end_kilo;
+        $data['start_kilo'] = $end_kilo;
+        $data['end_kilo'] = $start_kilo;
         $msg['code'] = 200;
         $msg['msg']  = '';
         $msg['data'] = $data;
