@@ -3049,6 +3049,11 @@ class OrderController extends CommonController{
                         $msg['msg']  = '线路不存在';
                         return $msg;
                     }
+                    if($line_info->group_code == $user_info->group_code){
+                        $msg['code'] = 310;
+                        $msg['msg']  = '不可以在自己的线路上下单';
+                        return $msg;
+                    }
 
                     $inserttt = [];
                     $sort = 1;
