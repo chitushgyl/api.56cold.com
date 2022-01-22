@@ -296,6 +296,9 @@ class OrderController extends CommonController{
             if($v->id == 781){
                 $button_info1[]=$v;
             }
+            if($v->id == 782){
+                $button_info1[]=$v;
+            }
         }
         foreach ($data['items'] as $k=>$v) {
             foreach ($v->TmsOrderDispatch as $kkk =>$vvv){
