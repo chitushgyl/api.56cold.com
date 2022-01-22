@@ -84,7 +84,7 @@ class OrderController extends CommonController{
         $user_info     = $request->get('user_info');//接收中间件产生的参数
         $button_info    = $request->get('anniu');//接收中间件产生的参数
         $buttonInfo     = $request->get('buttonInfo');
-        dd($button_info);
+
         /**接收数据*/
         $num            =$request->input('num')??10;
         $page           =$request->input('page')??1;
