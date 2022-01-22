@@ -7,6 +7,7 @@ use App\Models\User\UserCapital;
 use App\Models\User\UserWallet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommonController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1787,20 +1788,29 @@ class OrderController extends CommonController{
         $self_id=$request->input('self_id');
         $flag='delFlag';
         //$self_id='car_202012242220439016797353';
-
-        $status_info=$status->changeFlag($table_name,$medol_name,$self_id,$flag,$now_time);
+        $old_info = TmsOrder::where('self_id',$self_id)->select('self_id','order_status','delete_flag')->first();
+        $data['delete_flag'] = 'N';
+        $data['update_time'] = $now_time;
 
         $operationing->access_cause='删除';
         $operationing->table=$table_name;
         $operationing->table_id=$self_id;
         $operationing->now_time=$now_time;
-        $operationing->old_info=$status_info['old_info'];
-        $operationing->new_info=$status_info['new_info'];
+        $operationing->old_info=$old_info;
+        $operationing->new_info=(object)$data;
         $operationing->operation_type=$flag;
-
-        $msg['code']=$status_info['code'];
-        $msg['msg']=$status_info['msg'];
-        $msg['data']=$status_info['new_info'];
+        DB::beginTransaction();
+        try{
+            TmsOrder::where('self_id',$self_id)->update($data);
+            TmsOrderDispatch::where('order_id',$self_id)->update($data);
+            DB::commit();
+            $msg['code']=200;
+            $msg['msg']='删除成功！';
+        }catch(\Exception $e){
+            DB::rollBack();
+            $msg['code']=301;
+            $msg['msg']='删除失败！';
+        }
 
         return $msg;
     }
