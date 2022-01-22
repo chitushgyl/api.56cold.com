@@ -267,6 +267,7 @@ class OrderController extends CommonController{
         $button_info5 = [];
         $button_info6 = [];
         $button_info7 = [];
+        $button_info8 = [];
         foreach ($button_info as $k => $v){
             if($v->id == 647){
                 $button_info1[]=$v;
@@ -274,10 +275,12 @@ class OrderController extends CommonController{
                 $button_info5[]=$v;
                 $button_info6[]=$v;
                 $button_info7[]=$v;
+                $button_info8[]=$v;
             }
             if($v->id == 272){
                 $button_info2[] = $v;
                 $button_info5[] = $v;
+                $button_info8[] = $v;
             }
             if($v->id == 745){
                 $button_info3[]=$v;
@@ -288,6 +291,9 @@ class OrderController extends CommonController{
             }
             if($v->id == 758){
                 $button_info7[]=$v;
+            }
+            if($v->id == 781){
+                $button_info1[]=$v;
             }
         }
         foreach ($data['items'] as $k=>$v) {
