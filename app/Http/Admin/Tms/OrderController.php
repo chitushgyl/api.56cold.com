@@ -295,6 +295,8 @@ class OrderController extends CommonController{
             }
             if($v->id == 781){
                 $button_info1[]=$v;
+                $button_info6[]=$v;
+                $button_info7[]=$v;
             }
             if($v->id == 782){
                 $button_info1[]=$v;
