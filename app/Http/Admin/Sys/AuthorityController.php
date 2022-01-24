@@ -188,6 +188,7 @@ class AuthorityController  extends CommonController{
                     $where=[
                         ['delete_flag','=','Y'],
                         ['business_type','=',$business_type],
+                        ['self_id','=',$self_id],
                     ];
                     break;
 
@@ -206,10 +207,7 @@ class AuthorityController  extends CommonController{
             if($old_info){
                 //说明是修改权限
                 $data['update_time']=$now_time;
-                dump($where);
-                dd($data);
                 $id=SystemGroupAuthority::where($where)->update($data);
-                dd($id);
                 $operationing->access_cause='修改权限';
                 $operationing->operation_type='update';
 
