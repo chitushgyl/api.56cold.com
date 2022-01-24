@@ -90,7 +90,7 @@ class AuthorityController  extends CommonController{
 		if(!empty($data['info']->leaf_id)){
 			$data['leaf_id']=explode("*",$data['info']->leaf_id);
 		}
-		
+
         $whereMenu = [
             ['admin_flag', '=', 'N'],
             ['use_flag', '=', 'Y'],
@@ -207,6 +207,7 @@ class AuthorityController  extends CommonController{
                 //说明是修改权限
                 $dat['update_time']=$now_time;
                 $id=SystemGroupAuthority::where($where)->update($data);
+                dd($id);
                 $operationing->access_cause='修改权限';
                 $operationing->operation_type='update';
 
