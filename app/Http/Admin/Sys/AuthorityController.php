@@ -206,6 +206,7 @@ class AuthorityController  extends CommonController{
             if($old_info){
                 //说明是修改权限
                 $data['update_time']=$now_time;
+                dump($where);
                 dd($data);
                 $id=SystemGroupAuthority::where($where)->update($data);
                 dd($id);
