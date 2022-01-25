@@ -726,7 +726,7 @@ class OrderController extends CommonController{
         ];
         $select=['self_id','status','group_code','group_name','warehouse_id','warehouse_name','company_id','company_name'];
 
-                $selectSku=['self_id','storage_number'];
+        $selectSku=['self_id','storage_number'];
 
         $order_info=WmsOutOrder::with(['wmsOutSige' => function($query)use($selectSku) {
             $query->where('delete_flag','=','Y');

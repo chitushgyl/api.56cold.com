@@ -154,11 +154,7 @@ class LibraryController extends CommonController{
         $msg['data']=$data;
         //dd($msg);
         return $msg;
-
-
     }
-
-
 
 
     /***    入库导入      /wms/library/import
@@ -659,17 +655,9 @@ class LibraryController extends CommonController{
             $msg['code']=300;
             $msg['msg']="该订单不存在或已被审核完毕";
             return $msg;
-
         }
-
-
     }
 
-    /***    手工入库操作      /wms/library/createLibrary
-     */
-    public function createLibrary(Request $request){
-
-    }
     /***    手工入库操作      /wms/library/addLibrary
      */
     public function addLibrary(Request $request,Change $change,WmsMoney $money){
@@ -1000,7 +988,7 @@ class LibraryController extends CommonController{
             if($id){
                 WmsLibrarySige::insert($datalist);
                 $change->change($datalist,'preentry');
-//                $money->moneyCompute($data,$datalist,$now_time,$company_info,$user_info,'in');
+                $money->moneyCompute($data,$datalist,$now_time,$company_info,$user_info,'in');
                 //计算费用
 
 
@@ -1130,7 +1118,8 @@ class LibraryController extends CommonController{
             $update['use_flag'] = 'Y';
             $update['update_time'] = $now_time;
             $id =  WmsLibraryOrder::whereIn('self_id',explode(',',$self_id))->update($data);
-              WmsLibraryChange::whereIn('order_id',explode(',',$self_id))->update($update);
+            WmsLibraryChange::whereIn('order_id',explode(',',$self_id))->update($update);
+
             if($id){
                 $msg['code'] = 200;
                 $msg['msg'] = '操作成功';
