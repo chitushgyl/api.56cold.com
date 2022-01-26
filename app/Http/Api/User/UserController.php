@@ -266,6 +266,7 @@ class UserController extends Controller{
                         if($user_info->type == 'user'){
                             $user_order_where=[
                                 ['total_user_id','=',$user_info->total_user_id],
+                                ['delete_flag','=','Y'],
                                 ['read_flag','=','N'],
                             ];
                             $order_number=TmsOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
@@ -376,6 +377,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['group_code','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
                             ['read_flag','=','N'],
                         ];
                         $order_number=TmsOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
@@ -419,6 +421,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['group_code','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
                             ['read_flag','=','N'],
                         ];
                         $order_number=TmsOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
@@ -462,6 +465,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['group_code','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
                             ['read_flag','=','N'],
                         ];
                         $order_number=TmsOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
@@ -501,6 +505,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['receiver_id','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
                             ['order_type','!=','lift'],
                         ];
                         $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
@@ -537,6 +542,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['receiver_id','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
                             ['order_type','!=','lift'],
                         ];
                         $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
@@ -580,6 +586,7 @@ class UserController extends Controller{
                     if ($user_info){
                         $user_order_where=[
                             ['receiver_id','=',$user_info->total_user_id],
+                            ['delete_flag','=','Y'],
                             ['order_type','!=','lift'],
                         ];
                         $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
