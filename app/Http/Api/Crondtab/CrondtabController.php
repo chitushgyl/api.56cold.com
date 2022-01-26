@@ -101,7 +101,8 @@ class CrondtabController extends Controller {
         $now_time  = time();
         $where = [
             ['order_status','=',2],
-            ['order_type','=','vehicle'],
+            ['order_type','！=','line'],
+            ['order_type','=','lcl'],
             ['on_line_flag','=','Y']
         ];
         $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','on_line_flag','gather_time','order_id',];
