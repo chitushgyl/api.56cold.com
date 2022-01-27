@@ -1625,7 +1625,7 @@ class OrderController extends CommonController{
                     }
                     $list['gather_address_id']          = $dispatcher[0]['gather_address_id'];
 
-                    $data['total_money']                = ($total_money - 0) * 100;
+                    $list['total_money']                = ($total_money - 0) * 100;
 //                    $list['gather_contacts_id']         = $dispatcher[0]['gather_contacts_id'];
                     $list['gather_name']                = $dispatcher[0]['gather_contacts_name'];
                     $list['gather_tel']                 = $dispatcher[0]['gather_contacts_tel'];
