@@ -225,7 +225,7 @@ class LineController extends Controller{
     public function details(Request $request,Details $details){
         $self_id    = $request->input('self_id');//线路self_id
         $table_name = 'tms_line';
-        $select = ['self_id','shift_number','type','price','min_money','pick_price','send_price','pick_type','send_type','depart_time','all_weight','all_volume','weight_price'
+        $select = ['self_id','shift_number','type','price','min_money','pick_price','send_price','pick_type','send_type','depart_time','all_weight','all_volume','weight_price','group_code'
             ,'trunking','start_time','end_time','control','send_name','send_tel','send_sheng_name','send_shi_name','send_qu_name','send_address','gather_shi_name','gather_name','gather_tel',
             'gather_qu_name','gather_sheng_name','gather_address','time0','time1','time2','time3','time4','time5','time6','gather_sheng','gather_shi','gather_qu','send_sheng','send_shi','send_qu',
             'gather_address_id','send_address_id'];
