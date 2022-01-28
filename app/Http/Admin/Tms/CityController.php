@@ -117,8 +117,8 @@ class CityController extends CommonController{
         /** 接收数据*/
         $self_id=$request->input('self_id');
 //        $self_id = 'car_20210313180835367958101';
-        $data['tms_car_possess_type']    =config('tms.tms_car_possess_type');
-        $data['tms_control_type']    	 =config('tms.tms_control_type');
+//        $data['tms_car_possess_type']    =config('tms.tms_car_possess_type');
+//        $data['tms_control_type']    	 =config('tms.tms_control_type');
         $tms_car_possess_type    =array_column(config('tms.tms_car_possess_type'),'name','key');
         $tms_control_type    	 =array_column(config('tms.tms_control_type'),'name','key');
         $where=[
