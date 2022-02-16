@@ -3913,9 +3913,9 @@ class OrderController extends CommonController{
                             $money['create_time']                = $now_time;
                             $money['update_time']                = $now_time;
                             $money['money']                      = $send_money*100;
-                            if($user_info->group_code != $line_info['group_code']) {
-                                $money['money'] = 200 * 100;
-                            }
+//                            if($user_info->group_code != $line_info['group_code']) {
+//                                $money['money'] = 200 * 100;
+//                            }
                             $money['money_type']                 = 'send';
                             $money['type']                       = 'out';
                             $money['settle_flag']                = 'W';
