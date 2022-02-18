@@ -4463,12 +4463,12 @@ class OrderController extends Controller{
             'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','total_user_id','car_type'
         ];
         $select1 = ['self_id','parame_name'];
-        $data['total']=TmsOrderDispatch::where($where)->whereNull('receiver_id')->count(); //总的数据量
+        $data['total']=TmsOrderDispatch::where($where)->count(); //总的数据量
         $data['items']=TmsOrderDispatch::with(['tmsCarType'=>function($query)use($select1){
             $query->select($select1);
         }])
 
-            ->where($where)->whereNull('receiver_id')
+            ->where($where)
             ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
             ->select($select)->get();
         $data['group_show']='Y';
