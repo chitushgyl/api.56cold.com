@@ -4445,14 +4445,9 @@ class OrderController extends Controller{
             ['on_line_flag','=','Y'],
             ['order_type','=','lift'],
             ['order_status','=',2],
-            ['user_type','=','user']
+            ['user_type','=','driver']
         ];
-        $where1 = [
-            ['on_line_flag','=','Y'],
-            ['order_type','=','lift'],
-            ['order_status','=',2],
-            ['user_type','=','user'],
-        ];
+
         if ($startcity){
             $where[] = ['send_shi_name','=',$startcity];
             $where1[] = ['send_shi_name','=',$startcity];
@@ -4473,7 +4468,7 @@ class OrderController extends Controller{
             $query->select($select1);
         }])
 
-            ->where($where)->orWhere($where1)->whereNull('receiver_id')
+            ->where($where)->whereNull('receiver_id')
             ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
             ->select($select)->get();
         $data['group_show']='Y';
