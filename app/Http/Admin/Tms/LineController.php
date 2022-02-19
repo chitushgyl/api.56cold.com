@@ -66,9 +66,6 @@ class LineController extends CommonController{
         $depart_time  = $request->input('depart_time');//发车时间排序
         $listrows       = $num;
         $firstrow       = ($page-1)*$listrows;
-        if($time){
-            $week = date('w',strtotime($time));
-        }
 
         $search=[
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
@@ -80,9 +77,11 @@ class LineController extends CommonController{
         ];
 
         $where=get_list_where($search);
-        if($week){
+        if($time){
+            $week = date('w',strtotime($time));
             $where[] = ['time'.$week,'=','Y'];
         }
+
         $select=['self_id','shift_number','type','price','min_money','use_flag','group_name','send_address','gather_address','send_address_id','gather_address_id','trunking','control',
             'pick_price','send_price','pick_type','send_type','all_weight','all_volume','trunking','control','send_shi','send_qu','send_name','send_tel','gather_name','gather_tel',
             'send_sheng_name','send_shi_name','send_qu_name','gather_sheng_name','gather_shi_name','gather_qu_name','gather_sheng','gather_shi','gather_qu','send_sheng',
