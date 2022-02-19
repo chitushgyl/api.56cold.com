@@ -4375,7 +4375,7 @@ class OrderController extends CommonController{
         $operationing->type             ='add';
         $user_info  = $request->get('user_info');//接收中间件产生的参数
         $project_type       =$user_info->type;
-
+        $input      =$request->all();
         $total_user_id  = $user_info->total_user_id;
         /** 接收数据*/
         $self_id       = $request->input('self_id');
