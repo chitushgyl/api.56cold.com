@@ -4364,16 +4364,6 @@ class OrderController extends CommonController{
 }
 
     public function addUserFreeRide(Request $request,Tms $tms){
-
-        $now_time   = date('Y-m-d H:i:s',time());
-        $table_name = 'tms_order';
-        $user_info  = $request->get('user_info');//接收中间件产生的参数
-        $project_type       =$user_info->type;
-//        $project_type = 'company';
-        $total_user_id  = $user_info->total_user_id;
-        dd($user_info);
-        $input      =$request->all();
-
         $operationing   = $request->get('operationing');//接收中间件产生的参数
         $now_time       =date('Y-m-d H:i:s',time());
         $table_name     ='tms_order';
@@ -4383,9 +4373,10 @@ class OrderController extends CommonController{
         $operationing->operation_type   ='create';
         $operationing->now_time         =$now_time;
         $operationing->type             ='add';
-        $user_info = $request->get('user_info');//接收中间件产生的参数
-        $input                          =$request->all();
+        $user_info  = $request->get('user_info');//接收中间件产生的参数
+        $project_type       =$user_info->type;
 
+        $total_user_id  = $user_info->total_user_id;
         /** 接收数据*/
         $self_id       = $request->input('self_id');
         $order_type    = $request->input('order_type');//订单类型 vehicle  lcl   line
