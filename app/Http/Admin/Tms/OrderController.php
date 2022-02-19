@@ -4371,8 +4371,20 @@ class OrderController extends CommonController{
         $project_type       =$user_info->type;
 //        $project_type = 'company';
         $total_user_id  = $user_info->total_user_id;
-//        dd($user_info);
+        dd($user_info);
         $input      =$request->all();
+
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='tms_order';
+
+        $operationing->access_cause     ='创建/修改订单';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='add';
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $input                          =$request->all();
 
         /** 接收数据*/
         $self_id       = $request->input('self_id');
