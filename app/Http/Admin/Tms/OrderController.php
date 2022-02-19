@@ -4532,7 +4532,7 @@ class OrderController extends CommonController{
                 $total_user_id  = null;
                 $receiver_id    = null;
                 break;
-            case 'TML3PL':
+            case 'TMS3PL':
                 $company_id     = null;
                 $company_name   = null;
                 $group_code     = $user_info->group_code;
