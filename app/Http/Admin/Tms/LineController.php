@@ -536,6 +536,12 @@ class LineController extends CommonController{
 
         if($validator->passes()) {
             /***开始做二次效验**/
+
+            if(!$depart_time){
+                $msg['code'] = 301;
+                $msg['msg'] = '请选择发车时间';
+                return $msg;
+            }
             $where_group=[
                 ['delete_flag','=','Y'],
                 ['self_id','=',$group_code],
