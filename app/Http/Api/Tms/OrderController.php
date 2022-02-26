@@ -4904,6 +4904,83 @@ class OrderController extends Controller{
         return $msg;
     }
 
+    /**
+     * 快捷下单
+     * */
+    public function addFastOrder(Request $request){
+        $project_type       =$request->get('project_type');
+        $now_time   = date('Y-m-d H:i:s',time());
+        $table_name = 'tms_order';
+        $user_info  = $request->get('user_info');//接收中间件产生的参数
+//         $project_type = 'user';
+        $total_user_id  = $user_info->total_user_id;
+//        $token_name     = $user_info->token_name;
+        $input      =$request->all();
+
+        /** 接收数据*/
+        $self_id       = $request->input('self_id');
+        $order_type    = $request->input('order_type');//订单类型 vehicle  lcl   line
+        $price         = $request->input('price');//运输费
+        $total_money   = $request->input('total_money');//总计费用
+        $good_name_n   = $request->input('good_name');
+        $good_number_n = $request->input('good_number');
+        $good_weight_n = $request->input('good_weight');
+        $good_volume_n = $request->input('good_volume');
+        $dispatcher    = $request->input('dispatcher') ?? [];
+        $clod          = $request->input('clod');
+        $gather_time   = $request->input('gather_time')??null;
+        $send_time     = $request->input('send_time')??null;
+        $pay_type      = $request->input('pay_type');
+        $remark        = $request->input('remark')??''; //备注
+        $payer         = $request->input('payer');//付款方：发货人 consignor  收货人receiver
+        $kilo         = $request->input('kilometre');//付款方：发货人 consignor  收货人receiver
+
+$rules = [
+            'order_type'=>'required',
+        ];
+        $message = [
+            'order_type.required'=>'必须选择',
+        ];
+
+        switch ($project_type){
+            case 'user':
+                $company_id    = null;
+                $company_name    =null;
+                $group_code     = null;
+                $group_name     =null;
+                $receiver_id    = null;
+                break;
+            case 'customer':
+                $company_id    = $user_info->company_id;
+                $company_name    =$user_info->company_name;
+                $group_code     = $user_info->group_code;
+                $group_name     =$user_info->group_name;
+                $total_user_id = null;
+                $receiver_id = $user_info->group_code;
+                break;
+            case 'company':
+                $company_id     = null;
+                $company_name   = null;
+                $group_code     = $user_info->group_code;
+                $group_name     =$user_info->group_name;
+                $total_user_id = null;
+                $receiver_id = null;
+                break;
+            default:
+                $company_id    = null;
+                $company_name    =null;
+                $group_code     = null;
+                $group_name     =null;
+                $receiver_id = null;
+                $total_user_id = null;
+                break;
+        }
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+
+        }
+    }
+
 
 }
 ?>
