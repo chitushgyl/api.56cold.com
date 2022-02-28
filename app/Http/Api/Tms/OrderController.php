@@ -5266,7 +5266,7 @@ class OrderController extends Controller{
             $v->total_money       = number_format($v->total_money/100, 2);
             $v->good_weight       = floor($v->good_weight);
             $v->good_volume       = floor($v->good_volume);
-            $v->good_name         = explode(',',',',json_decode($v->good_name,true));
+            $v->good_name         = implode(',',json_decode($v->good_name,true));
             $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
             $v->order_status_show=$pay_status[$v->order_status-1]['pay_status_text']??null;
             $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
