@@ -4932,7 +4932,6 @@ class OrderController extends Controller{
         $send_time     = $request->input('send_time')??null;
         $pay_type      = $request->input('pay_type');
         $remark        = $request->input('remark')??''; //备注
-        $payer         = $request->input('payer');//付款方：发货人 consignor  收货人receiver
         $kilo         = $request->input('kilometre');//付款方：发货人 consignor  收货人receiver
 
         $rules = [
@@ -5139,7 +5138,6 @@ class OrderController extends Controller{
 //                        $this->sendPushMessage('订单信息','有新订单',$center_list);
 //                    }
                 }catch(\Exception $e){
-                    dd($e);
                     DB::rollBack();
                     $msg['code'] = 302;
                     $msg['msg']  = "操作失败";
