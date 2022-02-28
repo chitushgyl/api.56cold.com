@@ -5160,5 +5160,10 @@ class OrderController extends Controller{
     }
 
 
+    public function fastOrderPage(Request $request){
+
+    }
+
+
 }
 ?>
