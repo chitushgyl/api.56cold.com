@@ -75,7 +75,7 @@ class LineController extends Controller{
             }
 
         $data['info']   =$data['info'] ->select($select)
-            ->where('depart_time','<=',date('H:i',time()+7200))
+            ->where('depart_time','>=',date('H:i',time()+7200))
             ->orderBy('create_time','asc')
             ->offset($firstrow)
             ->limit($listrows)
