@@ -5266,6 +5266,7 @@ class OrderController extends Controller{
             $v->total_money       = number_format($v->total_money/100, 2);
             $v->good_weight       = floor($v->good_weight);
             $v->good_volume       = floor($v->good_volume);
+            $v->good_name         = explode(',',',',json_decode($v->good_name,true));
             $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
             $v->order_status_show=$pay_status[$v->order_status-1]['pay_status_text']??null;
             $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
@@ -5308,15 +5309,7 @@ class OrderController extends Controller{
                     $v->order_type_color = '#0088F4';
                     $v->order_type_font_color = '#FFFFFF';
                 }
-                if ($v->TmsCarType){
-                    $v->car_type_show = $v->TmsCarType->parame_name;
-                    if (!empty($v->car_type_show)){
-                        $v->good_info_show = '车型 '.$v->car_type_show;
-                    }else{
-                        $v->good_info_show = '';
-                    }
 
-                }
             }else{
                 $v->good_info_show = '货物 '.$v->good_number.'件'.$v->good_weight.'kg'.$v->good_volume.'方';
                 $v->order_type_color = '#E4F3FF';
@@ -5420,6 +5413,10 @@ class OrderController extends Controller{
         $msg['msg']  = "数据拉取成功";
         $msg['data'] = $data;
         return $msg;
+    }
+
+    public function orderDetails(Request $request){
+
     }
 
 
