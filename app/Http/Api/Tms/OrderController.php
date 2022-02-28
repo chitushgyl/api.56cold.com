@@ -9,6 +9,7 @@ use App\Models\Tms\TmsCarriageDriver;
 use App\Models\Tms\TmsCarType;
 use App\Models\Tms\TmsCity;
 use App\Models\Tms\TmsGroup;
+use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrderCost;
 use App\Models\Tms\TmsOrderMoney;
 use App\Models\Tms\TmsParam;
@@ -2119,7 +2120,6 @@ class OrderController extends Controller{
                         $msg['msg']  = "操作失败";
                         return $msg;
                     }
-                    break;
             }
 
             /***二次效验结束**/
@@ -4907,7 +4907,7 @@ class OrderController extends Controller{
     /**
      * 快捷下单
      * */
-    public function addFastOrder(Request $request){
+    public function addFastOrder(Request $request,TMS $tms){
         $project_type       =$request->get('project_type');
         $now_time   = date('Y-m-d H:i:s',time());
         $table_name = 'tms_order';
@@ -4935,7 +4935,7 @@ class OrderController extends Controller{
         $payer         = $request->input('payer');//付款方：发货人 consignor  收货人receiver
         $kilo         = $request->input('kilometre');//付款方：发货人 consignor  收货人receiver
 
-$rules = [
+        $rules = [
             'order_type'=>'required',
         ];
         $message = [
@@ -4944,31 +4944,17 @@ $rules = [
 
         switch ($project_type){
             case 'user':
-                $company_id    = null;
-                $company_name    =null;
                 $group_code     = null;
                 $group_name     =null;
                 $receiver_id    = null;
                 break;
-            case 'customer':
-                $company_id    = $user_info->company_id;
-                $company_name    =$user_info->company_name;
-                $group_code     = $user_info->group_code;
-                $group_name     =$user_info->group_name;
-                $total_user_id = null;
-                $receiver_id = $user_info->group_code;
-                break;
             case 'company':
-                $company_id     = null;
-                $company_name   = null;
                 $group_code     = $user_info->group_code;
                 $group_name     =$user_info->group_name;
                 $total_user_id = null;
                 $receiver_id = null;
                 break;
             default:
-                $company_id    = null;
-                $company_name    =null;
                 $group_code     = null;
                 $group_name     =null;
                 $receiver_id = null;
@@ -4977,7 +4963,200 @@ $rules = [
         }
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {
+            if($project_type == 'company'){
+                $where_group=[
+                    ['delete_flag','=','Y'],
+                    ['self_id','=',$group_code],
+                ];
+                $group_info    =SystemGroup::where($where_group)->select('group_code','group_name')->first();
+            }
+            /***开始做二次效验**/
+            if (empty($good_name_n)) {
+                $msg['code'] = 306;
+                $msg['msg'] = '货物名称不能为空！';
+                return $msg;
+            }
+            if (empty($good_weight_n) || $good_weight_n <= 0) {
+                $msg['code'] = 308;
+                $msg['msg'] = '货物重量错误！';
+                return $msg;
+            }
 
+            if (empty($clod)) {
+                $msg['code'] = 309;
+                $msg['msg'] = '请选择温度！';
+                return $msg;
+            }
+
+
+                $send_t = '提货';
+                $pick_t = '配送';
+
+            /** 处理一下发货地址  及联系人**/
+            foreach ($dispatcher as $k => $v){
+                if ($project_type == 'company'){
+                    $gather_address = $tms->address_contact($v['gather_address_id'],$v['gather_qu'],$v['gather_address'],$v['gather_name'],$v['gather_tel'],$group_info,$user_info,$now_time);
+                }else{
+                    $gather_address = $tms->address_contact($v['gather_address_id'],$v['gather_qu'],$v['gather_address'],$v['gather_name'],$v['gather_tel'],'',$user_info,$now_time);
+                }
+
+                if(empty($gather_address)){
+                    $msg['code'] = 303;
+                    $msg['msg'] = $pick_t.'地址不存在';
+                    return $msg;
+                }
+
+                if ($project_type == 'company'){
+                    $send_address=$tms->address_contact($v['send_address_id'],$v['send_qu'],$v['send_address'],$v['send_name'],$v['send_tel'],$group_info,$user_info,$now_time);
+                }else{
+                    $send_address=$tms->address_contact($v['send_address_id'],$v['send_qu'],$v['send_address'],$v['send_name'],$v['send_tel'],'',$user_info,$now_time);
+                }
+                if(empty($send_address)){
+                    $msg['code'] = 303;
+                    $msg['msg'] = $send_t.'地址不存在';
+                    return $msg;
+                }
+
+                if (empty($v['good_name'])) {
+                    $msg['code'] = 306;
+                    $msg['msg']  = '货物名称不能为空！';
+                    return $msg;
+                }
+
+                if (empty($v['good_weight']) || $v['good_weight'] <= 0) {
+                    $msg['code'] = 308;
+                    $msg['msg']  = '货物重量错误！';
+                    return $msg;
+                }
+
+                if (empty($v['clod'])) {
+                    $msg['code'] = 309;
+                    $msg['msg']  = '请选择温度！';
+                    return $msg;
+                }
+                $dispatcher[$k]['send_address_id']        = $send_address->self_id;
+                $dispatcher[$k]['send_sheng']             = $send_address->sheng;
+                $dispatcher[$k]['send_sheng_name']        = $send_address->sheng_name;
+                $dispatcher[$k]['send_shi']               = $send_address->shi;
+                $dispatcher[$k]['send_shi_name']          = $send_address->shi_name;
+                $dispatcher[$k]['send_qu']                = $send_address->qu;
+                $dispatcher[$k]['send_qu_name']           = $send_address->qu_name;
+                $dispatcher[$k]['send_address']           = $send_address->address;
+                $dispatcher[$k]['send_address_longitude'] = $send_address->longitude;
+                $dispatcher[$k]['send_address_latitude']  = $send_address->dimensionality;
+//                $dispatcher[$k]['send_contacts_id']       = $send_contacts->self_id;
+                $dispatcher[$k]['send_contacts_name']     = $send_address->contacts;
+                $dispatcher[$k]['send_contacts_tel']      = $send_address->tel;
+
+                $dispatcher[$k]['gather_address_id']        = $gather_address->self_id;
+                $dispatcher[$k]['gather_sheng']             = $gather_address->sheng;
+                $dispatcher[$k]['gather_sheng_name']        = $gather_address->sheng_name;
+                $dispatcher[$k]['gather_shi']               = $gather_address->shi;
+                $dispatcher[$k]['gather_shi_name']          = $gather_address->shi_name;
+                $dispatcher[$k]['gather_qu']                = $gather_address->qu;
+                $dispatcher[$k]['gather_qu_name']           = $gather_address->qu_name;
+                $dispatcher[$k]['gather_address']           = $gather_address->address;
+                $dispatcher[$k]['gather_address_longitude'] = $gather_address->longitude;
+                $dispatcher[$k]['gather_address_latitude']  = $gather_address->dimensionality;
+//                $dispatcher[$k]['gather_contacts_id']       = $gather_contacts->self_id;
+                $dispatcher[$k]['gather_contacts_name']     = $gather_address->contacts;
+                $dispatcher[$k]['gather_contacts_tel']      = $gather_address->tel;
+            }
+            $order_id = generate_id('order_');
+            $wheres['self_id'] = $self_id;
+            $old_info=TmsLittleOrder::where($wheres)->first();
+
+
+
+            $data['order_type']                 = $order_type;
+            $data['gather_time']                = $gather_time;
+            $data['gather_address_id']          = $dispatcher[0]['gather_address_id'];
+
+            $data['gather_name']                = $dispatcher[0]['gather_contacts_name'];
+            $data['gather_tel']                 = $dispatcher[0]['gather_contacts_tel'];
+            $data['gather_sheng']               = $dispatcher[0]['gather_sheng'];
+            $data['gather_sheng_name']          = $dispatcher[0]['gather_sheng_name'];
+            $data['gather_shi']                 = $dispatcher[0]['gather_shi'];
+            $data['gather_shi_name']            = $dispatcher[0]['gather_shi_name'];
+            $data['gather_qu']                  = $dispatcher[0]['gather_qu'];
+            $data['gather_qu_name']             = $dispatcher[0]['gather_qu_name'];
+            $data['gather_address']             = $dispatcher[0]['gather_address'];
+            $data['gather_address_longitude']   = $dispatcher[0]['gather_address_longitude'];
+            $data['gather_address_latitude']    = $dispatcher[0]['gather_address_latitude'];
+            $data['send_time']                  = $send_time;
+            $data['send_address_id']            = $dispatcher[0]['send_address_id'];
+
+            $data['send_name']                  = $dispatcher[0]['send_contacts_name'];
+            $data['send_tel']                   = $dispatcher[0]['send_contacts_tel'];
+            $data['send_sheng']                 = $dispatcher[0]['send_sheng'];
+            $data['send_sheng_name']            = $dispatcher[0]['send_sheng_name'];
+            $data['send_shi']                   = $dispatcher[0]['send_shi'];
+            $data['send_shi_name']              = $dispatcher[0]['send_shi_name'];
+            $data['send_qu']                    = $dispatcher[0]['send_qu'];
+            $data['send_qu_name']               = $dispatcher[0]['send_qu_name'];
+            $data['send_address']               = $dispatcher[0]['send_address'];
+            $data['send_address_longitude']     = $dispatcher[0]['send_address_longitude'];
+            $data['send_address_latitude']      = $dispatcher[0]['send_address_latitude'];
+            $data['good_number']                = $good_number_n;
+            $data['good_weight']                = $good_weight_n;
+            $data['good_volume']                = $good_volume_n;
+            $data['total_money']                = ($total_money - 0) * 100;
+            $data['info']                       = json_encode($dispatcher,JSON_UNESCAPED_UNICODE);
+            $data['good_info']                  = $good_name_n;
+            $data['clod']                       = json_encode($clod,JSON_UNESCAPED_UNICODE);
+            $data['price']                      = ($price - 0)*100;
+            $data['pay_type']                   = $pay_type;
+            $data['remark']                     = $remark;
+            $data['kilometre']                  = $kilo;
+
+
+
+
+            if($old_info){
+                $orderid = $self_id;
+                $data['update_time'] = $now_time;
+                $id = TmsLittleOrder::where($wheres)->update($data);
+                // $operationing->access_cause='修改订单';
+                // $operationing->operation_type='update';
+            }else{
+                $data['self_id']          = $order_id;
+                $data['group_code']       = $group_code;
+                $data['group_name']       = $group_name;
+                $data['total_user_id']   = $total_user_id;
+                $data['create_time']      = $data['update_time'] = $now_time;
+                $orderid = $data['self_id'];
+                if ($pay_type == 'offline'){
+                    $data['order_status'] = 2;
+                }
+
+                DB::beginTransaction();
+                try{
+                    $id = TmsLittleOrder::insert($data);
+                    DB::commit();
+//                    if ($data['pay_type'] == 'offline'){
+//                        $center_list = '有从'. $data['send_shi_name'].'发往'.$data['gather_shi_name'].'的整车订单';
+//                        $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $this->sendPushMessage('订单信息','有新订单',$center_list);
+//                    }
+                }catch(\Exception $e){
+                    DB::rollBack();
+                    $msg['code'] = 302;
+                    $msg['msg']  = "操作失败";
+                    return $msg;
+                }
+            }
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg']  = "操作成功";
+                $msg['order_id'] = $orderid;
+                $msg['order_id_show'] = substr($orderid,15);
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg']  = "操作失败";
+                return $msg;
+            }
         }
     }
 
