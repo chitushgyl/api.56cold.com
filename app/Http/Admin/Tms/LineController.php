@@ -121,7 +121,6 @@ class LineController extends CommonController{
                 }
                 $data['items'] = $data['items']
                     ->offset($firstrow)->limit($listrows)->orderBy('create_time','desc')->orderBy('self_id','desc')
-                    ->where('depart_time','<=',date('H:i',time()+7200))
                     ->select($select)->get();
                 $data['group_show']='N';
                 break;
