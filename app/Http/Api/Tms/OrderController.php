@@ -5200,7 +5200,7 @@ class OrderController extends Controller{
             $search[] = ['type'=>'=','name'=>'order_type','value'=>$order_type];
         }
         $where  = get_list_where($search);
-        $select = ['self_id','group_name','create_user_name','create_time','use_flag','order_type','order_status','clod',
+        $select = ['self_id','group_name','create_user_name','create_time','use_flag','order_type','order_status','clod','good_info',
             'gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address',
             'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
             'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time'];
@@ -5266,7 +5266,7 @@ class OrderController extends Controller{
             $v->total_money       = number_format($v->total_money/100, 2);
             $v->good_weight       = floor($v->good_weight);
             $v->good_volume       = floor($v->good_volume);
-            $v->good_name         = implode(',',json_decode($v->good_name,true));
+            $v->good_name         = implode(',',json_decode($v->good_info,true));
             $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
             $v->order_status_show=$pay_status[$v->order_status-1]['pay_status_text']??null;
             $v->order_type_show   = $tms_order_type[$v->order_type] ?? null;
@@ -5416,7 +5416,124 @@ class OrderController extends Controller{
     }
 
     public function orderDetails(Request $request){
+        $tms_money_type    = array_column(config('tms.tms_money_type'),'name','key');
+        $tms_order_status_type = array_column(config('tms.tms_order_status_type'),'pay_status_text','key');
+        $tms_order_type        = array_column(config('tms.tms_order_type'),'name','key');
+        $tms_pay_type    = array_column(config('tms.pay_type'),'name','key');
+        $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
+        $self_id = $request->input('self_id');
+//         $self_id = 'order_202106231835153294998879';
+        $table_name = 'tms_little_order';
+        $select = ['self_id','group_code','group_name','create_user_name','create_time','use_flag','order_type','order_status','gather_address_id',
+            'gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_time','send_time',
+            'gather_address','send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_address',
+            'remark','total_money','price','good_name','good_number','good_weight','good_volume','info','good_info','clod','pay_type'];
 
+
+        $where = [
+            ['delete_flag','=','Y'],
+            ['self_id','=',$self_id],
+        ];
+
+        $info = TmsLittleOrder::where($where)->select($select)->first();
+        if($info) {
+            $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
+            $info->order_type_show   = $tms_order_type[$info->order_type] ??null;
+            $info->pay_status = $tms_pay_type[$info->pay_type];
+            $receipt_info = [];
+            $receipt_info_list= [];
+
+            /** 零担发货收货仓**/
+            $line_info = [];
+            $pick_store_info = [];
+            $send_store_info = [];
+
+
+//            $info->receipt = $receipt_info_list;
+            $order_info              = json_decode($info->info,true);
+            $send_info = [];
+            $gather_info = [];
+
+            $info->info = $order_info;
+
+            $info->send_info = $send_info;
+            $info->gather_info = $gather_info;
+            $info->self_id_show = substr($info->self_id,15);
+            $info->good_info         = json_decode($info->good_info,true);
+            $info->clod              = json_decode($info->clod,true);
+            /** 如果需要对数据进行处理，请自行在下面对 $info 进行处理工作*/
+            $info->total_money = number_format($info->total_money/100, 2);
+            $info->price       = number_format($info->price/100, 2);
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lift'){
+                $info->good_weight = ($info->good_weight/1000).'吨';
+            }
+            $info->color = '#FF7A1A';
+            $info->order_id_show = '订单编号'.$info->self_id_show;
+            $order_details = [];
+            $receipt_list = [];
+            $car_info = [];
+            $order_details1['name'] = '订单金额';
+            $order_details1['value'] = '¥'.$info->total_money;
+            $order_details1['color'] = '#FF7A1A';
+
+
+            $order_details4['name'] = '收货时间';
+            $order_details4['value'] = $info->gather_time;
+            $order_details4['color'] = '#000000';
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                $order_details3['name'] = '装车时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+            }else{
+                $order_details3['name'] = '提货时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+            }
+            $order_details6['name'] = '订单备注';
+            $order_details6['value'] = $info->remark;
+            $order_details6['color'] = '#000000';
+
+//            $order_details8['name'] = '时效';
+//            $order_details8['value'] = $info->trunking;
+//            $order_details8['color'] = '#000000';
+
+            $order_details9['name'] = '运输信息';
+            $order_details9['value'] = $info->car_info;
+
+            $order_details10['name'] = '回单信息';
+            $order_details10['value'] = $info->receipt;
+
+            $order_details[] = $order_details1;
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                $order_details[] = $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details6;
+            }else{
+                $order_details[]= $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details6;
+            }
+            if(!empty($info->car_info)){
+                $car_info[] = $order_details9;
+            }
+            if (!empty($info->receipt)){
+                $receipt_list[] = $order_details10;
+            }
+
+//            dd($info->toArray());
+            $data['info'] = $info;
+            $data['order_details'] = $order_details;
+            $data['receipt_list'] = $receipt_list;
+            $data['car_info'] = $car_info;
+            $msg['code'] = 200;
+            $msg['msg']  = "数据拉取成功";
+            $msg['data'] = $data;
+            return $msg;
+        } else {
+            $msg['code'] = 300;
+            $msg['msg']  = "没有查询到数据";
+            return $msg;
+        }
     }
 
 

@@ -159,7 +159,7 @@ Route::group([
         Route::any('/order/liftOrder','OrderController@liftOrder');//顺风车列表
         Route::any('/order/addFastOrder','OrderController@addFastOrder');//顺风车列表
         Route::any('/order/fastOrderPage','OrderController@fastOrderPage');//顺风车列表
-
+        Route::any('/order/orderDetails','OrderController@orderDetails');//顺风车列表
         /**TMS联系人管理 - 用户端**/
         Route::any('/contacts/contactsPage', 'ContactsController@contactsPage');
         Route::any('/contacts/addContacts','ContactsController@addContacts');
