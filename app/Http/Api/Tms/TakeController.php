@@ -1832,7 +1832,7 @@ class TakeController extends Controller{
             'good_number','good_weight','good_volume','gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi',
             'gather_qu','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','clod','create_time','receipt_flag','gather_address_longitude',
             'gather_address_latitude','send_address_id','send_contacts_id','send_name','send_tel', 'send_sheng','send_shi','send_time','gather_time',
-            'send_qu','send_sheng_name','send_shi_name','send_qu_name','send_address','send_address_longitude','send_address_latitude','pay_type',
+            'send_qu','send_sheng_name','send_shi_name','send_qu_name','send_address','send_address_longitude','send_address_latitude','pay_type','info'
         ];
         $info = TmsLittleOrder::where('self_id',$self_id)->select($select)->first();
 

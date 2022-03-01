@@ -5061,6 +5061,7 @@ class OrderController extends Controller{
                 $dispatcher[$k]['gather_contacts_name']     = $gather_address->contacts;
                 $dispatcher[$k]['gather_contacts_tel']      = $gather_address->tel;
             }
+
             $order_id = generate_id('order_');
             $wheres['self_id'] = $self_id;
             $old_info=TmsLittleOrder::where($wheres)->first();
