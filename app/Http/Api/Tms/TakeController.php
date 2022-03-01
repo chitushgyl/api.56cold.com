@@ -1825,7 +1825,7 @@ class TakeController extends Controller{
     /**
      * 快捷订单接单详情
      * */
-    public function takeOrderDetials(Request $request){
+    public function takeOrderDetails(Request $request){
         $self_id=$request->input('self_id');
         $table_name='tms_little_order';
         $select=['self_id','order_type','order_status','group_code','group_name','use_flag','on_line_flag','total_money','good_info',
