@@ -1520,7 +1520,6 @@ class TakeController extends Controller{
         foreach ($data['items'] as $k=>$v) {
             $v->order_type_show=$tms_order_type[$v->order_type]??null;
             $v->total_money = number_format($v->total_money/100);
-            $v->on_line_money = number_format($v->on_line_money/100);
             $temperture = json_decode($v->clod);
             foreach ($temperture as $kk => $vv){
                 $temperture[$kk]    = $tms_control_type[$vv] ?? null;
@@ -1598,6 +1597,7 @@ class TakeController extends Controller{
         $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
 
         foreach ($data['info'] as $k=>$v) {
+            $v->total_money = number_format($v->total_money/100);
             $v->self_id_show       = substr($v->self_id,15);
             $v->send_time          = date('m-d H:i',strtotime($v->send_time));
             $temperture = json_decode($v->clod);
@@ -1826,6 +1826,127 @@ class TakeController extends Controller{
      * 快捷订单接单详情
      * */
     public function takeOrderDetials(Request $request){
+        $self_id=$request->input('self_id');
+        $table_name='tms_little_order';
+        $select=['self_id','order_type','order_status','group_code','group_name','use_flag','on_line_flag','total_money','good_info',
+            'good_number','good_weight','good_volume','gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi',
+            'gather_qu','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','clod','create_time','receipt_flag','gather_address_longitude',
+            'gather_address_latitude','send_address_id','send_contacts_id','send_name','send_tel', 'send_sheng','send_shi','send_time','gather_time',
+            'send_qu','send_sheng_name','send_shi_name','send_qu_name','send_address','send_address_longitude','send_address_latitude','pay_type',
+        ];
+        $info = TmsLittleOrder::where('self_id',$self_id)->select($select)->first();
 
+        if($info){
+            $tms_order_type          =array_column(config('tms.tms_order_type'),'name','key');
+            $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
+            $tms_pay_type            =array_column(config('tms.pay_type'),'name','key');
+
+            /** 如果需要对数据进行处理，请自行在下面对 $info 进行处理工作*/
+            $info->total_money=number_format($info->total_money/100,2);
+
+            $info->good_info=json_decode($info->good_info,true);
+            $info->clod=json_decode($info->clod,true);
+            $info->info=json_decode($info->info,true);
+            $info->order_type_show=$tms_order_type[$info->order_type]??null;
+            $info->pay_type_show = $tms_pay_type[$info->pay_type]??null;
+            $info_clod = $info->clod;
+            $info->self_id_show  = substr($info->self_id,15);
+            foreach ($info_clod as $key => $value){
+                $info_clod[$key]=$tms_control_type[$value]??null;
+            }
+            $info->clod = $info_clod;
+            $info_good_info = $info->good_info;
+            foreach ($info_good_info as $k => $v){
+                $info_good_info[$k]['clod']=$tms_control_type[$v['clod']]??null;
+            }
+            $info->good_info = $info_good_info;
+
+            $temperture = $info->clod;
+            foreach ($temperture as $key => $value){
+                $temperture[$key] = $value;
+            }
+            $car_list = [];
+
+            $info->temperture = implode(',',$temperture);
+            if ($info->tmsReceipt){
+                $receipt_info = img_for($info->tmsReceipt->receipt,'more');
+                $info->receipt = $receipt_info;
+            }
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                $order_info = $info->info;
+                foreach ($order_info as $kkk => $vvv){
+                    $order_info[$kkk]['good_weight'] = ($vvv['good_weight']/1000).'吨';
+                }
+                $info->info = $order_info;
+                $info->good_weight = ($info->good_weight/1000).'吨';
+            }
+            $info->color = '#FF7A1A';
+            $info->order_id_show = '订单编号'.$info->self_id_show;
+            $order_details = [];
+            $receipt_list = [];
+            $car_info = [];
+            $order_details1['name'] = '订单金额';
+            $order_details1['value'] = '¥'.$info->total_money;
+            $order_details1['color'] = '#FF7A1A';
+            $order_details2['name'] = '里程';
+            $order_details2['value'] = $info->kilometre.'km';
+            $order_details2['color'] = '#FF7A1A';
+
+            $order_details4['name'] = '收货时间';
+            $order_details4['value'] = $info->gather_time;
+            $order_details4['color'] = '#000000';
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                $order_details3['name'] = '装车时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+            }else{
+                $order_details3['name'] = '提货时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details5['color'] = '#000000';
+            }
+            $order_details6['name'] = '订单备注';
+            $order_details6['value'] = $info->remark;
+            $order_details6['color'] = '#000000';
+
+            $order_details10['name'] = '回单信息';
+            $order_details10['value'] = $info->receipt;
+
+            $order_details[] = $order_details1;
+//            $order_details[]= $order_details2;
+
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                if ($info->kilometre){
+                    $order_details[] = $order_details2;
+                }
+                $order_details[] = $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }else{
+//                $order_details[]= $order_details7;
+//                $order_details[]= $order_details8;
+                $order_details[]= $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details5;
+                $order_details[]= $order_details6;
+            }
+
+            if (!empty($info->receipt)){
+                $receipt_list[] = $order_details10;
+            }
+//            dd($info->toArray());
+            $data['info']=$info;
+            $data['order_details'] = $order_details;
+            $data['receipt_list'] = $receipt_list;
+            $data['car_info'] = $car_info;
+            $msg['code']=200;
+            $msg['msg']="数据拉取成功";
+            $msg['data']=$data;
+            return $msg;
+        }else{
+            $msg['code']=300;
+            $msg['msg']="没有查询到数据";
+            return $msg;
+        }
     }
 }
