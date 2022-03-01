@@ -5289,5 +5289,294 @@ class OrderController extends CommonController{
         }
     }
 
+    public function fastOrderPage(Request $request){
+        $tms_order_status_type    =array_column(config('tms.tms_order_status_type'),'pay_status_text','key');
+        $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
+        $tms_control_type         =array_column(config('tms.tms_control_type'),'name','key');
+        $tms_order_inco_type         =array_column(config('tms.tms_order_inco_type'),'icon','key');
+        /** 接收中间件参数**/
+        $group_info     = $request->get('group_info');//接收中间件产生的参数
+        $user_info     = $request->get('user_info');//接收中间件产生的参数
+        $button_info    = $request->get('anniu');//接收中间件产生的参数
+        $buttonInfo     = $request->get('buttonInfo');
+
+        /**接收数据*/
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
+        $use_flag       =$request->input('use_flag');
+        $group_code     =$request->input('group_code');
+        $company_id     =$request->input('company_id');
+        $type           =$request->input('type');
+        $state          =$request->input('order_status');
+        $order_status   =$request->input('status') ?? null;
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
+
+        $search=[
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
+            ['type'=>'all','name'=>'use_flag','value'=>$use_flag],
+            ['type'=>'=','name'=>'group_code','value'=>$group_code],
+            ['type'=>'=','name'=>'company_id','value'=>$company_id],
+            ['type'=>'=','name'=>'type','value'=>$type],
+            ['type'=>'=','name'=>'order_status','value'=>$state],
+        ];
+
+
+        $where=get_list_where($search);
+
+        $select=['self_id','group_name','create_user_name','create_time','use_flag','order_type','order_status','clod','good_info',
+            'gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address',
+            'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
+            'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time'];
+        switch ($group_info['group_id']){
+            case 'all':
+                $data['total']=TmsLittleOrder::where($where)->count(); //总的数据量
+                $data['items']=TmsLittleOrder::where($where);
+                if ($order_status){
+                    if ($order_status == 1){
+                        $data['items'] = $data['items']->where('order_status',3);
+                    }elseif($order_status == 2){
+                        $data['items'] = $data['items']->whereIn('order_status',[4,5]);
+                    }elseif($order_status == 3){
+                        $data['items'] = $data['items']->where('order_status',6);
+                    }elseif($order_status == 6){
+                        $data['items'] = $data['items']->where('order_status',2);
+                    }else{
+                        $data['items'] = $data['items']->where('order_status',7);
+                    }
+                }
+                $data['items'] = $data['items']
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='Y';
+                break;
+
+            case 'one':
+                $where[]=['group_code','=',$group_info['group_code']];
+                $data['total']=TmsLittleOrder::where($where)->count(); //总的数据量
+                $data['items']=TmsLittleOrder::where($where);
+                if ($order_status){
+                    if ($order_status == 1){
+                        $data['items'] = $data['items']->where('order_status',3);
+                    }elseif($order_status == 2){
+                        $data['items'] = $data['items']->whereIn('order_status',[4,5]);
+                    }elseif($order_status == 3){
+                        $data['items'] = $data['items']->where('order_status',6);
+                    }elseif($order_status == 6){
+                        $data['items'] = $data['items']->where('order_status',2);
+                    }else{
+                        $data['items'] = $data['items']->where('order_status',7);
+                    }
+                }
+                $data['items'] = $data['items']
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='N';
+                break;
+
+            case 'more':
+                $data['total']=TmsOrder::where($where)->whereIn('group_code',$group_info['group_code'])->count(); //总的数据量
+                $data['items']=TmsOrder::where($where);
+                if ($order_status){
+                    if ($order_status == 1){
+                        $data['items'] = $data['items']->where('order_status',3);
+                    }elseif($order_status == 2){
+                        $data['items'] = $data['items']->whereIn('order_status',[4,5]);
+                    }elseif($order_status == 3){
+                        $data['items'] = $data['items']->where('order_status',6);
+                    }elseif($order_status == 6){
+                        $data['items'] = $data['items']->where('order_status',2);
+                    }else{
+                        $data['items'] = $data['items']->where('order_status',7);
+                    }
+                }
+                $data['items'] = $data['items']
+                    ->whereIn('group_code',$group_info['group_code'])
+                    ->offset($firstrow)->limit($listrows)->orderBy('create_time', 'desc')
+                    ->select($select)->get();
+                $data['group_show']='Y';
+                break;
+        }
+
+        $button_info1=[];
+        $button_info2=[];
+        $button_info3 = [];
+        $button_info4 = [];
+        $button_info5 = [];
+        $button_info6 = [];
+        $button_info7 = [];
+        $button_info8 = [];
+        foreach ($button_info as $k => $v){
+            if($v->id == 647){
+                $button_info1[]=$v;
+                $button_info4[]=$v;
+                $button_info5[]=$v;
+                $button_info6[]=$v;
+                $button_info7[]=$v;
+                $button_info8[]=$v;
+            }
+            if($v->id == 272){
+                $button_info2[] = $v;
+                $button_info5[] = $v;
+                $button_info8[] = $v;
+            }
+            if($v->id == 745){
+                $button_info3[]=$v;
+                $button_info4[]=$v;
+            }
+            if($v->id == 757){
+                $button_info6[]=$v;
+            }
+            if($v->id == 758){
+                $button_info7[]=$v;
+            }
+            if($v->id == 781){
+                $button_info1[]=$v;
+                $button_info6[]=$v;
+                $button_info7[]=$v;
+            }
+            if($v->id == 782){
+                $button_info1[]=$v;
+            }
+        }
+        foreach ($data['items'] as $k=>$v) {
+            $v->total_money = number_format($v->total_money/100, 2);
+            $v->order_status_show=$tms_order_status_type[$v->order_status]??null;
+            $v->order_type_show=$tms_order_type[$v->order_type]??null;
+            $v->type_inco = img_for($tms_order_inco_type[$v->order_type],'no_json')??null;
+            $v->button_info=$button_info;
+            if ($order_status == 1 || $order_status==2){
+                $v->button_info=$button_info5;
+            }else if($v->order_status == 5){
+                $v->button_info=$button_info4;
+            }else{
+                $v->button_info=$button_info1;
+            }
+            $v->self_id_show = substr($v->self_id,15);
+            $v->send_time    = date('m-d H:i',strtotime($v->send_time));
+
+            $v->clod=json_decode($v->clod,true);
+
+            $cold = $v->clod;
+            foreach ($cold as $key => $value){
+                $cold[$key] =$tms_control_type[$value];
+            }
+            $v->clod= $cold;
+            if($v->order_type == 'vehicle' || $v->order_type == 'lift'){
+                $v->picktime_show = '装车时间 '.$v->send_time;
+            }else{
+                $v->picktime_show = '提货时间 '.$v->send_time;
+            }
+
+            $v->temperture_show ='温度 '.$v->clod[0];
+            $v->order_id_show = '订单编号'.substr($v->self_id,15);
+            if ($v->order_status == 1){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 2){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 3){
+                $v->state_font_color = '#0088F4';
+            }elseif($v->order_status == 4){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 5){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 6){
+                $v->state_font_color = '#FF9400';
+            }else{
+                $v->state_font_color = '#FF807D';
+            }
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->order_type_color = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+            }else{
+                $v->good_info_show = '货物 '.$v->good_number.'件'.$v->good_weight.'kg'.$v->good_volume.'方';
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+            }
+            $button1 = [];
+            $button2 = [];
+            $button3 = [];
+            $button4 = [];
+            $button5 = [];
+            $button6 = [];
+            $button7 = [];
+            $button8 = [];
+            foreach ($buttonInfo as $key =>$value){
+                if ($value->id == 124 ){
+                    $button1[] = $value;
+                }
+                if ($value->id == 144){
+                    $button2[] = $value;
+                    $button4[] = $value;
+                }
+                if($value->id == 161){
+                    $button3[] = $value;
+                }
+                if ($value->id == 184){
+                    $button4[] = $value;
+                    $button5[] = $value;
+                }
+                if ($value->id == 162){
+                    $button6[] = $value;
+                }
+                if ($value->id == 236){
+                    $button7[] = $value;
+                }
+                if ($value->id == 239){
+                    $button8[] = $value;
+                }
+                if ($v->order_status == 3 && $v->order_type == 'line'){
+                    $v->button  = $button1;
+                }
+                if ($v->order_status == 5){
+                    $v->button  = $button2;
+                }
+                if ($v->order_status == 2){
+                    $v->button = $button3;
+                }
+                if ($v->order_status == 2 && $v->order_type == 'vehicle'){
+                    $v->button  = $button1;
+                }
+                if ($v->order_status == 2 && $v->order_type == 'lift'){
+                    $v->button  = $button1;
+                }
+                if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
+                    $v->button  = $button4;
+                }
+                if ($v->order_status == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
+                    $v->button  = $button5;
+                }
+                if($v->order_status == 6 && $v->discuss_flag == 'N'){
+                    $v->button = $button7;
+                }
+                if($v->order_status == 6 && $v->discuss_flag == 'Y' && $v->follow_flag == 'N'){
+                    $v->button = $button8;
+                }
+                if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+                    $v->button  = $button5;
+                }
+
+
+            }
+            if (empty($v->total_user_id)){
+                $v->object_show = $v->group_name;
+            }else{
+                $v->object_show = $v->userReg->tel;
+
+            }
+
+        }
+
+//        dd($data['items']);
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
+    }
+
 }
 ?>

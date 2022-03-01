@@ -5206,7 +5206,6 @@ class OrderController extends Controller{
             'gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address',
             'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
             'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time'];
-        $select2 = ['self_id','parame_name'];
         $data['info'] = TmsLittleOrder::where($where);
 
         switch ($project_type){
