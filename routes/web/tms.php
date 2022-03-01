@@ -166,6 +166,7 @@ Route::group([
 	Route::any('/order/orderDone','OrderController@orderDone');
 	Route::any('/order/add_order','OrderController@add_order');
 	Route::any('/order/addUserFreeRide','OrderController@addUserFreeRide');
+	Route::any('/order/addFastOrder','OrderController@addFastOrder');
     Route::group([
         "middleware"=>['daily'],
     ], function(){
