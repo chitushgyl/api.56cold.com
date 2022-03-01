@@ -5430,7 +5430,6 @@ class OrderController extends Controller{
             'gather_address','send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_address',
             'remark','total_money','price','good_name','good_number','good_weight','good_volume','info','good_info','clod','pay_type'];
 
-
         $where = [
             ['delete_flag','=','Y'],
             ['self_id','=',$self_id],
