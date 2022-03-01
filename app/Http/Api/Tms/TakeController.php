@@ -1855,11 +1855,6 @@ class TakeController extends Controller{
                 $info_clod[$key]=$tms_control_type[$value]??null;
             }
             $info->clod = $info_clod;
-            $info_good_info = $info->good_info;
-            foreach ($info_good_info as $k => $v){
-                $info_good_info[$k]['clod']=$tms_control_type[$v['clod']]??null;
-            }
-            $info->good_info = $info_good_info;
 
             $temperture = $info->clod;
             foreach ($temperture as $key => $value){
