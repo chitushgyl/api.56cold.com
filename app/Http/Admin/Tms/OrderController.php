@@ -5046,6 +5046,7 @@ class OrderController extends CommonController{
         $operationing->now_time         =$now_time;
         $operationing->type             ='add';
         $user_info  = $request->get('user_info');//接收中间件产生的参数
+        $group_info     = $request->get('group_info');//接收中间件产生的参数
         $project_type       =$user_info->type;
         $input      =$request->all();
         $total_user_id  = $user_info->total_user_id;
