@@ -1746,7 +1746,7 @@ class TakeController extends Controller{
                 ['self_id','=',$dispatch_id],
             ];
 
-            $select=['self_id','order_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+            $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address', 'send_sheng_name','send_shi_name','send_qu_name',
                 'send_address','good_info','good_number','good_weight','good_volume','total_money'];
             $wait_info=TmsLittleOrder::where($where)->select($select)->first();
@@ -1820,5 +1820,12 @@ class TakeController extends Controller{
             }
             return $msg;
         }
+    }
+
+    /**
+     * 快捷订单接单详情
+     * */
+    public function takeOrderDetials(Request $request){
+
     }
 }
