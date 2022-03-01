@@ -8,6 +8,7 @@ use App\Models\Tms\TmsCarriage;
 use App\Models\Tms\TmsCarriageDispatch;
 use App\Models\Tms\TmsCarriageDriver;
 use App\Models\Tms\TmsGroup;
+use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
 use App\Models\Tms\TmsOrderCost;
 use App\Models\Tms\TmsOrderDispatch;
@@ -1458,5 +1459,260 @@ class TakeController extends Controller{
             }
             return $msg;
         }
+    }
+
+    /**
+     * 承运端快捷订单接单列表
+     * */
+    public function takeOrder(Request $request){
+        /** 接收中间件参数**/
+
+        $carriage_flag    =array_column(config('tms.carriage_flag'),'name','key');
+        $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
+        $tms_control_type = array_column(config('tms.tms_control_type'),'name','key');
+        $tms_line_type    = array_column(config('tms.tms_line_type'),'name','key');
+        /**接收数据*/
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
+        $use_flag       =$request->input('use_flag');
+        $group_code     =$request->input('group_code');
+        $startcity      =$request->input('startcity')??'';
+        $endcity        =$request->input('endcity')??'';
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
+
+        $where=[
+            ['on_line_flag','=','Y'],
+            ['pay_type','=','online'],
+            ['order_status','=',2]
+        ];
+        $where1 = [
+            ['on_line_flag','=','Y'],
+            ['pay_type','=','offline'],
+            ['order_status','=',2]
+        ];
+        if ($startcity){
+            $where[] = ['send_shi_name','=',$startcity];
+            $where1[] = ['send_shi_name','=',$startcity];
+        }
+        if ($endcity){
+            $where[] = ['gather_shi_name','=',$endcity];
+            $where1[] = ['gather_shi_name','=',$endcity];
+        }
+        $select=['self_id','order_type','order_status','receiver_id','clod','gather_time','send_time','group_code','group_name','use_flag',
+            'on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_sheng_name','send_shi_name'
+            ,'send_qu_name','send_address','total_money','good_info','good_number','good_weight','good_volume', 'gather_address_id',
+            'gather_contacts_id','gather_name','gather_tel', 'gather_sheng','gather_shi','gather_qu', 'gather_address_longitude','gather_address_latitude',
+            'send_address_id','send_contacts_id', 'send_name','send_tel','send_qu','send_address','send_address_longitude','send_address_latitude',
+            'total_user_id',
+        ];
+        $select1 = ['self_id','parame_name'];
+        $data['total']=TmsLittleOrder::where($where)->orWhere($where1)->whereNull('receiver_id')->count(); //总的数据量
+        $data['items']=TmsLittleOrder::with(['tmsCarType'=>function($query)use($select1){
+            $query->select($select1);
+        }])
+
+            ->where($where)->orWhere($where1)->whereNull('receiver_id')
+            ->offset($firstrow)->limit($listrows)->orderBy('update_time', 'desc')
+            ->select($select)->get();
+        $data['group_show']='Y';
+
+        foreach ($data['items'] as $k=>$v) {
+            $v->order_type_show=$tms_order_type[$v->order_type]??null;
+            $v->total_money = number_format($v->total_money/100);
+            $v->on_line_money = number_format($v->on_line_money/100);
+            $temperture = json_decode($v->clod);
+            foreach ($temperture as $kk => $vv){
+                $temperture[$kk]    = $tms_control_type[$vv] ?? null;
+            }
+            $v->clod = implode(',',$temperture);
+            $v->order_type       = $tms_line_type[$v->order_type] ?? null;
+            $v->order_id_show    = substr($v->self_id,15);
+            $v->send_time        = date('m-d H:i',strtotime($v->send_time));
+            $v->gather_time      = date('m-d H:i',strtotime($v->gather_time));
+            if ($v->tmsCarType){
+                $v->car_type_show = $v->tmsCarType->parame_name;
+            }
+            $v->start_time_show = '装车时间 '.$v->send_time;
+            $v->end_time_show = '送达时间 '.$v->gather_time;
+            if ($v->tmsCarType){
+                $v->car_show = '车型 '.$v->tmsCarType->parame_name;
+            }
+            $v->temperture_show = '温度 '.$v->clod;
+            $v->background_color_show = '#0088F4';
+            $v->text_color_show = '#000000';
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
+                $v->background_color_show = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+                if ($v->order_type == 'vehicle'){
+                    $v->background_color_show = '#0088F4';
+                    $v->order_type_font_color = '#FFFFFF';
+                }
+            }
+        }
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+        return $msg;
+    }
+
+    public function fastOrderPage(Request $request){
+        $now_time     = date('Y-m-d H:i:s',time());
+        $user_info    = $request->get('user_info');
+        $pay_status     =config('tms.tms_order_status_type');
+        $order_status     = $request->post('status');//接收中间件产生的参数
+        $project_type     = $request->get('project_type');
+        $button_info      = $request->get('buttonInfo');
+
+        $select=['self_id','order_type','order_status','group_code','group_name','use_flag','on_line_flag','total_money','good_info',
+            'good_number','good_weight','good_volume','gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi',
+            'gather_qu','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','clod','create_time','receipt_flag','gather_address_longitude',
+            'gather_address_latitude','send_address_id','send_contacts_id','send_name','send_tel', 'send_sheng','send_shi','send_time','gather_time',
+            'send_qu','send_sheng_name','send_shi_name','send_qu_name','send_address','send_address_longitude','send_address_latitude','pay_type',
+        ];
+        $search=[
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
+            ['type'=>'=','name'=>'use_flag','value'=>'Y'],
+            ['type'=>'=','name'=>'receiver_id','value'=>$user_info->total_user_id],
+            ['type'=>'!=','name'=>'order_type','value'=>'lift'],
+        ];
+        $select2 = ['self_id','parame_name'];
+        $where  = get_list_where($search);
+        $data['info'] = TmsLittleOrder::with(['tmsCarType' => function($query) use($select2){
+            $query->select($select2);
+        }])->where($where);
+        if ($order_status){
+            if ($order_status == 1){
+                $data['info'] = $data['info']->whereIn('order_status',[2,3]);
+            }elseif($order_status == 2){
+                $data['info'] = $data['info']->whereIn('order_status',[4,5]);
+            }else{
+                $data['info'] = $data['info']->where('order_status',6);
+            }
+        }
+        $data['info'] = $data['info']->orderBy('create_time','desc')->select($select)->get();
+//        dd($data['info']);
+
+
+        $tms_control_type = array_column(config('tms.tms_control_type'),'name','key');
+        $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
+
+        foreach ($data['info'] as $k=>$v) {
+            $v->self_id_show       = substr($v->self_id,15);
+            $v->send_time          = date('m-d H:i',strtotime($v->send_time));
+            $temperture = json_decode($v->clod);
+            foreach ($temperture as $kk => $vv){
+                $temperture[$kk]    = $tms_control_type[$vv] ?? null;
+            }
+            if ($v->order_type == 'vehicle' || $v->order_type == 'lift'){
+                if ($v->tmsCarType){
+                    $v->car_type_show = $v->tmsCarType->parame_name;
+                }
+            }
+            $v->temperture = $temperture;
+            $v->order_type_show=$tms_order_type[$v->order_type]??null;
+            $v->pay_status_color=$pay_status[$v->order_status-1]['pay_status_color']??null;
+            $v->pay_status_text=$pay_status[$v->order_status-1]['pay_status_text']??null;
+
+            if($v->order_type == 'vehicle' || $v->order_type == 'lift'){
+                $v->picktime_show = '装车时间 '.$v->send_time;
+            }else{
+                $v->picktime_show = '提货时间 '.$v->send_time;
+            }
+
+            $v->temperture_show ='温度 '.$v->temperture[0];
+            $v->order_id_show = '订单编号'.substr($v->self_id,15);
+            if ($v->order_status == 1){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 2){
+                $v->state_font_color = '#333';
+            }elseif($v->order_status == 3){
+                $v->state_font_color = '#0088F4';
+            }elseif($v->order_status == 4){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 5){
+                $v->state_font_color = '#35B85F';
+            }elseif($v->order_status == 6){
+                $v->state_font_color = '#FF9400';
+            }else{
+                $v->state_font_color = '#FF807D';
+            }
+            if($v->order_type == 'vehicle' || $v->order_type == 'lcl' || $v->order_type == 'lift'){
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+            }else{
+                $v->good_info_show = '货物 '.$v->good_number.'件'.$v->good_weight.'kg'.$v->good_volume.'方';
+                $v->order_type_color = '#E4F3FF';
+                $v->order_type_font_color = '#0088F4';
+            }
+            $button1 = [];
+            $button2 = [];
+            $button3 = [];
+            $button4 = [];
+            $button5 = [];
+            $button6 = [];
+            switch ($project_type){
+                case 'carriage':
+                    foreach ($button_info as $key => $value){
+                        if ($value->id == 120 ){
+                            $button1[] = $value;
+                        }
+                        if ($value->id == 121){
+                            $button1[] = $value;
+                        }
+                        if ($value->id == 122){
+                            $button2[] = $value;
+                        }
+//                        if ($value->id == 123){
+//                            $button2[] = $value;
+//                        }
+                        if ($value->id == 123){
+                            $button2[] = $value;
+                            $button3[] = $value;
+                            $button5[] = $value;
+                        }
+                        if ($value->id == 142){
+                            $button4[] = $value;
+                        }
+                        if ($value->id == 229){
+                            $button5[] = $value;
+                            $button6[] = $value;
+                        }
+                        if ($v->order_status == 2 || $v->order_status == 3){
+                            $v->button  = $button1;
+                        }
+                        if ($v->order_status == 4 ){
+                            $v->button  = $button2;
+                        }
+                        if ($v->order_status == 5 && $v->receipt_flag == 'N'){
+                            $v->button  = $button3;
+                        }
+                        if ($v->order_status == 5 && $v->receipt_flag == 'N' && $v->pay_type == 'offline' && $v->pay_status == 'N'){
+                            $v->button = $button5;
+                        }
+                        if ($v->order_status == 5 && $v->receipt_flag == 'Y' && $v->pay_type == 'offline' && $v->pay_status == 'N'){
+                            $v->button = $button6;
+                        }
+                        if ($v->order_status == 6  && $v->pay_type == 'offline' && $v->pay_status == 'N' && $v->receipt_flag == 'N'){
+                            $v->button = $button6;
+                        }
+//                        if ($v->receipt_flag == 'Y'){
+//                            $v->button  = $button4;
+//                        }
+                        if ($v->receipt_flag == 'Y' && $v->pay_type == 'online'){
+                            $v->button  = [];
+                        }
+
+                    }
+                    break;
+                case 'customer':
+
+                    break;
+            }
+        }
+        $msg['code'] = 200;
+        $msg['msg']  = '数据拉取成功！';
+        $msg['data'] = $data;
+        return $msg;
     }
 }
