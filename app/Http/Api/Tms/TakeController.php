@@ -1715,4 +1715,110 @@ class TakeController extends Controller{
         $msg['data'] = $data;
         return $msg;
     }
+
+    /**
+     * 接单
+     * */
+    public function addFastTakeOrder(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $total_user_id = $user_info->total_user_id;
+        $token_name    = $user_info->token_name;
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $dispatch_id       = $request->input('dispatch_id');
+
+        /*** 虚拟数据
+        $input['dispatch_id']           =$dispatch_id='dispatch_202101282034423534882996';
+         **/
+        $rules = [
+            'dispatch_id'=>'required',
+        ];
+        $message = [
+            'dispatch_id.required'=>'请选择接取的订单',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$dispatch_id],
+            ];
+
+            $select=['self_id','order_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address', 'send_sheng_name','send_shi_name','send_qu_name',
+                'send_address','good_info','good_number','good_weight','good_volume','total_money'];
+            $wait_info=TmsLittleOrder::where($where)->select($select)->first();
+            $order_where = [
+                ['self_id','=',$wait_info->order_id]
+            ];
+
+
+
+            if($wait_info->on_line_flag == 'N' && $wait_info->receiver_id){
+                $msg['code'] = 304;
+                $msg['msg'] = '您选择的订单已被承接';
+                return $msg;
+            }
+            if ($wait_info->total_user_id == $user_info->total_user_id){
+                $msg['code'] = 305;
+                $msg['msg'] = '不可以接自己的订单';
+                return $msg;
+            }
+
+            $update['receiver_id']       =$user_info->total_user_id;
+            $update['dispatch_flag']     ='Y';
+            $update['on_line_flag']      ='N';
+            $update['order_status']      = 3;
+            $update['update_time']        =$now_time;
+            $id = TmsLittleOrder::where($where)->update($update);
+
+//            /** 保存应收及应付对象**/
+//            if ($wait_info->pay_type == 'online'){
+//                $money['shouk_total_user_id']           = $user_info->total_user_id;
+//                $money['shouk_type']                    = 'USER';
+//                $money['fk_group_code']                 = '1234';
+//                $money['fk_type']                       = 'PLATFORM';
+//                $money['ZIJ_total_user_id']             = $user_info->total_user_id;
+//                $money['order_id']                      = $wait_info->order_id;
+//                $money['create_time']                   = $now_time;
+//                $money['update_time']                   = $now_time;
+//                $money['money']                         = $wait_info->on_line_money*100;
+//                $money['money_type']                    = 'freight';
+//                $money['type']                          = 'out';
+//                TmsOrderCost::insert($money);
+//            }else{
+//                $money_where = [
+//                    ['order_id','=',$wait_info->order_id],
+//                    ['delete_flag','=','Y'],
+//
+//                ];
+//                $money['shouk_total_user_id']           = $user_info->total_user_id;
+//                $money['shouk_type']                    = 'USER';
+//                TmsOrderCost::where($money_where)->update($money);
+//            }
+
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
 }

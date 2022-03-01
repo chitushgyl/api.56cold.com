@@ -5126,6 +5126,7 @@ class OrderController extends Controller{
                 $orderid = $data['self_id'];
                 if ($pay_type == 'offline'){
                     $data['order_status'] = 2;
+                    $data['on_line_flag'] = 'Y';
                 }
 
                 DB::beginTransaction();
