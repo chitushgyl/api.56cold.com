@@ -2398,10 +2398,9 @@ class DispatchController extends CommonController{
             ];
             $select=['self_id','receiver_id','create_time','create_time','group_name','group_code','order_type',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status','receipt_flag','remark',
-                'send_sheng_name','send_shi_name','send_qu_name','send_address','clod','on_line_money','total_user_id','delete_flag',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address','clod','total_user_id','delete_flag','total_money',
                 'good_info','good_number','good_weight','good_volume','total_money','send_time','gather_time','pay_type','dispatch_flag'];
-            $select2 = ['self_id','parame_name'];
-            $select3 = ['self_id','total_user_id','tel'];
+
             $data['info']=TmsLittleOrder::where($where);
             if ($order_status){
                 if ($order_status == 1){
