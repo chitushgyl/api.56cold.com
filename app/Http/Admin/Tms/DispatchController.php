@@ -2745,13 +2745,11 @@ class DispatchController extends CommonController{
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
             $order_details4['color'] = '#000000';
-            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
-                $order_details3['name'] = '装车时间';
-                $order_details3['value'] = $info->send_time;
-                $order_details3['color'] = '#000000';
-            }else{
 
-            }
+            $order_details3['name'] = '装车时间';
+            $order_details3['value'] = $info->send_time;
+            $order_details3['color'] = '#000000';
+
             $order_details6['name'] = '订单备注';
             $order_details6['value'] = $info->remark;
             $order_details6['color'] = '#000000';
