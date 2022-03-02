@@ -2425,7 +2425,6 @@ class DispatchController extends CommonController{
             foreach ($data['info'] as $key => $value){
 //                dd($value);
                 $value->self_id_show = substr($value->self_id,15);
-                $value->on_line_money       = number_format($value->on_line_money/100, 2);
                 $value->total_money       = number_format($value->total_money/100, 2);
                 $value->order_type_show=$tms_order_type[$value->order_type]??null;
                 $value->order_status_show = $tms_order_status_type[$value->order_status] ?? null;
@@ -2434,17 +2433,10 @@ class DispatchController extends CommonController{
                 $value['good_info'] = json_decode($value['good_info'],true);
                 if (!empty($value['good_info'])) {
                     foreach ($value['good_info'] as $k => $v) {
-                        if ($v['clod']) {
-                            $v['clod'] = $tms_control_type[$v['clod']];
-                        }
                         $value['good_info_show'] .= $v['good_name'] . ',';
                     }
                 }
-                if ($value->order_type == 'vehicle' || $value->order_type == 'lift'){
-                    if ($value->tmsCarType){
-                        $value->car_type_show = $value->tmsCarType->parame_name;
-                    }
-                }
+
                 $temperture = json_decode($value['clod'],true);
                 foreach ($temperture as $kkk => $vvv){
                     $temperture[$kkk] = $tms_control_type[$vvv];
@@ -2481,10 +2473,7 @@ class DispatchController extends CommonController{
                         $value->order_type_color = '#0088F4';
                         $value->order_type_font_color = '#FFFFFF';
                     }
-                    if ($value->TmsCarType){
-                        $value->car_type_show = $value->TmsCarType->parame_name;
-                        $value->good_info_show = '车型 '.$value->car_type_show;
-                    }
+
                 }else{
                     $value->good_info_show = '货物 '.$value->good_number.'件'.$value->good_weight.'kg'.$value->good_volume.'方';
                     $value->order_type_color = '#E4F3FF';
