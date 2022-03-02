@@ -2690,7 +2690,7 @@ class DispatchController extends CommonController{
         $table_name='tms_little_order';
         $select=['self_id','create_time','use_flag','delete_flag','group_code','group_name','order_type','order_status','gather_name','remark',
             'gather_tel','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_name','send_tel','send_sheng_name','send_shi_name','send_qu_name','info','kilometre',
-            'send_address','total_money','good_info','good_number','good_weight','good_volume','dispatch_flag','carriage_group_id','on_line_flag',
+            'send_address','total_money','good_info','good_number','good_weight','good_volume','dispatch_flag','on_line_flag',
             'clod','total_money','gather_time','send_time','receiver_id','total_user_id','pay_type'];
 
         $where = [
