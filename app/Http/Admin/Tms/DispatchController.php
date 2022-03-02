@@ -2736,11 +2736,7 @@ class DispatchController extends CommonController{
             $receipt_list = [];
             $car_info = [];
             $order_details1['name'] = '应收运费';
-            if ($info->group_code != $info->receiver_id){
-                $order_details1['value'] = '¥'.$info->on_line_money;
-            }else{
-                $order_details1['value'] = '¥'.$info->total_money;
-            }
+            $order_details1['value'] = '¥'.$info->total_money;
             $order_details1['color'] = '#FF7A1A';
             if ($info->group_code != $info->receiver_id || $info->total_user_id != $info->receiver_id){
                 $order_details1['value'] = '¥'.$info->on_line_money;
