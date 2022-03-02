@@ -2431,11 +2431,6 @@ class DispatchController extends CommonController{
                 $value->type_inco = img_for($tms_order_inco_type[$value->order_type],'no_json')??null;
                 $value->send_time         = date('m-d H:i',strtotime($value->send_time));
                 $value['good_info'] = json_decode($value['good_info'],true);
-                if (!empty($value['good_info'])) {
-                    foreach ($value['good_info'] as $k => $v) {
-                        $value['good_info_show'] .= $v['good_name'] . ',';
-                    }
-                }
 
                 $temperture = json_decode($value['clod'],true);
                 foreach ($temperture as $kkk => $vvv){
