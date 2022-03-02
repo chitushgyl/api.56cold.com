@@ -192,6 +192,9 @@ Route::group([
     Route::any('/dispatch/liftDispatch','DispatchController@liftDispatch');
     Route::any('/dispatch/liftPage','DispatchController@liftPage');
     Route::any('/dispatch/liftList','DispatchController@liftList');
+    Route::any('/dispatch/dispatchFastOrderPage','DispatchController@dispatchFastOrderPage');
+    Route::any('/dispatch/addDispatchFastOrder','DispatchController@addDispatchFastOrder');
+    Route::any('/dispatch/dispatchFastOrderDetails','DispatchController@dispatchFastOrderDetails');
     Route::group([
         "middleware"=>['daily'],
     ], function(){

@@ -2,6 +2,7 @@
 namespace App\Http\Admin\Tms;
 use App\Models\Group\SystemGroup;
 use App\Models\Tms\TmsDriver;
+use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
 use App\Models\Tms\TmsOrderCost;
 use App\Models\Tms\TmsOrderMoney;
@@ -2358,6 +2359,481 @@ class DispatchController extends CommonController{
         $msg['msg']="数据拉取成功";
         $msg['data']=$data;
         return $msg;
+    }
+
+    /**
+     * 快捷订单接单列表
+     * */
+    public function dispatchFastOrderPage(Request $request){
+        $group_info             = $request->get('group_info');
+        $buttonInfo             = $request->get('buttonInfo');
+//        dd($buttonInfo);
+        $tms_order_status_type = array_column(config('tms.tms_order_status_type'),'pay_status_text','key');
+        $tms_control_type           =array_column(config('tms.tms_control_type'),'name','key');
+        $tms_order_type           =array_column(config('tms.tms_order_type'),'name','key');
+        $tms_order_inco_type         =array_column(config('tms.tms_order_inco_type'),'icon','key');
+        $order_status    = $request->get('status');//状态值 后端调用固传 status = 1;
+        /** 接收数据*/
+        $input          =$request->all();
+        $group_code     =$request->input('group_code');
+        $num            =$request->input('num')??10;
+        $page           =$request->input('page')??1;
+        $listrows       =$num;
+        $firstrow       =($page-1)*$listrows;
+        $app_status = $request->input('app_status');
+//        $input['group_code'] = $group_code =  '1234';
+        $rules=[
+            'group_code'=>'required',
+        ];
+        $message=[
+            'group_code.required'=>'请选择业务公司',
+        ];
+//        $order_status = 2;
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['receiver_id','=',$group_code],
+                ['order_type','!=','lift'],
+            ];
+            $select=['self_id','receiver_id','company_name','create_time','create_time','group_name','group_code','order_type','order_id',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status','car_type','receipt_flag','remark',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address','clod','on_line_money','company_id','total_user_id','delete_flag',
+                'good_info','good_number','good_weight','good_volume','total_money','send_time','gather_time','pay_type','pay_status','dispatch_flag'];
+            $select2 = ['self_id','parame_name'];
+            $select3 = ['self_id','total_user_id','tel'];
+            $data['info']=TmsLittleOrder::where($where);
+            if ($order_status){
+                if ($order_status == 1){
+                    if ($app_status){
+                        $data['info'] = $data['info']->whereIn('order_status',[2,3]);
+                    }else{
+                        $data['info'] = $data['info']->where('dispatch_flag','Y')->whereIn('order_status',[2,3]);
+                    }
+                }elseif($order_status == 2){
+                    $data['info'] = $data['info']->whereIn('order_status',[4,5]);
+                }else{
+                    $data['info'] = $data['info']->where('order_status',6);
+                }
+            }
+
+            $data['info'] = $data['info']
+                ->select($select)
+                ->offset($firstrow)
+                ->limit($listrows)
+                ->orderBy('update_time','DESC')->get(); //总的数据量
+            $data['total'] = TmsLittleOrder::where($where)->where('dispatch_flag','Y')->whereIn('order_status',[2,3])->count();
+            foreach ($data['info'] as $key => $value){
+//                dd($value);
+                $value->self_id_show = substr($value->self_id,15);
+                $value->on_line_money       = number_format($value->on_line_money/100, 2);
+                $value->total_money       = number_format($value->total_money/100, 2);
+                $value->order_type_show=$tms_order_type[$value->order_type]??null;
+                $value->order_status_show = $tms_order_status_type[$value->order_status] ?? null;
+                $value->type_inco = img_for($tms_order_inco_type[$value->order_type],'no_json')??null;
+                $value->send_time         = date('m-d H:i',strtotime($value->send_time));
+                $value['good_info'] = json_decode($value['good_info'],true);
+                if (!empty($value['good_info'])) {
+                    foreach ($value['good_info'] as $k => $v) {
+                        if ($v['clod']) {
+                            $v['clod'] = $tms_control_type[$v['clod']];
+                        }
+                        $value['good_info_show'] .= $v['good_name'] . ',';
+                    }
+                }
+                if ($value->order_type == 'vehicle' || $value->order_type == 'lift'){
+                    if ($value->tmsCarType){
+                        $value->car_type_show = $value->tmsCarType->parame_name;
+                    }
+                }
+                $temperture = json_decode($value['clod'],true);
+                foreach ($temperture as $kkk => $vvv){
+                    $temperture[$kkk] = $tms_control_type[$vvv];
+                }
+                $value->temperture = implode(',',$temperture);
+
+                if($value->order_type == 'vehicle' || $value->order_type == 'lift'){
+                    $value->picktime_show = '装车时间 '.$value->send_time;
+                }else{
+                    $value->picktime_show = '提货时间 '.$value->send_time;
+                }
+
+                $value->temperture_show ='温度 '.$value->temperture;
+                $value->order_id_show = '订单编号'.substr($value->self_id,15);
+                if ($value->order_status == 1){
+                    $value->state_font_color = '#333';
+                }elseif($value->order_status == 2){
+                    $value->state_font_color = '#333';
+                }elseif($value->order_status == 3){
+                    $value->state_font_color = '#0088F4';
+                }elseif($value->order_status == 4){
+                    $value->state_font_color = '#35B85F';
+                }elseif($value->order_status == 5){
+                    $value->state_font_color = '#35B85F';
+                }elseif($value->order_status == 6){
+                    $value->state_font_color = '#FF9400';
+                }else{
+                    $value->state_font_color = '#FF807D';
+                }
+                if($value->order_type == 'vehicle' || $value->order_type == 'lcl' || $value->order_type == 'lift'){
+                    $value->order_type_color = '#E4F3FF';
+                    $value->order_type_font_color = '#0088F4';
+                    if ($value->order_type == 'vehicle'){
+                        $value->order_type_color = '#0088F4';
+                        $value->order_type_font_color = '#FFFFFF';
+                    }
+                    if ($value->TmsCarType){
+                        $value->car_type_show = $value->TmsCarType->parame_name;
+                        $value->good_info_show = '车型 '.$value->car_type_show;
+                    }
+                }else{
+                    $value->good_info_show = '货物 '.$value->good_number.'件'.$value->good_weight.'kg'.$value->good_volume.'方';
+                    $value->order_type_color = '#E4F3FF';
+                    $value->order_type_font_color = '#0088F4';
+                }
+                $button1 = [];
+                $button2 = [];
+                $button3 = [];
+                $button4 = [];
+                $button5 = [];
+                $button6 = [];
+                $button7 = [];
+                foreach ($buttonInfo as $kk =>$vv){
+                    if ($vv->id == 129){
+                        $button1[] = $vv;
+                    }
+                    if ($vv->id == 128){
+                        $button1[] = $vv;
+                        $button3[] = $vv;
+                    }
+                    if ($vv->id == 125){
+                        $button2[] = $vv;
+                    }
+                    if ($vv->id == 126){
+                        $button2[] = $vv;
+                    }
+                    if ($vv->id == 127){
+                        $button4[] = $vv;
+                        $button6[] = $vv;
+                    }
+                    if ($vv->id == 143){
+                        $button5[] = $vv;
+                    }
+                    if ($vv->id == 145){
+                        $button3[] = $vv;
+                    }
+                    if ($vv->id == 228){
+                        $button6[] = $vv;
+                        $button7[] = $vv;
+                    }
+
+
+                    if ($value->order_status == 3){
+                        if ($value->order_type == 'vehicle'){
+                            if ($value->group_code == $value->receiver_id || $value->receiver_id == $value->total_user_id){
+                                $value->button  = $button3;
+                            }else{
+                                $value->button  = $button1;
+                            }
+                        }else{
+                            $value->button  = $button3;
+                        }
+
+                    }
+                    if ($value->order_status == 4){
+                        $value->button  = $button2;
+                    }
+                    if ($value->order_status == 5 && $value->receipt_flag == 'N'){
+                        $value->button  = $button4;
+                    }
+                    if ($value->order_status == 5 && $value->receipt_flag == 'N' && $value->pay_type == 'offline' && $value->pay_status == 'N' && $value->group_code != $value->receiver_id){
+                        $value->button = $button6;
+                    }
+                    if ($value->order_status == 5 && $value->receipt_flag == 'Y' && $value->pay_type == 'offline' && $value->pay_status == 'N' && $value->group_code != $value->receiver_id){
+                        $value->button = $button7;
+                    }
+                    if ($value->order_status == 6 && $value->receipt_flag == 'N'){
+                        $value->button  = $button4;
+                    }
+                    if ($value->order_status == 6  && $value->pay_type == 'offline' && $value->pay_status == 'N' && $value->receipt_flag == 'N' && $value->group_code != $value->receiver_id){
+                        $value->button = $button7;
+                    }
+//                    if ($value->receipt_flag == 'Y'){
+//                        $value->button  = $button5;
+//                    }
+                    if ($value->receipt_flag == 'Y' && $value->pay_type == 'online'){
+                        $value->button  = [];
+                    }
+
+                }
+
+            }
+//            dd($data['info']->toArray());
+            $msg['code']=200;
+            $msg['msg']="数据拉取成功";
+            $msg['data']=$data;
+            return $msg;
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 快捷接单
+     * */
+    public function addDispatchFastOrder(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='tms_little_order';
+//        dd($user_info);
+        $operationing->access_cause     ='接单';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='add';
+
+        $input              =$request->all();
+
+        /** 接收数据*/
+        $dispatch_id         =$request->input('dispatch_id'); //调度单ID
+        /*** 虚拟数据
+        $input['dispatch_id']     =$dispatch_id='dispatch_202102021623135577267482';
+         * ***/
+        $rules=[
+            'dispatch_id'=>'required',
+        ];
+        $message=[
+            'dispatch_id.required'=>'必须选择最少一个可调度单',
+        ];
+
+
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$dispatch_id],
+            ];
+            $select=['self_id','order_status','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','group_code',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address',
+                'good_info','good_number','good_weight','good_volume'];
+            $wait_info=TmsLittleOrder::where($where)->select($select)->first(); //总的数据量
+//            dd($wait_info->order_id);
+            if(empty($wait_info)){
+                $msg['code'] = 304;
+                $msg['msg'] = '您选择的订单已被承接';
+                return $msg;
+            }
+            if ($wait_info->group_code == $user_info->group_code){
+                $msg['code'] = 305;
+                $msg['msg'] = '不可以接取自己的订单';
+                return $msg;
+            }
+
+            $update['receiver_id']      =$user_info->group_code;
+            $update['dispatch_flag']      ='Y';
+            $update['on_line_flag']       ='N';
+            $update['order_status']       = 3;
+            $update['update_time']        =$now_time;
+            $id = TmsLittleOrder::where($where)->update($update);
+
+            /*** 保存应收及应付对象**/
+//            if ($wait_info->pay_type == 'online'){
+//                $money['shouk_group_code']              = $user_info->group_code;
+//                $money['shouk_type']                    = 'GROUP_CODE';
+//                $money['fk_group_code']                 = '1234';
+//                $money['fk_type']                       = 'PLATFORM';
+//                $money['ZIJ_group_code']                = '1234';
+//                $money['order_id']                      = $wait_info->order_id;
+//                $money['create_time']                   = $now_time;
+//                $money['update_time']                   = $now_time;
+//                $money['money']                         = $wait_info->on_line_money*100;
+//                $money['money_type']                    = 'freight';
+//                $money['type']                          = 'out';
+//                TmsOrderCost::insert($money);
+//            }else{
+//                $money_where = [
+//                    ['order_id','=',$wait_info->order_id],
+//                    ['delete_flag','=','Y'],
+//
+//                ];
+//                $money['shouk_group_code']              = $user_info->group_code;
+//                $money['shouk_type']                    = 'GROUP_CODE';
+//                TmsOrderCost::where($money_where)->update($money);
+//            }
+
+            $operationing->table_id=$dispatch_id;
+            $operationing->old_info=null;
+            $operationing->new_info=(object)$update;
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 快捷接单详情
+     * */
+    public function dispatchFastOrderDetails(Request $request,TMS $tms){
+        $tms_order_status_type = array_column(config('tms.tms_order_status_type'),'pay_status_text','key');
+        $self_id=$request->input('self_id');
+        $table_name='tms_little_order';
+        $select=['self_id','create_time','use_flag','delete_flag','group_code','group_name','order_type','order_status','gather_name','remark',
+            'gather_tel','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_name','send_tel','send_sheng_name','send_shi_name','send_qu_name','info','kilometre',
+            'send_address','total_money','good_info','good_number','good_weight','good_volume','dispatch_flag','carriage_group_id','on_line_flag',
+            'clod','total_money','gather_time','send_time','receiver_id','total_user_id','pay_type'];
+
+        $where = [
+            ['self_id','=',$self_id],
+        ];
+
+        $info = TmsLittleOrder::where($where)->select($select)->first();
+        if($info){
+            $tms_order_type        =array_column(config('tms.tms_order_type'),'name','key');
+            $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
+            /** 如果需要对数据进行处理，请自行在下面对 $$info 进行处理工作*/
+            $info->total_money=$info->total_money/100;
+
+            $info->clod=json_decode($info->clod,true);
+            $info->order_type_show=$tms_order_type[$info->order_type];
+            $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
+            $info->self_id_show = substr($info->self_id,15);
+            $info->driver_price = 0;
+            $cold = $info->clod;
+            foreach ($cold as $key => $value){
+                $cold[$key] =$tms_control_type[$value];
+            }
+            $info->clod= $cold;
+            $info->info = json_decode($info->info,true);
+            /** 对商品信息进行处理*/
+
+            $good_info=json_decode($info->good_info,true);
+            foreach ($good_info as $k => $v){
+                $good_info[$k]['clod_show']=$tms_control_type[$v['clod']];
+            }
+            $info->good_info_show=$good_info;
+
+            $car_list = [];
+
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                $order_info = $info->info;
+                foreach ($order_info as $kkk => $vvv){
+                    $order_info[$kkk]['good_weight'] = ($vvv['good_weight']/1000).'吨';
+                }
+                $info->info = $order_info;
+                $info->good_weight = ($info->good_weight/1000).'吨';
+            }
+            $info->color = '#FF7A1A';
+            $info->order_id_show = '订单编号'.$info->self_id_show;
+            $order_details = [];
+            $receipt_list = [];
+            $car_info = [];
+            $order_details1['name'] = '应收运费';
+            if ($info->group_code != $info->receiver_id){
+                $order_details1['value'] = '¥'.$info->on_line_money;
+            }else{
+                $order_details1['value'] = '¥'.$info->total_money;
+            }
+            $order_details1['color'] = '#FF7A1A';
+            if ($info->group_code != $info->receiver_id || $info->total_user_id != $info->receiver_id){
+                $order_details1['value'] = '¥'.$info->on_line_money;
+            }
+            $order_details2['name'] = '里程';
+            $order_details2['value'] = $info->kilometre.'km';
+            $order_details2['color'] = '#FF7A1A';
+
+            $order_details4['name'] = '收货时间';
+            $order_details4['value'] = $info->gather_time;
+            $order_details4['color'] = '#000000';
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                $order_details3['name'] = '装车时间';
+                $order_details3['value'] = $info->send_time;
+                $order_details3['color'] = '#000000';
+            }else{
+
+            }
+            $order_details6['name'] = '订单备注';
+            $order_details6['value'] = $info->remark;
+            $order_details6['color'] = '#000000';
+
+            $order_details9['name'] = '运输信息';
+            $order_details9['value'] = $info->car_info;
+
+            $order_details10['name'] = '回单信息';
+            $order_details10['value'] = $info->receipt;
+
+            $order_details11['name'] = '应付司机';
+            $order_details11['value'] = '¥'.$info->driver_price;
+            $order_details11['color'] = '#000000';
+
+            $order_details[] = $order_details1;
+//            $order_details[]= $order_details2;
+            if(!empty($info->tmsCarriage)){
+                $car_info[] = $order_details11;
+            }
+            if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
+                if($info->kilometre){
+                    $order_details[] = $order_details2;
+                }
+                $order_details[] = $order_details3;
+                $order_details[]= $order_details4;
+                $order_details[]= $order_details6;
+            }else{
+                $order_details[]= $order_details6;
+            }
+            if(!empty($info->car_info)){
+                $car_info[] = $order_details9;
+            }
+            if (!empty($info->receipt)){
+                $receipt_list[] = $order_details10;
+            }
+
+            $data['info']=$info;
+            $data['order_details'] = $order_details;
+            $data['receipt_list'] = $receipt_list;
+            $data['car_info'] = $car_info;
+            $log_flag='N';
+            $data['log_flag']=$log_flag;
+            $log_num='10';
+            $data['log_num']=$log_num;
+            $data['log_data']=null;
+
+            $msg['code']=200;
+            $msg['msg']="数据拉取成功";
+            $msg['data']=$data;
+            return $msg;
+        }else{
+            $msg['code']=300;
+            $msg['msg']="没有查询到数据";
+            return $msg;
+        }
     }
 }
 ?>
