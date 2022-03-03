@@ -1617,12 +1617,12 @@ class UserController extends Controller{
                             ['delete_flag','=','Y'],
                             ['order_type','!=','lift'],
                         ];
-                        $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+                        $order_number=TmsLittleOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
 
                         if($order_number){
                             foreach ($order_number as $kk => $vv){
                                 $abcd='status';
-                                if ($vv->order_status == 2 || $vv->order_status == 3){
+                                if ($vv->order_status == 3){
                                     $abcd='status1';
                                 }
                                 if ($vv->order_status == 4 || $vv->order_status == 5){
@@ -1654,12 +1654,12 @@ class UserController extends Controller{
                             ['delete_flag','=','Y'],
                             ['order_type','!=','lift'],
                         ];
-                        $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+                        $order_number=TmsLittleOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
 
                         if($order_number){
                             foreach ($order_number as $kk => $vv){
                                 $abcd='status';
-                                if ($vv->order_status == 2 || $vv->order_status == 3){
+                                if ($vv->order_status == 3){
                                     $abcd='status1';
                                 }
                                 if ($vv->order_status == 4 || $vv->order_status == 5){
@@ -1692,12 +1692,12 @@ class UserController extends Controller{
                             ['delete_flag','=','Y'],
                             ['order_type','!=','lift'],
                         ];
-                        $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+                        $order_number=TmsLittleOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
 
                         if($order_number){
                             foreach ($order_number as $kk => $vv){
                                 $abcd='status';
-                                if ($vv->order_status == 2 || $vv->order_status == 3){
+                                if ($vv->order_status == 3){
                                     $abcd='status1';
                                 }
                                 if ($vv->order_status == 4 || $vv->order_status == 5){
