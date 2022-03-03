@@ -1944,4 +1944,94 @@ class TakeController extends Controller{
             return $msg;
         }
     }
+
+    /**
+     * 快捷订单取消接单
+     * */
+    public function takeOrderCancel(Request $request){
+
+            $user_info = $request->get('user_info');//接收中间件产生的参数
+            $now_time      = date('Y-m-d H:i:s',time());
+            $input         = $request->all();
+
+            /** 接收数据*/
+            $dispatch_id       = $request->input('dispatch_id');
+
+            /*** 虚拟数据
+            $input['dispatch_id']           =$dispatch_id='dispatch_202101282034423534882996';
+             **/
+            $rules = [
+                'dispatch_id'=>'required',
+            ];
+            $message = [
+                'dispatch_id.required'=>'请取消的订单',
+            ];
+
+            $validator = Validator::make($input,$rules,$message);
+            if($validator->passes()) {
+                $where=[
+                    ['delete_flag','=','Y'],
+                    ['self_id','=',$dispatch_id],
+                ];
+                $select=['self_id','order_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                    'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
+                    'send_sheng_name','send_shi_name','send_qu_name','send_address',
+                    'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
+                $wait_info=TmsOrderDispatch::where($where)->select($select)->first();
+                $order_where = [
+                    ['self_id','=',$wait_info->order_id]
+                ];
+                $order_update['order_status'] = 2;
+                $order = TmsOrder::where($order_where)->update($order_update);
+
+                if ($wait_info->order_status == 4){
+                    $msg['code'] = 305;
+                    $msg['msg'] = '此订单已调度不可以取消';
+                    return $msg;
+                }
+
+                $update['receiver_id']       = null;
+                $update['dispatch_flag']     ='N';
+                $update['on_line_flag']      ='Y';
+                $update['order_status']      = 2;
+                $update['update_time']        =$now_time;
+                $id = TmsOrderDispatch::where($where)->update($update);
+
+                /** 设置费用表里的收款对象为null **/
+                $money_where = [
+                    ['order_id','=',$wait_info->order_id],
+                    ['delete_flag','=','Y'],
+                    ['shouk_type','=','USER']
+                ];
+                if ($wait_info->pay_type == 'online'){
+                    $money['delete_flag'] = 'N';
+                }else{
+                    $money['shouk_total_user_id']           = null;
+                    $money['shouk_type']                    = null;
+                }
+
+                TmsOrderCost::where($money_where)->update($money);
+
+                if($id){
+                    $msg['code'] = 200;
+                    $msg['msg'] = "操作成功";
+                    return $msg;
+                }else{
+                    $msg['code'] = 302;
+                    $msg['msg'] = "操作失败";
+                    return $msg;
+                }
+            }else{
+                //前端用户验证没有通过
+                $erro = $validator->errors()->all();
+                $msg['code'] = 300;
+                $msg['msg']  = null;
+                foreach ($erro as $k => $v) {
+                    $kk = $k+1;
+                    $msg['msg'].=$kk.'：'.$v.'</br>';
+                }
+                return $msg;
+            }
+        }
+
 }
