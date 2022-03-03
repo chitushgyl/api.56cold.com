@@ -1764,7 +1764,6 @@ class UserController extends Controller{
                     }
 
                     if ($user_info){
-//                        ($user_info->type == 'TMS3PL' || $user_info->type == 'company')
                         if ($user_info->type == 'user' ||$user_info->type == 'carriage'){
 //                            if($user_info->userCapital->money>1000000){
 //                                $user_info->userCapital->money = $money =number_format($user_info->userCapital->money/1000000, 2).'万';                 //用户余额
@@ -1772,7 +1771,6 @@ class UserController extends Controller{
 //                                $user_info->userCapital->money = $money =number_format($user_info->userCapital->money/100, 2);                          //用户余额
 //                            }
                             $user_info->userCapital->money = $money = number_format($user_info->userCapital->money/100,2);
-//                            dd($money);
                         }else{
                             $admin_where=[
                                 ['group_code','=',$user_info->group_code],
