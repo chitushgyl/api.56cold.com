@@ -5583,5 +5583,127 @@ class OrderController extends CommonController{
         return $msg;
     }
 
+    /**
+     * 极速版货主公司取消订单
+     * */
+    public function fastOrderCancel(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='tms_order';
+//        dd($user_info);
+        $operationing->access_cause     ='取消订单';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='add';
+
+        $input              =$request->all();
+
+        /** 接收数据*/
+        $order_id         = $request->input('order_id'); //调度单ID
+        /*** 虚拟数据
+        $input['order_id']     =$order_id='order_202105081609390186653744';
+         * ***/
+        $rules=[
+            'order_id'=>'required',
+        ];
+        $message=[
+            'order_id.required'=>'请选择要取消的订单',
+        ];
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            //二次验证
+            $order = TmsLittleOrder::where('self_id',$order_id)->select(['self_id','order_status','total_money','pay_type','group_code'])->first();
+            if($user_info->group_code != '1234'){
+                if ($order->order_status == 3){
+                    $msg['code'] = 303;
+                    $msg['msg'] = '该订单已被承接，取消请联系客服';
+                    return $msg;
+                }
+            }
+
+            if ($order->order_status == 6 ){
+                $msg['code'] = 304;
+                $msg['msg'] = '此订单已完成不可以取消';
+                return $msg;
+            }
+            if ($order->order_status == 7 ){
+                $msg['code'] = 305;
+                $msg['msg'] = '此订单已取消';
+                return $msg;
+            }
+            /** 修改订单状态为已取消 **/
+            $order_update['order_status'] = 7;
+            $order_update['update_time'] = $now_time;
+            $id = TmsLittleOrder::where('self_id',$order_id)->update($order_update);
+            /*** 修改可调度订单为已取消**/
+
+            /** 判断是在线支付还是货到付款,在线支付应退还支付费用**/
+            if ($order->pay_type == 'online'){
+                $wallet = UserCapital::where('group_code',$order->group_code)->select(['self_id','money'])->first();
+                $wallet_update['money'] = $order->total_money + $wallet->money;
+                $wallet_update['update_time'] = $now_time;
+                UserCapital::where('group_code',$order->group_code)->update($wallet_update);
+                $data['self_id'] = generate_id('wallet_');
+                $data['produce_type'] = 'refund';
+                $data['capital_type'] = 'wallet';
+                $data['money'] = $order->total_money;
+                $data['create_time'] = $now_time;
+                $data['update_time'] = $now_time;
+                $data['now_money'] = $wallet_update['money'];
+                $data['now_money_md'] = get_md5($wallet_update['money']);
+                $data['wallet_status'] = 'SU';
+                $data['wallet_type'] = 'user';
+                $data['group_code'] = $order->group_code;
+                UserWallet::insert($data);
+            }
+            /** 取消订单应该删除应付费用**/
+            $money_where = [
+//                ['total_user_id','=',$user_info->total_user_id],
+                ['type','=','in'],
+
+            ];
+//            $money_update['delete_flag'] = 'N';
+//            $money_update['update_time'] = $now_time;
+//            $money_list = TmsOrderCost::where('order_id',$order_id)->select('self_id')->get();
+//            $money_id_list = array_column($money_list->toArray(),'self_id');
+//            TmsOrderCost::where($money_where)->whereIn('self_id',$money_id_list)->select(['self_id','money','delete_flag'])->update($money_update);
+
+            /** 订单如果被承接应通知承运方订单已取消 **/
+
+            $operationing->old_info = (object)$order;
+            $operationing->table_id = $order_id;
+            $operationing->new_info=$order_update;
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 极速下单完成
+     * */
+    public function fastOrderDone(Request $request){
+
+    }
+
 }
 ?>
