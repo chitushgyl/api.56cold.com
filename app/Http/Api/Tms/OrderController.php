@@ -5534,6 +5534,211 @@ class OrderController extends Controller{
         }
     }
 
+    /**
+     * 快捷订单取消下单
+     * */
+    public function fastOrderCancel(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $order_id       = $request->input('order_id');
+
+        /*** 虚拟数据
+        $input['order_id']           =$order_id='order_202103061730081629411962';
+         **/
+        $rules = [
+            'order_id'=>'required',
+        ];
+        $message = [
+            'order_id.required'=>'请取消的订单',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$order_id],
+            ];
+            $select=['self_id','order_status','pay_type','total_money'];
+            $wait_info=TmsLittleOrder::where($where)->select($select)->first();
+            if ($wait_info->order_status == 3){
+                $msg['code'] = 305;
+                $msg['msg'] = '该订单已被承接，取消请联系客服';
+                return $msg;
+            }
+
+            if ($wait_info->order_status == 4 || $wait_info->order_status == 5){
+                $msg['code'] = 305;
+                $msg['msg'] = '此订单运输中不可以取消';
+                return $msg;
+            }
+            if ($wait_info->order_status == 6 ){
+                $msg['code'] = 305;
+                $msg['msg'] = '此订单已完成不可以取消';
+                return $msg;
+            }
+            if ($wait_info->order_status == 7 ){
+                $msg['code'] = 305;
+                $msg['msg'] = '此订单已取消';
+                return $msg;
+            }
+            DB::beginTransaction();
+            try {
+                /***判断订单时线上支付还是货到付款，线上支付要退款 **/
+                if($wait_info->pay_type == 'online'){
+                    $wallet = UserCapital::where('total_user_id',$user_info->total_user_id)->select(['self_id','money'])->first();
+                    $wallet_update['money'] = $wait_info->total_money + $wallet->money;
+                    $wallet_update['update_time'] = $now_time;
+                    UserCapital::where('total_user_id',$user_info->total_user_id)->update($wallet_update);
+                    $data['self_id'] = generate_id('wallet_');
+                    $data['produce_type'] = 'refund';
+                    $data['capital_type'] = 'wallet';
+                    $data['money'] = $wait_info->total_money;
+                    $data['create_time'] = $now_time;
+                    $data['update_time'] = $now_time;
+                    $data['now_money'] = $wallet_update['money'];
+                    $data['now_money_md'] = get_md5($wallet_update['money']);
+                    $data['wallet_status'] = 'SU';
+                    $data['wallet_type'] = 'user';
+                    $data['total_user_id'] = $user_info->total_user_id;
+                    UserWallet::insert($data);
+                }
+                /** 修改订单状态**/
+                $update['order_status']      = 7;
+                $update['update_time']        =$now_time;
+                $id = TmsLittleOrder::where($where)->update($update);
+
+                /** 取消订单应该删除应付费用**/
+//                $money_where = [
+//                    ['order_id','=',$order_id],
+//                ];
+//                $money_update['delete_flag'] = 'N';
+//                $money_update['update_time'] = $now_time;
+//                $money_list = TmsOrderCost::where($money_where)->update($money_update);
+
+                //如果订单已被承接，通知司机订单已取消
+                DB::commit();
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }catch(\Exception $e){
+                DB::rollBack();
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 快捷订单确认完成
+     * */
+    public function fastOrderDone(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $input         = $request->all();
+        $now_time    = date('Y-m-d H:i:s',time());
+        $self_id     = $request->input('self_id');
+        $rules = [
+            'self_id'=>'required',
+        ];
+        $message = [
+            'self_id.required'=>'请选择订单',
+        ];
+        /**虚拟数据
+        $input['self_id']       = $self_id       = 'order_202104101356286664799683';
+         **/
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where = [
+                ['self_id','=',$self_id],
+                ['order_status','!=',7]
+            ];
+            $select = ['self_id','order_status','total_money','pay_type'];
+            $order = TmsLittleOrder::where($where)->select($select)->first();
+            if ($order->order_status == 6){
+                $msg['code'] = 301;
+                $msg['msg'] = '订单已完成';
+                return $msg;
+            }
+            $update['update_time'] = $now_time;
+            $update['order_status'] = 6;
+            $id = TmsLittleOrder::where($where)->update($update);
+
+            /** 查找所有的运输单 修改运输状态**/
+                /*** 订单完成后，如果订单是在线支付，添加运费到承接司机或3pl公司余额 **/
+
+            $idit = substr($order->receiver_id,0,5);
+            if ($idit == 'user_'){
+                $wallet_where = [
+                    ['total_user_id','=',$order->receiver_id]
+                ];
+                $data['wallet_type'] = 'user';
+                $data['total_user_id'] = $order->receiver_id;
+            }else{
+                $wallet_where = [
+                    ['group_code','=',$order->receiver_id]
+                ];
+                $data['wallet_type'] = '3PLTMS';
+                $data['group_code'] = $order->receiver_id;
+            }
+            $wallet = UserCapital::where($wallet_where)->select(['self_id','money'])->first();
+
+            $money['money'] = $wallet->money + $order->total_money;
+            $data['money'] = $order->total_money;
+            if ($order->group_code == $order->receiver_id){
+                $money['money'] = $wallet->money + $order->total_money;
+                $data['money'] = $order->total_money;
+            }
+
+            $money['update_time'] = $now_time;
+            UserCapital::where($wallet_where)->update($money);
+
+            $data['self_id'] = generate_id('wallet_');
+            $data['produce_type'] = 'in';
+            $data['capital_type'] = 'wallet';
+            $data['create_time'] = $now_time;
+            $data['update_time'] = $now_time;
+            $data['now_money'] = $money['money'];
+            $data['now_money_md'] = get_md5($money['money']);
+            $data['wallet_status'] = 'SU';
+
+            UserWallet::insert($data);
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
 
 }
 ?>
