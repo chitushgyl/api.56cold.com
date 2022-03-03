@@ -2825,7 +2825,7 @@ class DispatchController extends CommonController{
                 ['use_flag','=','Y'],
                 ['self_id','=',$self_id]
             ];
-            $select=['self_id','order_id','group_code','order_type','order_status','total_money','dispatch_flag', 'send_address_latitude', 'on_line_flag',];
+            $select=['self_id','group_code','order_type','order_status','total_money','dispatch_flag', 'send_address_latitude', 'on_line_flag',];
             $order_info = TmsLittleOrder::where($where)->select($select)->first();
             if($order_info->order_status == 2){
                 $msg['code']=303;
