@@ -27,6 +27,7 @@ Route::group([
             /******用户底部导航*******/
 
             Route::any('/owm', 'UserController@owm');  //用户个人中心
+            Route::any('/newOwm', 'UserController@newOwm');  //用户个人中心
 //        });
         Route::any('/get_identity', 'UserController@get_identity');                 //获取身份角色
         Route::any('/update_pwd', 'UserController@update_pwd');                     //修改密码

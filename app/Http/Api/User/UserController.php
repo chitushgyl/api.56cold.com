@@ -10,6 +10,7 @@ use App\Models\Tms\TmsAdvert;
 use App\Models\Tms\TmsAttestation;
 use App\Models\Tms\TmsCar;
 use App\Models\Tms\TmsCarriage;
+use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
 use App\Models\Tms\TmsOrderDispatch;
 use App\Models\User\UserBank;
@@ -1333,6 +1334,490 @@ class UserController extends Controller{
         $msg['code'] = 200;
         $msg['msg']  = '获取成功!';
         $msg['data']  = $info;
+        return $msg;
+    }
+
+    /**
+     * 用户个人中心      /user/owm
+     */
+    public function newOwm(Request $request){
+        //print_r($request->all());exit;
+        $user_info      =$request->get('user_info');
+        $now_time       =date('Y-m-d H:i:s',time());
+        $project_type       =$request->get('project_type');
+//        $project_type = 'business';
+//        dd($project_type);
+        /** 如果用户的身份过来是user   ，而user_identity  是空的话，说明这个用户没有任何身份，则需要在身份那里添加一个默认的用户身份给他**/
+        if ($user_info){
+            if ($project_type == 'user'){
+                if($project_type=='user' && count((array)$user_info->userIdentity)<=0){
+                    $user_identity = UserIdentity::where([['total_user_id','=',$user_info->total_user_id],['type','=','user'],['delete_flag','=','Y']])->first();
+
+                    $data['total_user_id']      =$user_info->total_user_id;
+                    $data['type']               ='user';
+                    $data['create_user_id']     = '1111111111';
+                    $data['create_user_name']   = $user_info->total_user_id;
+                    if ($user_identity){
+                        UserIdentity::where([['total_user_id','=',$user_info->total_user_id],['type','=','user'],['delete_flag','=','Y']])->update($data);
+                    }else{
+                        $data['self_id']            = generate_id('identity_');
+                        $data['create_time']        = $data['update_time'] = date('Y-m-d H:i:s',time());
+                        UserIdentity::insert($data);
+                    }
+
+                }
+            }elseif($project_type == 'carriage'){
+                if($project_type=='carriage' && count((array)$user_info->userIdentity) <= 0){
+                    $user_identity = UserIdentity::where([['total_user_id','=',$user_info->total_user_id],['type','=','carriage'],['delete_flag','=','Y']])->first();
+//                    $data['self_id']            = generate_id('identity_');
+                    $data['total_user_id']      =$user_info->total_user_id;
+                    $data['type']               ='carriage';
+                    $data['create_user_id']     = '2222222';
+                    $data['create_user_name']   = $user_info->total_user_id;
+
+                    if ($user_identity){
+                        UserIdentity::where([['total_user_id','=',$user_info->total_user_id],['type','=','carriage'],['delete_flag','=','Y']])->update($data);
+                    }else{
+                        $data['self_id']            = generate_id('identity_');
+                        $data['create_time']        = $data['update_time'] = date('Y-m-d H:i:s',time());
+                        UserIdentity::insert($data);
+                    }
+                }
+            }
+
+        }
+
+
+//        dump($project_type);
+
+        $project_type2=$project_type.'_owm';
+//        dd($user_info);
+        if($user_info){
+            switch ($user_info->userTotal->grade_id){
+                case '3':
+                    $user_info->grade_name='代理商';
+                    break;
+                case '4':
+                    $user_info->grade_name='运营商';
+                    break;
+                case '5':
+                    $user_info->grade_name='分公司';
+                    break;
+                default:
+                    $user_info->grade_name=null;
+                    break;
+            }
+        }
+
+
+        $select=['id','node','name','type','path','inactive_img','list_flag','number_flag','app_path','app_url','routine_path'];
+        $user_foot_where=[
+            ['use_flag','=','Y'],
+            ['delete_flag','=','Y'],
+            ['level','=','1'],
+            ['project_type','=',$project_type2],
+        ];
+        $user_foot_where2=[
+            ['use_flag','=','Y'],
+            ['delete_flag','=','Y'],
+        ];
+
+        $info = SysFoot::with(['sysFoot' => function($query)use($select,$user_foot_where2) {
+            $query->where($user_foot_where2);
+            $query->select($select);
+            $query->orderBy('sort','asc');
+        }])->where($user_foot_where)->select($select)->orderBy('sort','asc')->get();
+//        dd($info);
+        foreach ($info as $k => $v){
+
+            $v->inactive_img=img_for($v->inactive_img,'no_json');
+            switch ($v->type){
+                case 'user_order':
+                    /** 初始化一下*/
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+
+                    if($user_info){
+                        if($user_info->type == 'user'){
+                            $user_order_where=[
+                                ['total_user_id','=',$user_info->total_user_id],
+                                ['delete_flag','=','Y'],
+                                ['read_flag','=','N'],
+                            ];
+                            $order_number=TmsLittleOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                            if($order_number){
+                                foreach ($order_number as $kk => $vv){
+                                    $abcd='status';
+                                    if ($vv->order_status == 1){
+                                        $abcd='status1';
+                                    }
+                                    if ($vv->order_status == 2){
+                                        $abcd='status2';
+                                    }
+                                    if ($vv->order_status == 3 || $vv->order_status == 4 || $vv->order_status == 5){
+                                        $abcd='status3';
+                                    }
+                                    if ($vv->order_status == 7){
+                                        $abcd='status7';
+                                    }
+                                    foreach ($v->sysFoot as $kkk => $vvv){
+                                        if($vvv->type == $abcd){
+                                            $vvv->number += $vv->num;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($vvv->number >99){
+                            $vvv->number = '99+';
+                        }
+                    }
+                    break;
+
+                case 'TMS3PL_order':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['group_code','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
+                            ['read_flag','=','N'],
+                        ];
+                        $order_number=TmsLittleOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 2){
+                                    $abcd='status6';
+                                }
+                                if ($vv->order_status == 3){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status2';
+                                }
+//                            if ($vv->order_status == 6){
+//                                $abcd='status3';
+//                            }
+                                if ($vv->order_status == 7){
+                                    $abcd='status4';
+                                }
+
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number +=$vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
+                case 'business_order':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['group_code','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
+                            ['read_flag','=','N'],
+                        ];
+                        $order_number=TmsLittleOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 2){
+                                    $abcd='status6';
+                                }
+                                if ($vv->order_status == 3){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status2';
+                                }
+//                            if ($vv->order_status == 6){
+//                                $abcd='status3';
+//                            }
+                                if ($vv->order_status == 7){
+                                    $abcd='status4';
+                                }
+
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number +=$vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
+                case 'company_order':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['group_code','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
+                            ['read_flag','=','N'],
+                        ];
+                        $order_number=TmsLittleOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 1){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 2){
+                                    $abcd='status2';
+                                }
+                                if ($vv->order_status == 3 || $vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status3';
+                                }
+                                if ($vv->order_status == 7){
+                                    $abcd='status7';
+                                }
+
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number +=$vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
+                case 'TMS3PL_order_take':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['receiver_id','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
+                            ['order_type','!=','lift'],
+                        ];
+                        $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 2 || $vv->order_status == 3){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status2';
+                                }
+//                            if ($vv->order_status == 6){
+//                                $abcd='status3';
+//                            }
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number += $vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
+                case 'dispatch_order_take':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['receiver_id','=',$user_info->group_code],
+                            ['delete_flag','=','Y'],
+                            ['order_type','!=','lift'],
+                        ];
+                        $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 2 || $vv->order_status == 3){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status2';
+                                }
+//                            if ($vv->order_status == 6){
+//                                $abcd='status3';
+//                            }
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number += $vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
+
+                case 'carriage_order':
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+                    if ($user_info){
+                        $user_order_where=[
+                            ['receiver_id','=',$user_info->total_user_id],
+                            ['delete_flag','=','Y'],
+                            ['order_type','!=','lift'],
+                        ];
+                        $order_number=TmsOrderDispatch::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
+
+                        if($order_number){
+                            foreach ($order_number as $kk => $vv){
+                                $abcd='status';
+                                if ($vv->order_status == 2 || $vv->order_status == 3){
+                                    $abcd='status1';
+                                }
+                                if ($vv->order_status == 4 || $vv->order_status == 5){
+                                    $abcd='status2';
+                                }
+//                            if ($vv->order_status == 6){
+//                                $abcd='status3';
+//                            }
+                                foreach ($v->sysFoot as $kkk => $vvv){
+                                    if($vvv->type == $abcd){
+                                        $vvv->number += $vv->num;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($vvv->number >99){
+                        $vvv->number = '99+';
+                    }
+                    break;
+                case 'attestation':
+                    if ($user_info){
+                        if ($user_info->type == 'TMS3PL' ||$user_info->type == 'company' || $user_info->type == 'business' || $user_info->type == 'dispatcher'){
+                            $v->title_show = $user_info->group_name;
+                        }elseif($user_info->type == 'driver'){
+                            $v->title_show = '免费开放企业权限';
+                        }else{
+                            $v->title_show = '免费开放企业权限';
+                        }
+                    }else{
+                        $v->title_show = '免费开放企业权限';
+                    }
+
+                    break;
+                case 'list':
+                    $car_number = $money = $bank_number = 0;
+                    if ($user_info){
+                        if ($user_info->type == 'TMS3PL' || $user_info->type == 'company' || $user_info->type == 'business' || $user_info->type == 'dispatcher'){
+                            $car_where = [
+                                ['group_code','=',$user_info->group_code],
+                                ['delete_flag','=','Y']
+                            ];
+                        }else{
+                            $car_where = [
+                                ['total_user_id','=',$user_info->total_user_id],
+                                ['delete_flag','=','Y']
+                            ];
+                        }
+                        $car_number = TmsCar::where($car_where)->count();
+
+
+                        if ($user_info->type == 'TMS3PL' || $user_info->type == 'company' || $user_info->type == 'business' || $user_info->type == 'dispatcher'){
+                            $bank_where = [
+                                ['group_code','=',$user_info->group_code],
+                                ['delete_flag','=','Y']
+                            ];
+                        }else{
+                            $bank_where = [
+                                ['total_user_id','=',$user_info->total_user_id],
+                                ['delete_flag','=','Y']
+                            ];
+                        }
+                        $bank_number = UserBank::where($bank_where)->count();
+                    }
+
+                    if ($user_info){
+//                        ($user_info->type == 'TMS3PL' || $user_info->type == 'company')
+                        if ($user_info->type == 'user' ||$user_info->type == 'carriage'){
+//                            if($user_info->userCapital->money>1000000){
+//                                $user_info->userCapital->money = $money =number_format($user_info->userCapital->money/1000000, 2).'万';                 //用户余额
+//                            }else{
+//                                $user_info->userCapital->money = $money =number_format($user_info->userCapital->money/100, 2);                          //用户余额
+//                            }
+                            $user_info->userCapital->money = $money = number_format($user_info->userCapital->money/100,2);
+//                            dd($money);
+                        }else{
+                            $admin_where=[
+                                ['group_code','=',$user_info->group_code],
+                                ['delete_flag','=','Y'],
+                            ];
+                            $select_capital=['self_id','money'];
+                            $money_info=UserCapital::where($admin_where)->select($select_capital)->first();
+                            $user_info->userCapital->money = $money = number_format($money_info->money/100,2);
+
+                        }
+                    }
+
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        if($vvv->type == 'car'){
+                            $vvv->number = $car_number;
+                        }elseif($vvv->type == 'money'){
+//                            $vvv->number = number_format($money,2);
+                            $vvv->number = $money;
+                        }elseif($vvv->type == 'bank'){
+                            $vvv->number = $bank_number;
+                        }elseif($vvv->type == 'coupon'){
+                            $vvv->number = 0;
+                        }else{
+                            $vvv->number = 0;
+                        }
+
+                    }
+                    break;
+
+                default:
+
+                    foreach ($v->sysFoot as $kkk => $vvv){
+                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
+                        $vvv->number=0;
+                    }
+
+                    break;
+
+            }
+        }
+//        dd($info->toArray());
+        $msg['code']=200;
+        $msg['msg']='数据拉取成功';
+        $msg['data']=$user_info;
+        $msg['info']=$info;
         return $msg;
     }
 

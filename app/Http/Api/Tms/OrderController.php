@@ -5110,8 +5110,6 @@ class OrderController extends Controller{
             $data['kilometre']                  = $kilo;
 
 
-
-
             if($old_info){
                 $orderid = $self_id;
                 $data['update_time'] = $now_time;

@@ -5322,7 +5322,6 @@ class OrderController extends CommonController{
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ['type'=>'all','name'=>'use_flag','value'=>$use_flag],
             ['type'=>'=','name'=>'group_code','value'=>$group_code],
-            ['type'=>'=','name'=>'company_id','value'=>$company_id],
             ['type'=>'=','name'=>'type','value'=>$type],
             ['type'=>'=','name'=>'order_status','value'=>$state],
         ];
