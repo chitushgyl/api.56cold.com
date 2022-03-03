@@ -2812,7 +2812,7 @@ class DispatchController extends CommonController{
         public function dispatchOrderCancel(Request $request){
             $now_time=date('Y-m-d H:i:s',time());
             $operationing = $request->get('operationing');//接收中间件产生的参数
-            $table_name='tms_order_dispatch';
+            $table_name='tms_little_order';
             $self_id=$request->input('self_id');
             $operationing->access_cause='取消接单';
             $operationing->table = $table_name;
@@ -2825,8 +2825,8 @@ class DispatchController extends CommonController{
                 ['use_flag','=','Y'],
                 ['self_id','=',$self_id]
             ];
-            $select=['self_id','order_id','group_code','company_id','company_name','order_type','order_status','total_money','dispatch_flag', 'send_address_latitude', 'on_line_flag',];
-            $order_info = TmsOrderDispatch::where($where)->select($select)->first();
+            $select=['self_id','order_id','group_code','order_type','order_status','total_money','dispatch_flag', 'send_address_latitude', 'on_line_flag',];
+            $order_info = TmsLittleOrder::where($where)->select($select)->first();
             if($order_info->order_status == 2){
                 $msg['code']=303;
                 $msg['msg']='已取消，请勿重复操作';
@@ -2842,25 +2842,22 @@ class DispatchController extends CommonController{
             $data['order_status']  = 2;
             $data['receiver_id'] = null;
             $data['update_time'] = $now_time;
-            $id=TmsOrderDispatch::where($where)->update($data);
+            $id=TmsLittleOrder::where($where)->update($data);
 
-            $order_update['order_status'] = 2;
-            $order_update['update_time'] = $now_time;
-            TmsOrder::where('self_id',$order_info->order_id)->update($order_update);
 
             /** 修改订单费用中的应收对象 **/
-            $money_where = [
-                ['delete_flag','=','Y'],
-                ['use_flag','=','Y'],
-                ['dispatch_id','=',$self_id],
-                ['shouk_type','=','GROUP_CODE'],
-                ['order_id','=',$order_info->order_id]
-
-            ];
-            $money_update['shouk_group_code'] = null;
-            $money_update['shouk_type']       = null;
-            $money_update['update_time']      = $now_time;
-            TmsOrderCost::where($money_where)->update($money_update);
+//            $money_where = [
+//                ['delete_flag','=','Y'],
+//                ['use_flag','=','Y'],
+//                ['dispatch_id','=',$self_id],
+//                ['shouk_type','=','GROUP_CODE'],
+//                ['order_id','=',$order_info->order_id]
+//
+//            ];
+//            $money_update['shouk_group_code'] = null;
+//            $money_update['shouk_type']       = null;
+//            $money_update['update_time']      = $now_time;
+//            TmsOrderCost::where($money_where)->update($money_update);
 
             $operationing->old_info = (object)$old_info;
             $operationing->table_id = $self_id;

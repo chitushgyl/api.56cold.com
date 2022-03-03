@@ -1973,16 +1973,16 @@ class TakeController extends Controller{
                     ['delete_flag','=','Y'],
                     ['self_id','=',$dispatch_id],
                 ];
-                $select=['self_id','order_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
                     'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
                     'send_sheng_name','send_shi_name','send_qu_name','send_address',
-                    'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
-                $wait_info=TmsOrderDispatch::where($where)->select($select)->first();
+                    'good_info','good_number','good_weight','good_volume','total_money'];
+                $wait_info=TmsLittleOrder::where($where)->select($select)->first();
                 $order_where = [
                     ['self_id','=',$wait_info->order_id]
                 ];
                 $order_update['order_status'] = 2;
-                $order = TmsOrder::where($order_where)->update($order_update);
+                $order = TmsLittleOrder::where($order_where)->update($order_update);
 
                 if ($wait_info->order_status == 4){
                     $msg['code'] = 305;
@@ -1995,22 +1995,22 @@ class TakeController extends Controller{
                 $update['on_line_flag']      ='Y';
                 $update['order_status']      = 2;
                 $update['update_time']        =$now_time;
-                $id = TmsOrderDispatch::where($where)->update($update);
+                $id = TmsLittleOrder::where($where)->update($update);
 
                 /** 设置费用表里的收款对象为null **/
-                $money_where = [
-                    ['order_id','=',$wait_info->order_id],
-                    ['delete_flag','=','Y'],
-                    ['shouk_type','=','USER']
-                ];
-                if ($wait_info->pay_type == 'online'){
-                    $money['delete_flag'] = 'N';
-                }else{
-                    $money['shouk_total_user_id']           = null;
-                    $money['shouk_type']                    = null;
-                }
-
-                TmsOrderCost::where($money_where)->update($money);
+//                $money_where = [
+//                    ['order_id','=',$wait_info->order_id],
+//                    ['delete_flag','=','Y'],
+//                    ['shouk_type','=','USER']
+//                ];
+//                if ($wait_info->pay_type == 'online'){
+//                    $money['delete_flag'] = 'N';
+//                }else{
+//                    $money['shouk_total_user_id']           = null;
+//                    $money['shouk_type']                    = null;
+//                }
+//
+//                TmsOrderCost::where($money_where)->update($money);
 
                 if($id){
                     $msg['code'] = 200;
