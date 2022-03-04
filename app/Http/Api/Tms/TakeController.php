@@ -2033,5 +2033,136 @@ class TakeController extends Controller{
                 return $msg;
             }
         }
+        /**
+         * 快捷订单调度
+         * */
+        public function addTakeFastOrder(Request $request){
+            $user_info = $request->get('user_info');//接收中间件产生的参数
+            $now_time      = date('Y-m-d H:i:s',time());
+            $input         = $request->all();
+
+            /** 接收数据*/
+            $dispatch_id       = $request->input('dispatch_id');
+            $car_id       = $request->input('car_id');
+            $contacts       = $request->input('contacts');
+            $tel            = $request->input('tel');
+
+            /*** 虚拟数据
+            $input['dispatch_id']           =$dispatch_id='dispatch_202101282034423534882996';
+            $input['car_id']                =$car_id='car_202101281717140184141326';
+            $input['contacts']              =$contacts='李白';
+            $input['tel']                   =$tel='13256454879';
+             **/
+            $rules = [
+                'dispatch_id'=>'required',
+                'car_id'=>'required',
+
+            ];
+            $message = [
+                'dispatch_id.required'=>'请选择调度订单',
+                'car_id.required'=>'请选择车辆',
+            ];
+
+            $validator = Validator::make($input,$rules,$message);
+            if($validator->passes()) {
+                $where=[
+                    ['delete_flag','=','Y'],
+                    ['self_id','=',$dispatch_id],
+                ];
+                $car_where=[
+                    ['use_flag','=','Y'],
+                    ['delete_flag','=','Y'],
+                    ['self_id','=',$car_id],
+                ];
+                $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                    'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id',
+                    'send_sheng_name','send_shi_name','send_qu_name','send_address',
+                    'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
+                $wait_info=TmsOrderDispatch::where($where)->select($select)->first();
+                $car = TmsCar::where($car_where)->first();
+                //调度订单修改订单状态
+                $order_where = [
+                    ['self_id','=',$wait_info->order_id]
+                ];
+                $order_update['order_status'] = 4;
+                $order_update['update_time']  = $now_time;
+                $order = TmsOrder::where($order_where)->update($order_update);
+                TmsOrderDispatch::where($where)->update($order_update);
+
+                $carriage_id = generate_id('carriage_');
+
+                $list['self_id']            =generate_id('c_d_');
+                $list['order_dispatch_id']        = $dispatch_id;
+                $list['carriage_id']        = $carriage_id;
+                $list['total_user_id']         = $user_info->total_user_id;
+                $list['create_user_id']     = $user_info->total_user_id;
+                $list['create_time']        =$list['update_time']=$now_time;
+
+
+                $order_list['self_id']            =generate_id('driver_');
+                $order_list['carriage_id']        = $carriage_id;
+                $order_list['total_user_id']         = $user_info->total_user_id;
+                $order_list['create_user_id']     = $user_info->total_user_id;
+                $order_list['create_time']        =$order_list['update_time']=$now_time;
+                $order_list['car_id']   = $car_id;
+
+
+                $order_list['car_number']   =  $car->car_number;
+                $order_list['contacts']   =  $contacts;
+                $order_list['tel']   = $tel;
+                $order_list['price'] = $wait_info->total_money;
+
+                /**保存应付费用**/
+//            $money['self_id']           = generate_id('order_money_');
+//            $money['shouk_group_code']           = $user_info->group_code;
+//            $money['shouk_type']                 = 'COMPANY';
+//            $money['fk_total_user_id']           = $user_info->total_user_id;
+//            $money['fk_type']                    = 'USER';
+//            $money['ZIJ_total_user_id']          = $user_info->total_user_id;
+//
+//
+//            $money['order_id']                   = $dispatch_id;
+//            $money['create_time']                = $now_time;
+//            $money['update_time']                = $now_time;
+//            $money['money']                      = $total_money;
+//            $money['money_type']                 = 'freight';
+//            $money['type']                       = 'in';
+
+
+                $data['self_id']            = $carriage_id;
+                $data['create_user_id']     = $user_info->admin_id;
+                $data['create_user_name']   = $user_info->name;
+                $data['create_time']        = $data['update_time']=$now_time;
+                $data['total_user_id']        = $user_info->total_user_id;
+                $data['total_money']        = $wait_info->on_line_money;
+                $data['carriage_flag']   =  'compose';
+                $data['order_status']   =  2;
+
+                $id = TmsCarriage::insert($data);
+                TmsCarriageDispatch::insert($list);
+//            TmsOrderMoney::insert($money);
+                TmsCarriageDriver::insert($order_list);
+
+                if($order){
+                    $msg['code'] = 200;
+                    $msg['msg'] = "操作成功";
+                    return $msg;
+                }else{
+                    $msg['code'] = 302;
+                    $msg['msg'] = "操作失败";
+                    return $msg;
+                }
+            }else{
+                //前端用户验证没有通过
+                $erro = $validator->errors()->all();
+                $msg['code'] = 300;
+                $msg['msg']  = null;
+                foreach ($erro as $k => $v) {
+                    $kk = $k+1;
+                    $msg['msg'].=$kk.'：'.$v.'</br>';
+                }
+                return $msg;
+            }
+        }
 
 }

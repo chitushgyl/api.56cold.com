@@ -1841,6 +1841,72 @@ class AlipayController extends Controller{
         return json_encode(['code'=>200,'msg'=>'请求成功','data'=>$data]);
     }
 
+    /**
+     * 极速版下单支付宝支付
+     * */
+    public function fastOrderAlipay(Request $request){
+        $config    = config('tms.alipay_config');//引入配置文件参数
+        $input     = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $type      = $request->input('type'); // 1  2  3
+        $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
+        $self_id   = $request->input('self_id');// 订单ID
+        $price     = $request->input('price');// 支付金额
+        $price     = 0.01;
+        if (!$user_info){
+            $msg['code'] = 401;
+            $msg['msg']  = '未登录，请完成登录！';
+            return $msg;
+        }
+        /**虚拟数据
+        $user_id = 'user_15615612312454564';
+        $price = 0.01;
+        $type = 1;
+        $self_id = 'order_202103090937308279552773';
+         * */
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+        if($type == 3){
+            $payment = TmsPayment::where('order_id',$self_id)->where('order_id','!=','')->select('order_id','pay_result','paytype','state')->first();
+            if($payment){
+                $msg['code'] = 302;
+                $msg['msg']  = '此订单不能重复上线';
+                return $msg;
+            }
+        }
+        include_once base_path( '/vendor/alipay/aop/AopClient.php');
+        include_once base_path( '/vendor/alipay/aop/request/AlipayTradeAppPayRequest.php');
+        $aop = new \AopClient();
+        $request = new \AlipayTradeAppPayRequest();
+        $aop->gatewayUrl = $config['gatewayUrl'];
+        $aop->appId = $config['app_id'];
+        $aop->rsaPrivateKey = $config['merchant_private_key'];
+        $aop->format = $config['format'];
+        $aop->charset = $config['charset'];
+        $aop->signType = $config['sign_type'];
+        //运单支付
+        $subject = '订单支付';
+//        $notifyurl = "http://api.56cold.com/alipay/appAlipay_notify";
+        $notifyurl = $pay_type[$type];
+        $aop->alipayrsaPublicKey = $config['alipay_public_key'];
+        $bizcontent = json_encode([
+            'body' => '支付宝支付',
+            'subject' => $subject,
+            'out_trade_no' => $self_id,//此订单号为商户唯一订单号
+            'total_amount' => $price,//保留两位小数
+            'product_code' => 'QUICK_MSECURITY_PAY',
+            'passback_params' => $user_id
+        ]);
+        $request->setNotifyUrl($notifyurl);
+        $request->setBizContent($bizcontent);
+        //这里和普通的接口调用不同，使用的是sdkExecute
+        $response = $aop->sdkExecute($request);
+        return $response;
+    }
+
 
 
 
