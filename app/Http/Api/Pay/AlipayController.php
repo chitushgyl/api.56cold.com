@@ -1963,7 +1963,7 @@ class AlipayController extends Controller{
             UserWallet::insert($wallet);
             file_put_contents(base_path('/vendor/alipay1.txt'),$wallet);
             if ($order->order_type == 'line'){
-                $order_update['order_status'] = 3;
+                $order_update['order_status'] = 2;
             }else{
                 $order_update['order_status'] = 2;
             }
