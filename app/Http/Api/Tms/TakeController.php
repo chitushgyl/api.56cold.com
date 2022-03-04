@@ -2165,4 +2165,65 @@ class TakeController extends Controller{
             }
         }
 
+        /**
+         * 订单送达
+         * */
+    public function fastOrderDone(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $dispatch_id       = $request->input('self_id');
+        /*** 虚拟数据
+        $input['self_id']           =$dispatch_id='patch_202105091028035791605429';
+         **/
+        $rules = [
+            'self_id'=>'required',
+        ];
+        $message = [
+            'self_id.required'=>'请选择调度订单',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$dispatch_id],
+            ];
+
+            $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address',
+                'good_info','good_number','good_weight','good_volume','total_money'];
+
+            $wait_info = TmsLittleOrder::where($where)->select($select)->first();
+
+            //修改当前运输单状态
+            $dispatch_order['order_status']  = 5;
+            $dispatch_order['update_time']   = $now_time;
+            $id = TmsLittleOrder::where($where)->update($dispatch_order);
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
 }

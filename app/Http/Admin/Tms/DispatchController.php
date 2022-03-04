@@ -2873,5 +2873,123 @@ class DispatchController extends CommonController{
                 return $msg;
             }
         }
+
+        /**
+         * 快速下单确认订单送达
+         * */
+    public function fastOrderDone(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='tms_littlle_dispatch';
+//        dd($user_info);
+        $operationing->access_cause     ='确认送达';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='add';
+
+        $input              =$request->all();
+
+        /** 接收数据*/
+        $dispatch_id        = $request->input('dispatch_id'); //调度单ID
+        /*** 虚拟数据
+        $input['dispatch_id']     =$dispatch_id='patch_202105091028035791605429';
+         * ***/
+        $rules=[
+            'dispatch_id'=>'required',
+        ];
+        $message=[
+            'dispatch_id.required'=>'请选择运输订单',
+        ];
+
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$dispatch_id],
+            ];
+
+            $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id','receiver_id','group_code',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address','order_status',
+                'good_info','good_number','good_weight','good_volume','total_money'];
+
+            $wait_info = TmsLittleOrder::where($where)->select($select)->first();
+            if ($wait_info->order_status == 5){
+                $msg['code'] = 301;
+                $msg['msg'] = "已确认货物送达，请勿重复操作";
+                return $msg;
+            }
+            if($wait_info->group_code == $wait_info->receiver_id){
+                $receipt = TmsReceipt::where('order_id',$dispatch_id)->count();
+                if ($receipt = 0){
+                    $msg['code'] = 302;
+                    $msg['msg'] = "请上传回单！";
+                    return $msg;
+                }
+            }
+            //调度订单修改订单状态
+            $order_where = [
+                ['self_id','=',$wait_info->order_id]
+            ];
+            $dispatch_where = [
+                ['order_id','=',$wait_info->order_id]
+            ];
+            $flag = 'Y';
+            //判断是否所有的运输单状态是否都为调度，是修改订单状态为已接单
+            $tmsOrderDispatch = TmsOrderDispatch::where($dispatch_where)->select(['self_id'])->get();
+
+            if ($tmsOrderDispatch){
+                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+                $orderStatus = TmsOrderDispatch::where('self_id','!=',$dispatch_id)->whereIn('self_id',$dispatch_list)->select(['order_status'])->get();
+                $arr = array_unique(array_column($orderStatus->toArray(),'order_status'));
+//                dump($arr);
+                if (count($arr) >= 1){
+                    if (implode('',$arr) == 5){
+                        $flag = 'Y';
+                    }else{
+                        $flag = 'N';
+                    }
+                }else{
+                    $flag = 'Y';
+                }
+            }
+            //修改当前运输单状态
+
+            $dispatch_order['update_time']   = $now_time;
+
+            if ($wait_info->group_code == $wait_info->receiver_id){
+                $order_update['order_status'] = 6;
+                $dispatch_order['order_status']  = 6;
+            }else{
+                $order_update['order_status'] = 5;
+                $dispatch_order['order_status']  = 5;
+            }
+            $order_update['update_time']  = $now_time;
+            $id = TmsLittleDispatch::where($where)->update($dispatch_order);
+
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
 }
 ?>

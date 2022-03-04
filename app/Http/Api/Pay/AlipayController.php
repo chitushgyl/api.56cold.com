@@ -2004,6 +2004,118 @@ class AlipayController extends Controller{
         } else {
             echo 'fail';
         }
+
+    }
+
+    /**
+     * 快捷下单余额支付
+     * */
+    public function fastOrderBalancePay(Request $request){
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        if (!$user_info){
+            $msg['code'] = 401;
+            $msg['msg']  = '未登录，请完成登录！';
+            return $msg;
+        }
+        // 订单ID
+        $self_id = $request->input('self_id');
+        // 支付金额
+        $price = $request->input('price');
+        $type  = $request->input('type'); // 支付宝 alipay  微信 wechat
+        /**虚拟数据
+        //        $price   = 0.01;
+        //        $self_id = 'order_202103121712041799645968';
+         * */
+        $now_time = date('Y-m-d H:i:s',time());
+        $pay['order_id'] = $self_id;
+        $pay['pay_number'] = $price*100;
+        $pay['platformorderid'] = generate_id('');
+        $pay['create_time'] = $pay['update_time'] = $now_time;
+        $pay['payname'] = $user_info->tel;
+        $pay['paytype'] = 'BALANCE';//
+        $pay['pay_result'] = 'SU';//
+        $pay['state'] = 'in';//支付状态
+        $pay['self_id'] = generate_id('pay_');
+        $order = TmsLittleOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+
+        if ($user_info->type == 'user'){
+            $pay['total_user_id'] = $user_info->total_user_id;
+            $wallet['total_user_id'] = $user_info->total_user_id;
+            $capital_where['total_user_id'] = $user_info->total_user_id;
+        }else{
+            $pay['group_code'] = $user_info->group_code;
+            $pay['group_name'] = $user_info->group_name;
+            $wallet['group_code'] = $user_info->group_code;
+            $wallet['group_name'] = $user_info->group_name;
+            $capital_where['group_code'] = $user_info->group_code;
+        }
+        $userCapital = UserCapital::where($capital_where)->first();
+        if ($userCapital->money < $price){
+            $msg['code'] = 302;
+            $msg['msg']  = '余额不足';
+            return $msg;
+        }
+        $capital['money'] = $userCapital->money - $price*100;
+        $capital['update_time'] = $now_time;
+        UserCapital::where($capital_where)->update($capital);
+        $wallet['self_id'] = generate_id('wallet_');
+        $wallet['produce_type'] = 'out';
+        $wallet['capital_type'] = 'wallet';
+        $wallet['create_time'] = $now_time;
+        $wallet['update_time'] = $now_time;
+        $wallet['money']       = $price*100;
+        $wallet['now_money'] = $capital['money'];
+        $wallet['now_money_md'] = get_md5($capital['money']);
+        $wallet['wallet_status'] = 'SU';
+        UserWallet::insert($wallet);
+        TmsPayment::insert($pay);
+        if ($order->order_type == 'line'){
+            $order_update['order_status'] = 2;
+        }else{
+            $order_update['order_status'] = 2;
+        }
+        $order_update['update_time'] = date('Y-m-d H:i:s',time());
+        $id = TmsLittleOrder::where('self_id',$self_id)->update($order_update);
+        /**修改费用数据为可用**/
+        $money['delete_flag']                = 'Y';
+        $money['settle_flag']                = 'W';
+        $tmsOrderCost = TmsOrderCost::where('order_id',$self_id)->select('self_id')->get();
+        if ($tmsOrderCost){
+            $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+            TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+        }
+        if($userCapital->money >= $price){
+            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$self_id)->select('self_id')->get();
+            if ($tmsOrderDispatch){
+                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
+            }
+            /**推送**/
+            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+            if($order->order_type == 'vehicle'){
+                if($order->group_code){
+                    $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
+                    if($group->company_type != 'TMS3PL'){
+                        $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+                    }
+                }else{
+                    $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+                }
+            }
+        }
+
+        if ($id){
+            $msg['code'] = 200;
+            $msg['msg']  = '支付成功！';
+            return $msg;
+        }else{
+            $msg['code'] = 303;
+            $msg['msg']  = '支付失败！';
+            return $msg;
+        }
     }
 
 

@@ -2373,10 +2373,27 @@ class OrderController extends CommonController{
             TmsOrderDispatch::whereIn('self_id',$dispatch_id_list)->update($order_update);
             /** 判断是在线支付还是货到付款,在线支付应退还支付费用**/
             if ($order->pay_type == 'online'){
-                $wallet = UserCapital::where('group_code',$order->group_code)->select(['self_id','money'])->first();
-                $wallet_update['money'] = $order->total_money + $wallet->money;
-                $wallet_update['update_time'] = $now_time;
-                UserCapital::where('group_code',$order->group_code)->update($wallet_update);
+//                if($user_info->group_code == '1234'){
+//                    if (empty($order->group_code)){
+//
+//                    }
+//                }else{
+//
+//                }
+
+                if($order->group_code){
+                    $wallet = UserCapital::where('group_code',$order->group_code)->select(['self_id','money'])->first();
+                    $wallet_update['money'] = $order->total_money + $wallet->money;
+                    $wallet_update['update_time'] = $now_time;
+                    UserCapital::where('group_code',$order->group_code)->update($wallet_update);
+                    $data['group_code'] = $order->group_code;
+                }else{
+                    $wallet = UserCapital::where('total_user_id',$order->total_user_id)->select(['self_id','money'])->first();
+                    $wallet_update['money'] = $order->total_money + $wallet->money;
+                    $wallet_update['update_time'] = $now_time;
+                    UserCapital::where('total_user_id',$order->total_user_id)->update($wallet_update);
+                    $data['total_user_id'] = $order->total_user_id;
+                }
                 $data['self_id'] = generate_id('wallet_');
                 $data['produce_type'] = 'refund';
                 $data['capital_type'] = 'wallet';
@@ -2387,7 +2404,6 @@ class OrderController extends CommonController{
                 $data['now_money_md'] = get_md5($wallet_update['money']);
                 $data['wallet_status'] = 'SU';
                 $data['wallet_type'] = 'user';
-                $data['group_code'] = $order->group_code;
                 UserWallet::insert($data);
             }
             /** 取消订单应该删除应付费用**/
