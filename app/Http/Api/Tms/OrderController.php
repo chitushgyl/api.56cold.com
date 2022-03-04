@@ -4912,9 +4912,6 @@ class OrderController extends Controller{
         $now_time   = date('Y-m-d H:i:s',time());
         $table_name = 'tms_order';
         $user_info  = $request->get('user_info');//接收中间件产生的参数
-        $msg['code'] = 306;
-        $msg['msg'] = $user_info;
-        return $msg;
 //         $project_type = 'user';
         $total_user_id  = $user_info->total_user_id;
 //        $token_name     = $user_info->token_name;
