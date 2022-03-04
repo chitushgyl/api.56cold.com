@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Api\Pay;
 use App\Models\Group\SystemGroup;
+use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
 use App\Models\Tms\TmsOrderCost;
 use App\Models\Tms\TmsOrderDispatch;
@@ -1848,7 +1849,7 @@ class AlipayController extends Controller{
         $config    = config('tms.alipay_config');//引入配置文件参数
         $input     = $request->all();
         $user_info = $request->get('user_info');//接收中间件产生的参数
-        $type      = $request->input('type'); // 1  2  3
+        $type      = $request->input('type'); // 1  2  3 4
         $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
         $self_id   = $request->input('self_id');// 订单ID
         $price     = $request->input('price');// 支付金额
@@ -1905,6 +1906,104 @@ class AlipayController extends Controller{
         //这里和普通的接口调用不同，使用的是sdkExecute
         $response = $aop->sdkExecute($request);
         return $response;
+    }
+
+    /**
+     *
+     * */
+    public function fastOrderAlipayNotify(Request $request){
+        include_once base_path( '/vendor/alipay/aop/AopClient.php');
+        $aop = new \AopClient();
+        $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
+        $flag = $aop->rsaCheckV1($_POST, NULL, "RSA2");
+        if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
+            $now_time = date('Y-m-d H:i:s',time());
+            $pay['order_id'] = $_POST['out_trade_no'];
+            $pay['pay_number'] = $_POST['total_amount'] * 100;
+            $pay['platformorderid'] = $_POST['trade_no'];
+            $pay['create_time'] = $pay['update_time'] = $now_time;
+            $pay['payname'] = $_POST['buyer_logon_id'];
+            $pay['paytype'] = 'ALIPAY';//
+            $pay['pay_result'] = 'SU';//
+            $pay['state'] = 'in';//支付状态
+            $pay['self_id'] = generate_id('pay_');
+            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
+            $order = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+            if ($order->order_status == 2 || $order->order_status == 3){
+                echo 'success';
+                return false;
+            }
+            $payment_info = TmsPayment::where('order_id',$_POST['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+            if ($payment_info){
+                echo 'success';
+                return false;
+            }
+            if ($order->total_user_id){
+                $pay['total_user_id'] = $_POST['passback_params'];
+                $wallet['total_user_id'] = $_POST['passback_params'];
+                $where['total_user_id'] = $_POST['passback_params'];
+            }else{
+                $pay['group_code'] = $_POST['passback_params'];
+                $pay['group_code'] = $_POST['passback_params'];
+                $wallet['group_code'] = $_POST['passback_params'];
+                $wallet['group_name'] = $order->group_name;
+                $where['group_code'] = $_POST['passback_params'];
+            }
+            TmsPayment::insert($pay);
+            $capital = UserCapital::where($where)->first();
+            $wallet['self_id'] = generate_id('wallet_');
+            $wallet['produce_type'] = 'out';
+            $wallet['capital_type'] = 'wallet';
+            $wallet['money'] = $_POST['total_amount'] * 100;
+            $wallet['create_time'] = $now_time;
+            $wallet['update_time'] = $now_time;
+            $wallet['now_money'] = $capital->money;
+            $wallet['now_money_md'] = get_md5($capital->money);
+            $wallet['wallet_status'] = 'SU';
+            UserWallet::insert($wallet);
+            file_put_contents(base_path('/vendor/alipay1.txt'),$wallet);
+            if ($order->order_type == 'line'){
+                $order_update['order_status'] = 3;
+            }else{
+                $order_update['order_status'] = 2;
+            }
+            $order_update['update_time'] = date('Y-m-d H:i:s',time());
+            $id = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
+            /**修改费用数据为可用**/
+//            $money['delete_flag']                = 'Y';
+//            $money['settle_flag']                = 'W';
+//            $tmsOrderCost = TmsOrderCost::where('order_id',$_POST['out_trade_no'])->select('self_id')->get();
+//            file_put_contents(base_path('/vendor/alipay2.txt'),$tmsOrderCost);
+//            if ($tmsOrderCost){
+//                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+//                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+//                file_put_contents(base_path('/vendor/alipay3.txt'),'123');
+//            }
+
+            /**推送**/
+//            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+//            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+////                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+//            if ($order->order_type == 'vehicle'){
+//                if($order->group_code){
+//                    $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
+//                    if($group->company_type != 'TMS3PL'){
+//                        $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+//                    }
+//                }else{
+//                    $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+//                }
+//            }
+
+            if ($id){
+                echo 'success';
+            }else{
+                echo 'fail';
+            }
+
+        } else {
+            echo 'fail';
+        }
     }
 
 
