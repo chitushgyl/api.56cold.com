@@ -2344,7 +2344,7 @@ class OrderController extends CommonController{
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
             //二次验证
-             $order = TmsOrder::where('self_id',$order_id)->select(['self_id','order_status','total_money','pay_type','group_code'])->first();
+             $order = TmsOrder::where('self_id',$order_id)->select(['self_id','order_status','total_money','pay_type','group_code','total_user_id'])->first();
              if($user_info->group_code != '1234'){
                  if ($order->order_status == 3){
                      $msg['code'] = 303;
