@@ -2078,34 +2078,34 @@ class AlipayController extends Controller{
         $order_update['update_time'] = date('Y-m-d H:i:s',time());
         $id = TmsLittleOrder::where('self_id',$self_id)->update($order_update);
         /**修改费用数据为可用**/
-        $money['delete_flag']                = 'Y';
-        $money['settle_flag']                = 'W';
-        $tmsOrderCost = TmsOrderCost::where('order_id',$self_id)->select('self_id')->get();
-        if ($tmsOrderCost){
-            $money_list = array_column($tmsOrderCost->toArray(),'self_id');
-            TmsOrderCost::whereIn('self_id',$money_list)->update($money);
-        }
-        if($userCapital->money >= $price){
-            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$self_id)->select('self_id')->get();
-            if ($tmsOrderDispatch){
-                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
-                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
-            }
+//        $money['delete_flag']                = 'Y';
+//        $money['settle_flag']                = 'W';
+//        $tmsOrderCost = TmsOrderCost::where('order_id',$self_id)->select('self_id')->get();
+//        if ($tmsOrderCost){
+//            $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+//            TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+//        }
+//        if($userCapital->money >= $price){
+//            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$self_id)->select('self_id')->get();
+//            if ($tmsOrderDispatch){
+//                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+//                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
+//            }
             /**推送**/
-            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
-            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
-//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
-            if($order->order_type == 'vehicle'){
-                if($order->group_code){
-                    $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
-                    if($group->company_type != 'TMS3PL'){
-                        $A = $this->send_push_msg('订单信息','有新订单',$center_list);
-                    }
-                }else{
-                    $A = $this->send_push_msg('订单信息','有新订单',$center_list);
-                }
-            }
-        }
+//            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+//            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+////                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+//            if($order->order_type == 'vehicle'){
+//                if($order->group_code){
+//                    $group = SystemGroup::where('self_id',$order->group_code)->select('self_id','group_name','company_type')->first();
+//                    if($group->company_type != 'TMS3PL'){
+//                        $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+//                    }
+//                }else{
+//                    $A = $this->send_push_msg('订单信息','有新订单',$center_list);
+//                }
+//            }
+//        }
 
         if ($id){
             $msg['code'] = 200;
