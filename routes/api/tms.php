@@ -117,6 +117,7 @@ Route::any('/alipay/qrcode_notify', 'Pay\AlipayController@qrcode_notify');
 Route::any('/alipay/depositAlipayNotify', 'Pay\AlipayController@depositAlipayNotify');
 Route::any('/alipay/depositWechatNotify', 'Pay\AlipayController@depositWechatNotify');
 Route::any('/alipay/fastOrderAlipayNotify', 'Pay\AlipayController@fastOrderAlipayNotify');
+Route::any('/alipay/fastOrderBalancePay', 'Pay\AlipayController@fastOrderBalancePay');
 
 Route::group([
     "middleware"=>['frontCheck','userCheck','holdCheck'],
