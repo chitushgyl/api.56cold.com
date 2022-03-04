@@ -2013,7 +2013,9 @@ class AlipayController extends Controller{
     public function fastOrderBalancePay(Request $request){
         $input = $request->all();
         $user_info = $request->get('user_info');//接收中间件产生的参数
-        return $user_info;
+            $msg['code'] = 401;
+            $msg['msg']  = $user_info;
+            return $msg;
 //        if (!$user_info){
 //            $msg['code'] = 401;
 //            $msg['msg']  = '未登录，请完成登录！';
