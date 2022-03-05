@@ -2083,14 +2083,12 @@ class TakeController extends Controller{
                 $car = TmsCar::where($car_where)->first();
                 //调度订单修改订单状态
                 $order_where = [
-                    ['self_id','=',$wait_info->order_id]
+                    ['self_id','=',$wait_info->self_id]
                 ];
                 $order_update['order_status'] = 4;
                 $order_update['update_time']  = $now_time;
+                $order_update['dispatch_flag']  = 'N';
                 $order = TmsLittleOrder::where($order_where)->update($order_update);
-
-                $carriage_id = generate_id('carriage_');
-
 
                 $order_list['self_id']            = generate_id('carriage_');
                 $order_list['order_id']           = $carriage_id;
@@ -2143,6 +2141,73 @@ class TakeController extends Controller{
                 return $msg;
             }
         }
+
+        /**
+         * 极速版取消调度
+         * */
+    public function fastCarriageCancel(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $dispatch_id       = $request->input('dispatch_id');
+        /*** 虚拟数据
+        $input['dispatch_id']           =$dispatch_id='dispatch_202101282034423534882996';
+         **/
+        $rules = [
+            'dispatch_id'=>'required',
+        ];
+        $message = [
+            'dispatch_id.required'=>'请选择调度订单',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$dispatch_id],
+            ];
+
+            $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address',
+                'good_info','good_number','good_weight','good_volume','total_money'];
+
+            $wait_info = TmsLittleOrder::where($where)->select($select)->first();
+
+            //修改当前运输单状态
+            $dispatch_order['order_status']  = 3;
+            $dispatch_order['dispatch_flag'] = 'Y';
+            $dispatch_order['update_time']   = $now_time;
+            $id = TmsLittleOrder::where($where)->update($dispatch_order);
+
+            //删除所有关联运输数据
+            $list['delete_flag']         = 'N';
+            $list['update_time']         = $now_time;
+            TmsFastCarriage::where('order_id',$wait_info->self_id)->update($list);
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
 
         /**
          * 订单送达
