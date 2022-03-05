@@ -103,6 +103,7 @@ Route::group([
     Route::any('/alipay/depositWechat', 'Pay\AlipayController@depositWechat');
     Route::any('/alipay/routineDeposit', 'Pay\AlipayController@routineDeposit');
     Route::any('/alipay/fastOrderAlipay', 'Pay\AlipayController@fastOrderAlipay');
+    Route::any('/alipay/fastOrderBalancePay', 'Pay\AlipayController@fastOrderBalancePay');
 });
 Route::any('/alipay/notify', 'Pay\AlipayController@notify');
 Route::any('/alipay/wxpaynotify', 'Pay\AlipayController@wxpaynotify');
@@ -117,7 +118,6 @@ Route::any('/alipay/qrcode_notify', 'Pay\AlipayController@qrcode_notify');
 Route::any('/alipay/depositAlipayNotify', 'Pay\AlipayController@depositAlipayNotify');
 Route::any('/alipay/depositWechatNotify', 'Pay\AlipayController@depositWechatNotify');
 Route::any('/alipay/fastOrderAlipayNotify', 'Pay\AlipayController@fastOrderAlipayNotify');
-Route::any('/alipay/fastOrderBalancePay', 'Pay\AlipayController@fastOrderBalancePay');
 
 Route::group([
     "middleware"=>['frontCheck','userCheck','holdCheck'],
