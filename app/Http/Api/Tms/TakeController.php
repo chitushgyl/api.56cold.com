@@ -7,6 +7,7 @@ use App\Models\Tms\TmsCar;
 use App\Models\Tms\TmsCarriage;
 use App\Models\Tms\TmsCarriageDispatch;
 use App\Models\Tms\TmsCarriageDriver;
+use App\Models\Tms\TmsFastCarriage;
 use App\Models\Tms\TmsGroup;
 use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
@@ -2119,7 +2120,7 @@ class TakeController extends Controller{
 //            $money['type']                       = 'in';
 
 
-              $id =   Tms::insert($order_list);
+              $id =   TmsFastCarriage::insert($order_list);
 
                 if($id){
                     $msg['code'] = 200;
