@@ -199,6 +199,7 @@ Route::group([
     Route::any('/dispatch/dispatchFastOrderDetails','DispatchController@dispatchFastOrderDetails');
     Route::any('/dispatch/dispatchOrderCancel','DispatchController@dispatchOrderCancel');
     Route::any('/dispatch/fastOrderDone','DispatchController@fastOrderDone');
+    Route::any('/dispatch/addFastDispatch','DispatchController@addFastDispatch');
     Route::group([
         "middleware"=>['daily'],
     ], function(){

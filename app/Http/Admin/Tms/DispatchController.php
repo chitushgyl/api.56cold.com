@@ -2996,7 +2996,7 @@ class DispatchController extends CommonController{
     /**
      * 极速版快捷订单调度
      * */
-    public function addFastDispatch(Request $request){
+    public function addFastDispatch(Request $request,TMS $tms){
         $user_info = $request->get('user_info');//接收中间件产生的参数
         $operationing   = $request->get('operationing');//接收中间件产生的参数
         $now_time       =date('Y-m-d H:i:s',time());
