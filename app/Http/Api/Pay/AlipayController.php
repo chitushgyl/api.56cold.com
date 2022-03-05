@@ -1967,6 +1967,7 @@ class AlipayController extends Controller{
             }else{
                 $order_update['order_status'] = 2;
             }
+            $order_update['on_line_flag'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
             /**修改费用数据为可用**/
@@ -2076,6 +2077,7 @@ class AlipayController extends Controller{
         }else{
             $order_update['order_status'] = 2;
         }
+        $order_update['on_line_flag'] = 'Y';
         $order_update['update_time'] = date('Y-m-d H:i:s',time());
         $id = TmsLittleOrder::where('self_id',$self_id)->update($order_update);
         /**修改费用数据为可用**/

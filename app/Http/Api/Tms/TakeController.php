@@ -2091,7 +2091,7 @@ class TakeController extends Controller{
                 $order = TmsLittleOrder::where($order_where)->update($order_update);
 
                 $order_list['self_id']            = generate_id('carriage_');
-                $order_list['order_id']           = $carriage_id;
+                $order_list['order_id']           = $wait_info->self_id;
                 $order_list['total_user_id']      = $user_info->total_user_id;
                 $order_list['create_user_id']     = $user_info->total_user_id;
                 $order_list['create_time']        = $order_list['update_time']=$now_time;

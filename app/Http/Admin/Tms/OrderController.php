@@ -5550,7 +5550,7 @@ class OrderController extends CommonController{
                 if ($value->id == 239){
                     $button8[] = $value;
                 }
-                if ($v->order_status == 3 && $v->order_type == 'line'){
+                if ($v->order_status == 3 || $v->order_status == 2){
                     $v->button  = $button1;
                 }
                 if ($v->order_status == 5){
@@ -5558,12 +5558,6 @@ class OrderController extends CommonController{
                 }
                 if ($v->order_status == 2){
                     $v->button = $button3;
-                }
-                if ($v->order_status == 2 && $v->order_type == 'vehicle'){
-                    $v->button  = $button1;
-                }
-                if ($v->order_status == 2 && $v->order_type == 'lift'){
-                    $v->button  = $button1;
                 }
                 if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
                     $v->button  = $button4;
