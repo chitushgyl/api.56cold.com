@@ -2075,10 +2075,10 @@ class TakeController extends Controller{
                     ['self_id','=',$car_id],
                 ];
                 $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
-                    'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id',
+                    'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
                     'send_sheng_name','send_shi_name','send_qu_name','send_address',
-                    'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
-                $wait_info=TmsOrderDispatch::where($where)->select($select)->first();
+                    'good_info','good_number','good_weight','good_volume','total_money'];
+                $wait_info=TmsLittleOrder::where($where)->select($select)->first();
                 $car = TmsCar::where($car_where)->first();
                 //调度订单修改订单状态
                 $order_where = [
@@ -2086,31 +2086,21 @@ class TakeController extends Controller{
                 ];
                 $order_update['order_status'] = 4;
                 $order_update['update_time']  = $now_time;
-                $order = TmsOrder::where($order_where)->update($order_update);
-                TmsOrderDispatch::where($where)->update($order_update);
+                $order = TmsLittleOrder::where($order_where)->update($order_update);
 
                 $carriage_id = generate_id('carriage_');
 
-                $list['self_id']            =generate_id('c_d_');
-                $list['order_dispatch_id']        = $dispatch_id;
-                $list['carriage_id']        = $carriage_id;
-                $list['total_user_id']         = $user_info->total_user_id;
-                $list['create_user_id']     = $user_info->total_user_id;
-                $list['create_time']        =$list['update_time']=$now_time;
 
-
-                $order_list['self_id']            =generate_id('driver_');
-                $order_list['carriage_id']        = $carriage_id;
-                $order_list['total_user_id']         = $user_info->total_user_id;
+                $order_list['self_id']            = generate_id('carriage_');
+                $order_list['order_id']           = $carriage_id;
+                $order_list['total_user_id']      = $user_info->total_user_id;
                 $order_list['create_user_id']     = $user_info->total_user_id;
-                $order_list['create_time']        =$order_list['update_time']=$now_time;
-                $order_list['car_id']   = $car_id;
-
-
-                $order_list['car_number']   =  $car->car_number;
-                $order_list['contacts']   =  $contacts;
-                $order_list['tel']   = $tel;
-                $order_list['price'] = $wait_info->total_money;
+                $order_list['create_time']        = $order_list['update_time']=$now_time;
+                $order_list['car_id']             = $car_id;
+                $order_list['car_number']         = $car->car_number;
+                $order_list['driver_name']        = $contacts;
+                $order_list['driver_tel']         = $tel;
+                $order_list['price']              = $wait_info->total_money;
 
                 /**保存应付费用**/
 //            $money['self_id']           = generate_id('order_money_');
@@ -2129,21 +2119,9 @@ class TakeController extends Controller{
 //            $money['type']                       = 'in';
 
 
-                $data['self_id']            = $carriage_id;
-                $data['create_user_id']     = $user_info->admin_id;
-                $data['create_user_name']   = $user_info->name;
-                $data['create_time']        = $data['update_time']=$now_time;
-                $data['total_user_id']        = $user_info->total_user_id;
-                $data['total_money']        = $wait_info->on_line_money;
-                $data['carriage_flag']   =  'compose';
-                $data['order_status']   =  2;
+              $id =   Tms::insert($order_list);
 
-                $id = TmsCarriage::insert($data);
-                TmsCarriageDispatch::insert($list);
-//            TmsOrderMoney::insert($money);
-                TmsCarriageDriver::insert($order_list);
-
-                if($order){
+                if($id){
                     $msg['code'] = 200;
                     $msg['msg'] = "操作成功";
                     return $msg;
