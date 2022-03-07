@@ -3042,10 +3042,13 @@ class DispatchController extends CommonController{
             $group_info= SystemGroup::where($where_check)->select('self_id','group_code','group_name')->first();
 
             $company_info = TmsGroup::where('self_id','=',$company_id)->select('self_id','company_name')->first();
+            $msg['code'] = 303;
+            $msg['msg'] = $company_info;
+            return $msg;
             if ($company_id){
-                if(empty($company_info)){
+                if(!(array)$company_info){
                     $msg['code'] = 303;
-                    $msg['msg'] = '业务公司不存在';
+                    $msg['msg'] = '请选择承运公司';
                     return $msg;
                 }
             }

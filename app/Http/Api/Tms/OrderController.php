@@ -5778,7 +5778,7 @@ class OrderController extends Controller{
                 }
             }
             $msg['info'] = $price;
-            $msg['kilo'] = $kilo;
+            $msg['kilo'] = round($kilo);
             $msg['code'] = 200;
             $msg['msg']  = "数据拉取成功";
             return $msg;
