@@ -2,6 +2,7 @@
 namespace App\Http\Api\Tms;
 use app\models\AppSetParam;
 use App\Models\Group\SystemGroup;
+use App\Models\Tms\AppSettingParam;
 use App\Models\Tms\TmsBankList;
 use App\Models\Tms\TmsCarriage;
 use App\Models\Tms\TmsCarriageDispatch;
@@ -5726,6 +5727,61 @@ class OrderController extends Controller{
                 $msg['msg'] = "操作失败";
                 return $msg;
             }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 极速版预估价格
+     * */
+    public function predictPrice(Request $request){
+        $input         = $request->all();
+        $gather_address= $request->input('gather_address');
+        $send_address = $request->input('send_address');
+        $weight = $request->input('weight');
+
+        /**虚拟数据
+        $input['weight'] = $weight = 300;
+        $input['gather_address'] = $gather_address = [["area"=>"东城区","city"=> "北京市","info"=> "123123","pro"=> "北京市"],["area"=>"房山区","city"=> "北京市","info"=> "星光路12号","pro"=> "北京市"]];
+        $input['send_address'] = $send_address = [['area'=>'嘉定区',"city"=> "上海市","info"=>"江桥镇","pro"=> "上海市"],['area'=>'松江区',"city"=> "上海市","info"=>"佘山","pro"=> "上海市"]];
+         **/
+        $rules = [
+            'gather_address'=>'required',
+            'send_address'=>'required',
+            'weight'=>'required',
+        ];
+        $message = [
+            'gather_address.required'=>'请选择发货地址',
+            'send_address.required'=>'请选择收货地址',
+            'weight.required'=>'请填写货物重量',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $price_info = AppSettingParam::get();
+            // 获取整车公里数
+            $kilo = $this->countKlio(2,$gather_address,$send_address);
+            $price_info = AppSettingParam::get();
+            $price = 0;
+            foreach($price_info as $key => $value){
+                if($kilo >= $value->param1 && $kilo<= $value->param2){
+                    $price = $value->start_price + $value->weight_price*$weight;
+                }
+            }
+            $msg['info'] = $price;
+            $msg['kilo'] = $kilo;
+            $msg['code'] = 200;
+            $msg['msg']  = "数据拉取成功";
+            return $msg;
         }else{
             //前端用户验证没有通过
             $erro = $validator->errors()->all();

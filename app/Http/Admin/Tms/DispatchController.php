@@ -3053,18 +3053,17 @@ class DispatchController extends CommonController{
             $where=[
                 ['delete_flag','=','Y'],
             ];
-            $select=['self_id','company_name','create_time','create_time','group_name','dispatch_flag',
-                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
-                'send_sheng_name','send_shi_name','send_qu_name','send_address',
-                'good_info','good_number','good_weight','good_volume'];
-            $select1 = ['order_id'];
-            $wait_info=TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select)->get();
-            $orderList=TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select1)->get();
+            $select=['self_id','company_name','create_time','create_time','group_name','dispatch_flag','gather_sheng_name','gather_shi_name',
+                'gather_qu_name','gather_address','send_sheng_name','send_shi_name','send_qu_name','send_address', 'good_info',
+                'good_number','good_weight','good_volume'];
+            $select1 = ['self_id'];
+            $wait_info=TmsLittleOrder::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select)->get();
+            $orderList=TmsLittleOrder::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select1)->get();
             if ($orderList){
                 $id_list = array_column($orderList->toArray(),'order_id');
                 $tmsOrder['order_status'] = 4;
                 $tmsOrder['update_time']  = $now_time;
-                TmsOrder::whereIn('self_id',$id_list)->update($tmsOrder);
+                TmsLittleOrder::whereIn('self_id',$id_list)->update($tmsOrder);
             }
 
             if(empty($wait_info)){
@@ -3129,21 +3128,21 @@ class DispatchController extends CommonController{
                     $order_info[]=$order_list;
                     $car_list[] = $car_list_info->car_possess;
 
-                    $money['self_id']                    = generate_id('order_money_');
-                    $money['shouk_driver_id']            = $order_list['self_id'];
-                    $money['shouk_type']                 = 'DRIVER';
-                    $money['fk_group_code']              = $group_info->group_code;
-                    $money['fk_type']                    = 'GROUP_CODE';
-                    $money['ZIJ_group_code']             = $group_info->group_code;
-                    $money['carriage_id']                = $carriage_id;
-                    $money['create_time']                = $now_time;
-                    $money['update_time']                = $now_time;
-                    $money['money']                      = $value['price']*100;
-                    $money['money_type']                 = 'freight';
-                    $money['type']                       = 'out';
-                    $money['driver_id']                  = $order_list['self_id'];
-                    $money['carriage_id']                = $carriage_id;
-                    $order_money[] = $money;
+//                    $money['self_id']                    = generate_id('order_money_');
+//                    $money['shouk_driver_id']            = $order_list['self_id'];
+//                    $money['shouk_type']                 = 'DRIVER';
+//                    $money['fk_group_code']              = $group_info->group_code;
+//                    $money['fk_type']                    = 'GROUP_CODE';
+//                    $money['ZIJ_group_code']             = $group_info->group_code;
+//                    $money['carriage_id']                = $carriage_id;
+//                    $money['create_time']                = $now_time;
+//                    $money['update_time']                = $now_time;
+//                    $money['money']                      = $value['price']*100;
+//                    $money['money_type']                 = 'freight';
+//                    $money['type']                       = 'out';
+//                    $money['driver_id']                  = $order_list['self_id'];
+//                    $money['carriage_id']                = $carriage_id;
+//                    $order_money[] = $money;
 
                 }
             }

@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Admin\Tms;
+use App\Models\Tms\AppSettingParam;
 use App\Models\Tms\TmsCarType;
 use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrderCost;
@@ -5714,6 +5715,9 @@ class OrderController extends CommonController{
     public function fastOrderDone(Request $request){
 
     }
+
+
+
 
 }
 ?>
