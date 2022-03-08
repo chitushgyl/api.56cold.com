@@ -575,8 +575,9 @@ class DispatchController extends CommonController{
         if($validator->passes()) {
             $group_info= SystemGroup::where($where_check)->select('self_id','group_code','group_name')->first();
             $company_info = TmsGroup::where('self_id',$company_id)->select('self_id','company_name')->first();
+            $log = DB::getQueryLog();
             $msg['code'] = 303;
-            $msg['msg'] = $company_info;
+            $msg['msg'] = $log;
             return $msg;
             if ($company_id){
                 if(empty($company_info)){
