@@ -7,14 +7,14 @@
  */
 namespace App\Models\Tms;
 use  Illuminate\Database\Eloquent\Model;
-class TmsLittleOrder extends Model{
+class TmsFastCarriageDriver extends Model{
     //软删除
     //   use SoftDeletes;
     //模型的连接名称（单独连接其他数据库）
     //protected $connection = 'connection-name';
 
     //指定数据库表 如果表名后带s则不需要 不带则需要
-    protected $table = 'tms_little_order';
+    protected $table = 'tms_fast_carriage_driver';
 
     //指定主键字段 默认为id
     //protected $primaryKey = 'id';
@@ -51,28 +51,12 @@ class TmsLittleOrder extends Model{
     ];
 
 //一对一
-    public function tmsCarriageDispatch(){
+    public function tmsCarriage(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
-        return $this->hasOne('App\Models\Tms\TmsCarriageDispatch','order_dispatch_id','self_id');
+        return $this->hasOne('App\Models\Tms\TmsCarriage','self_id','carriage_id');
     }
 
-    public function tmsReceipt(){
-        //参数：关联模型名称，外键，主键
-        //如果主键是id可以省略
-        return $this->hasOne('App\Models\Tms\TmsReceipt','order_id','self_id');
-    }
-
-    public function tmsCarType(){
-        //参数：关联模型名称，外键，主键
-        //如果主键是id可以省略
-        return $this->hasOne('App\Models\Tms\TmsCarType','self_id','car_type');
-    }
-    public function userReg(){
-        //参数：关联模型名称，外键，主键
-        //如果主键是id可以省略
-        return $this->hasOne('App\Models\User\UserReg','self_id','total_user_id');
-    }
 
 
 }

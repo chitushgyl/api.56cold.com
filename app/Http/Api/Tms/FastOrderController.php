@@ -92,10 +92,12 @@ class FastOrderController extends Controller{
                 $msg['msg'] = '货物名称不能为空！';
                 return $msg;
             }
-            if (empty($good_weight_n) || $good_weight_n <= 0) {
-                $msg['code'] = 308;
-                $msg['msg'] = '货物重量错误！';
-                return $msg;
+            if ($order_type == 'line'){
+                if (empty($good_weight_n) || $good_weight_n <= 0) {
+                    $msg['code'] = 308;
+                    $msg['msg'] = '货物重量错误！';
+                    return $msg;
+                }
             }
 
             if (empty($clod)) {
@@ -1124,6 +1126,165 @@ class FastOrderController extends Controller{
                 $msg['msg']  = "查不到数据";
                 return $msg;
             }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /***整车预估价格  /api/order/count_price
+
+     **/
+    public function count_price(Request $request){
+        $input         = $request->all();
+        $car_type = $request->input('car_type');
+        $gather_address= $request->input('gather_address');
+        $send_address = $request->input('send_address');
+        $picktype = $request->input('pick_flag')??null;
+        $sendtype = $request->input('send_flag')??null;
+        $order_type = $request->input('order_type');
+
+        /**虚拟数据
+        $input['pick_flag'] = $picktype = 2;  // 'Y' 提货  'N' 自送
+        $input['send_flag'] = $sendtype = 2;  // 'Y' 配送  'N' 自提
+        $input['volume'] = $volume = 2;
+        $input['weight'] = $weight = 1000;
+        $input['car_type'] = $car_type = 'type_202102051755118039490396';
+        $input['gather_address'] = $gather_address = [["area"=>"东城区","city"=> "北京市","info"=> "123123","pro"=> "北京市"],["area"=>"房山区","city"=> "北京市","info"=> "星光路12号","pro"=> "北京市"]];
+        $input['send_address'] = $send_address = [['area'=>'嘉定区',"city"=> "上海市","info"=>"江桥镇","pro"=> "上海市"],['area'=>'松江区',"city"=> "上海市","info"=>"佘山","pro"=> "上海市"]];
+         **/
+        $rules = [
+            'car_type'=>'required',
+            'gather_address'=>'required',
+            'send_address'=>'required',
+        ];
+        $message = [
+            'car_type.required'=>'请选择车辆类型',
+            'gather_address.required'=>'请选择发货地址',
+            'send_address.required'=>'请选择收货地址',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $type = 2;
+            // 装货费
+            $pickPrice = 0;
+            // 卸货费
+            $sendPrice = 0;
+            // 起步价系数
+            $scale_startprice = 1;
+            // 里程偏离系数
+            $scale_km = 1;
+            // 单公里价格系数
+            $scale_price_km =1;
+            // 装货费用系数
+            $scale_pickgood = 1;
+            // 卸货费用系数
+            $scale_sendgood = 1;
+            // 多点提配系数
+            $scale_multistore = 1;
+            // 促销优惠折扣系数 折扣为 总价格乘以折扣
+            $scale_discount = 1;
+            // 查找选定的车型
+            $car_type = TmsTypeCar::where('self_id',$car_type)->select('self_id','low_price','costkm_price','parame_name','pickup_price','unload_price','morepickup_price')->first()->toArray();
+            if (empty($car_type)){
+                $msg['code'] = 301;
+                $msg['msg']  = "请选择正确的车型";
+                return $msg;
+            }
+            // 查找系数比例
+            $scale = TmsParam::where('type',$type)->select('scale_startprice','scale_multistore','scale_km','scale_price_km','type','scale_pickgood','scale_sendgood','scale_discount')->first()->toArray();
+            // 如果有系数值则写入
+            if($scale['type']){
+                $scale_startprice = $scale['scale_startprice'];
+                $scale_km = $scale['scale_km'];
+                $scale_price_km = $scale['scale_price_km'];
+                $scale_pickgood = $scale['scale_pickgood'];
+                $scale_sendgood = $scale['scale_sendgood'];
+                $scale_multistore = $scale['scale_multistore'];
+                $scale_discount = $scale['scale_discount'];
+            }
+            // 获取整车公里数
+            $km = $this->countKlio(2,$gather_address,$send_address);
+            // 里程费 公里数*单价
+            $freight = $km*$car_type['costkm_price']*$scale_price_km/100;
+
+            // 装货费
+            if ($picktype == 2) {
+                $pickPrice = $car_type['pickup_price']*$scale_pickgood/100;
+            }
+            // 卸货费
+            if ($sendtype == 2) {
+                $sendPrice = $car_type['unload_price']*$scale_sendgood/100;
+            }
+            // 装卸费
+            $psPrice = $pickPrice+$sendPrice;
+
+            // 计算起步价
+            $startPrice = $car_type['low_price']*$scale_startprice/100;
+
+            $startstr=[];
+            $startstr_count = $endstr_count = 0;
+            if ($gather_address){
+                $pick_info=$gather_address;
+                foreach ($pick_info as $k=> $v){
+                    $startstr[]=$v['area'].$v['city'].$v['info'].$v['pro'];
+                }
+                $startstr_count = count(array_unique($startstr));
+            }
+            $endstr = [];
+            if ($send_address){
+                $send_info=$send_address;
+                foreach ($send_info as $k=> $v){
+                    $endstr[]=$v['area'].$v['city'].$v['info'].$v['pro'];
+                }
+                $endstr_count = count(array_unique($endstr));
+            }
+            // 多点提配费用
+            $multistorePrice = ($startstr_count+$endstr_count-2)*$car_type['morepickup_price']*$scale_multistore/100;
+            // 起步价费用取整
+            $startPrice = round($startPrice,2);
+            // 里程费费用取整
+            $freight = round($freight,2);
+            // 装卸费费用取整
+            $psPrice = round($psPrice,2);
+            // 多点提配费费用取整
+            $multistorePrice = round($multistorePrice,2);
+            //获取当天时间戳
+            $nowday = mktime(23, 59, 59, date('m'), date('d'), date('Y'))*1000;
+            //获取第二天时间戳
+            $seconday = $nowday+24*60*60*1000;
+            // 总运费 = 起步价 + 里程费 + 装卸费 + 多点提配费
+
+            $allmoney = $startPrice+$freight+$multistorePrice;
+            $freight1 = floor($freight+$startPrice);
+            // 折扣价
+            $discount = $allmoney*$scale_discount;
+            $price['singleprice'] = round($allmoney/100)*100;
+            $price['allmoney'] = round($allmoney/100)*100; // 总费用
+            $price['discount'] = round($discount); // 优惠价
+            $price['kilometre'] = round($km); // 公里数
+            $price['freight'] = $freight1; // 里程费
+            $price['psPrice'] = $psPrice; // 装卸费
+            $price['pickprice'] = $pickPrice;//装货费
+            $price['sendprice'] = $sendPrice;//卸货费
+            $price['multistorePrice'] = $multistorePrice; // 多点提配费
+            $price['maxprice'] = round($allmoney*1.1/100)*100;//预计最大费用
+            if ($order_type == 'lift'){
+                $price['allmoney'] = round($allmoney*0.7/100)*100; // 总费用
+                $price['maxprice'] = round($allmoney*1.1*0.7/100)*100;//预计最大费用
+            }
+            $msg['info'] = $price;
+            $msg['code'] = 200;
+            $msg['msg']  = "数据拉取成功";
+            return $msg;
         }else{
             //前端用户验证没有通过
             $erro = $validator->errors()->all();

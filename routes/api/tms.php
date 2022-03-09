@@ -213,6 +213,7 @@ Route::group([
         Route::any('/take/fastOrderDone','TakeController@fastOrderDone');//接单订单详情
         Route::any('/take/addTakeFastOrder','TakeController@addTakeFastOrder');//接单订单详情
         Route::any('/take/fastCarriageCancel','TakeController@fastCarriageCancel');//接单订单详情
+        Route::any('/take/dispatchUploadReceipt','TakeController@dispatchUploadReceipt');//接单订单详情
 
         /** TMS用户开票**/
         Route::any('/bill/order_list','BillController@order_list');

@@ -2,6 +2,9 @@
 namespace App\Http\Admin\Tms;
 use App\Models\Group\SystemGroup;
 use App\Models\Tms\TmsDriver;
+use App\Models\Tms\TmsFastCarriage;
+use App\Models\Tms\TmsFastCarriageDriver;
+use App\Models\Tms\TmsFastDispatch;
 use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
 use App\Models\Tms\TmsOrderCost;
@@ -575,10 +578,6 @@ class DispatchController extends CommonController{
         if($validator->passes()) {
             $group_info= SystemGroup::where($where_check)->select('self_id','group_code','group_name')->first();
             $company_info = TmsGroup::where('self_id',$company_id)->select('self_id','company_name')->first();
-            $log = DB::getQueryLog();
-            $msg['code'] = 303;
-            $msg['msg'] = $log;
-            return $msg;
             if ($company_id){
                 if(empty($company_info)){
                     $msg['code'] = 303;
@@ -3003,7 +3002,7 @@ class DispatchController extends CommonController{
         $user_info = $request->get('user_info');//接收中间件产生的参数
         $operationing   = $request->get('operationing');//接收中间件产生的参数
         $now_time       =date('Y-m-d H:i:s',time());
-        $table_name     ='tms_carriage';
+        $table_name     ='tms_fast_carriage';
 
         $operationing->access_cause     ='创建调度';
         $operationing->table            =$table_name;
@@ -3043,31 +3042,23 @@ class DispatchController extends CommonController{
         $validator=Validator::make($input,$rules,$message);
         if($validator->passes()) {
             $group_info= SystemGroup::where($where_check)->select('self_id','group_code','group_name')->first();
-
-            $company_info = TmsGroup::where('self_id','=',$company_id)->select('self_id','company_name')->first();
+            $company_info = TmsGroup::where('self_id',$company_id)->select('self_id','company_name')->first();
             if ($company_id){
-                if(!(array)$company_info){
+                if(empty($company_info)){
                     $msg['code'] = 303;
-                    $msg['msg'] = '请选择承运公司';
+                    $msg['msg'] = '业务公司不存在';
                     return $msg;
                 }
             }
-
             $where=[
                 ['delete_flag','=','Y'],
             ];
-            $select=['self_id','company_name','create_time','create_time','group_name','dispatch_flag','gather_sheng_name','gather_shi_name',
-                'gather_qu_name','gather_address','send_sheng_name','send_shi_name','send_qu_name','send_address', 'good_info',
-                'good_number','good_weight','good_volume'];
+            $select=['self_id','create_time','create_time','group_name','dispatch_flag',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address',
+                'good_info','good_number','good_weight','good_volume'];
             $select1 = ['self_id'];
             $wait_info=TmsLittleOrder::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select)->get();
-            $orderList=TmsLittleOrder::where($where)->whereIn('self_id',explode(',',$dispatch_list))->select($select1)->get();
-            if ($orderList){
-                $id_list = array_column($orderList->toArray(),'order_id');
-                $tmsOrder['order_status'] = 4;
-                $tmsOrder['update_time']  = $now_time;
-                TmsLittleOrder::whereIn('self_id',$id_list)->update($tmsOrder);
-            }
 
             if(empty($wait_info)){
                 $msg['code'] = 304;
@@ -3163,25 +3154,25 @@ class DispatchController extends CommonController{
             $data['group_name']         = $group_info->group_name;
             $data['total_money']        = $total_price*100;
             $data['order_status']       = 2;
-            if($company_id){
-                $data['company_id']         = $company_info->self_id;
-                $data['company_name']       = $company_info->company_name;
-                $data['order_status']       = 1;
-
-                $money['self_id']                    = generate_id('order_money_');
-                $money['shouk_company_id']           = $company_info->self_id;
-                $money['shouk_type']                 = 'COMPANY';
-                $money['fk_group_code']              = $group_info->group_code;
-                $money['fk_type']                    = 'GROUP_CODE';
-                $money['ZIJ_group_code']             = $group_info->group_code;
-                $money['carriage_id']                = $carriage_id;
-                $money['create_time']                = $now_time;
-                $money['update_time']                = $now_time;
-                $money['money']                      = $total_price*100;
-                $money['money_type']                 = 'freight';
-                $money['type']                       = 'out';
-                $order_money[] = $money;
-            }
+//            if($company_id){
+//                $data['company_id']         = $company_info->self_id;
+//                $data['company_name']       = $company_info->company_name;
+//                $data['order_status']       = 1;
+//
+//                $money['self_id']                    = generate_id('order_money_');
+//                $money['shouk_company_id']           = $company_info->self_id;
+//                $money['shouk_type']                 = 'COMPANY';
+//                $money['fk_group_code']              = $group_info->group_code;
+//                $money['fk_type']                    = 'GROUP_CODE';
+//                $money['ZIJ_group_code']             = $group_info->group_code;
+//                $money['carriage_id']                = $carriage_id;
+//                $money['create_time']                = $now_time;
+//                $money['update_time']                = $now_time;
+//                $money['money']                      = $total_price*100;
+//                $money['money_type']                 = 'freight';
+//                $money['type']                       = 'out';
+//                $order_money[] = $money;
+//            }
 
             if ($carriage_flag == 'oneself' || $carriage_flag == 'driver'){
                 $count_car = array_unique($car_list);
@@ -3191,18 +3182,18 @@ class DispatchController extends CommonController{
             }else{
                 $data['carriage_flag']       =  $carriage_flag;
             }
-            $id=TmsCarriage::insert($data);
-            TmsCarriageDispatch::insert($datalist);
-            TmsOrderCost::insert($order_money);
+            $id=TmsFastCarriage::insert($data);
+            TmsFastDispatch::insert($datalist);
+//            TmsOrderCost::insert($order_money);
             if ($carriage_flag == 'oneself' || $carriage_flag == 'driver'){
-                TmsCarriageDriver::insert($order_info);
+                TmsFastCarriageDriver::insert($order_info);
             }
 
 
             $data_update['dispatch_flag']      ='N';
             $data_update['order_status']       = 4;
             $data_update['update_time']        =$now_time;
-            TmsOrderDispatch::where($where)->whereIn('self_id',explode(',',$dispatch_list))->update($data_update);
+            TmsLittleOrder::where($where)->whereIn('self_id',explode(',',$dispatch_list))->update($data_update);
 
 
             $operationing->table_id=$carriage_id;
@@ -3219,6 +3210,249 @@ class DispatchController extends CommonController{
                 return $msg;
             }
 
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 取消调度
+     * */
+    public function fastDispatchCancel(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='tms_little_dispatch';
+//        dd($user_info);
+        $operationing->access_cause     ='确认送达';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='add';
+
+        $input              =$request->all();
+
+        /** 接收数据*/
+        $dispatch_id        = $request->input('dispatch_id'); //调度单ID
+        /*** 虚拟数据
+        $input['dispatch_id']     =$dispatch_id='dispatch_202103041052309956180789';
+         * ***/
+        $rules=[
+            'dispatch_id'=>'required',
+        ];
+        $message=[
+            'dispatch_id.required'=>'请选择运输订单',
+        ];
+
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$dispatch_id],
+            ];
+            $dispatch_where = [
+                ['delete_flag','=','Y'],
+                ['order_dispatch_id','=',$dispatch_id],
+            ];
+
+            $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id',
+                'send_sheng_name','send_shi_name','send_qu_name','send_address','receiver_id',
+                'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
+
+            $select1 = ['self_id','carriage_id','order_dispatch_id'];
+            $select2 = ['self_id','company_id','company_name','carriage_flag','total_money'];
+            $select3 = ['carriage_id','car_number','contacts','tel','price','car_id','self_id'];
+            $wait_info = TmsLittleOrder::with(['tmsFastDispatch'=>function($query)use($select,$select1,$select2,$select3,$dispatch_where){
+                $query->where($dispatch_where);
+                $query->select($select1);
+                $query->with(['tmsFastCarriage'=>function($query)use($select2){
+                    $query->select($select2);
+                }]);
+                $query->with(['tmsFastCarriageDriver'=>function($query)use($select3){
+                    $query->select($select3);
+                }]);
+            }])->where($where)->select($select)->first();
+//            dump($wait_info->toArray());
+            //调度订单修改订单状态
+            $order_where = [
+                ['self_id','=',$wait_info->order_id]
+            ];
+
+            $dispatch_where = [
+                ['order_id','=',$wait_info->order_id]
+            ];
+
+            //判断是否所有的运输单状态是否都为调度，是修改订单状态为已接单
+            $tmsOrderDispatch = TmsLittleOrder::where($dispatch_where)->select(['self_id'])->get();
+//            if ($tmsOrderDispatch){
+//                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+//                $orderStatus = TmsLittleOrder::where('self_id','!=',$dispatch_id)->whereIn('self_id',$dispatch_list)->select(['order_status'])->get();
+//                $arr = array_unique(array_column($orderStatus->toArray(),'order_status'));
+//                if (count($arr) >= 1){
+//                    if (implode('',$arr) == 3){
+//                        $order_update['order_status'] = 3;
+//                        $order_update['update_time']  = $now_time;
+//                        $order = TmsOrder::where($order_where)->update($order_update);
+//                    }
+//                }else{
+//                    $order_update['order_status'] = 3;
+//                    $order_update['update_time']  = $now_time;
+//                    $order = TmsOrder::where($order_where)->update($order_update);
+//                }
+//            }
+
+            //修改当前运输单状态及同一调度运输单状态
+            $dispatch_order['order_status']  = 3;
+            $dispatch_order['dispatch_flag'] = 'Y';
+            $dispatch_order['update_time']   = $now_time;
+            $id = TmsLittleOrder::where($where)->update($dispatch_order);
+
+
+            //删除所有关联运输数据
+            $list['delete_flag']         = 'N';
+            $list['update_time']         = $now_time;
+
+//            dump($wait_info->toArray());
+            TmsFastDispatch::where('self_id',$wait_info->tmsCarriageDispatch->self_id)->update($list);
+            foreach ($wait_info->tmsCarriageDispatch->tmsCarriage as $key => $value){
+
+                TmsFastCarriage::where('self_id',$value->self_id)->update($list);
+                if ($value->carriage_flag == 'carriers'){
+//                    $money_where = [
+//                        ['fk_group_code','=',$wait_info->receiver_id],
+//                        ['fk_type','=','GROUP_CODE'],
+//                        ['shouk_company_id','=',$value->company_id],
+//                        ['shouk_type','=','COMPANY'],
+//                        ['type','=','out'],
+//                        ['carriage_id','=',$value->self_id],
+////                        ['dispatch_id','=',$dispatch_id]
+//                    ];
+//                    TmsOrderCost::where($money_where)->update($list);
+                }else{
+                    foreach($wait_info->tmsFastDispatch->tmsCarriageDriver as $k => $v){
+//                        dump($v);
+//                        $money_where = [
+//                            ['fk_group_code','=',$wait_info->receiver_id],
+//                            ['fk_type','=','GROUP_CODE'],
+//                            ['shouk_driver_id','=',$v->self_id],
+//                            ['shouk_type','=','DRIVER'],
+//                            ['type','=','out'],
+//                            ['carriage_id','=',$v->carriage_id],
+//                            ['driver_id','=',$v->self_id],
+//                            ['money','=',$v->price]
+//                        ];
+//                        TmsOrderCost::where($money_where)->update($list);
+                        TmsFastCarriageDriver::where('self_id',$v->self_id)->update($list);
+                    }
+                }
+
+            }
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro=$validator->errors()->all();
+            $msg['code']=300;
+            $msg['msg']=null;
+            foreach ($erro as $k => $v){
+                $kk=$k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+    }
+
+    /**
+     * 快捷订单确认送达
+     * */
+    public function dispatchUploadReceipt(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $operationing   = $request->get('operationing');//接收中间件产生的参数
+        $now_time       =date('Y-m-d H:i:s',time());
+        $table_name     ='tms_receipt';
+
+        $operationing->access_cause     ='上传回单';
+        $operationing->table            =$table_name;
+        $operationing->operation_type   ='create';
+        $operationing->now_time         =$now_time;
+        $operationing->type             ='add';
+
+        $input              =$request->all();
+        //dd($input);
+        /** 接收数据*/
+        $order_id            =$request->input('order_id');
+        $receipt             =$request->input('receipt');
+
+
+        /*** 虚拟数据
+        $input['order_id']           =$order_id='dispatch_202103191711247168432433';
+        $input['receipt']              =$receipt=[['url'=>'https://bloodcity.oss-cn-beijing.aliyuncs.com/images/2021-03-20/829b89fa038d26bc6af59a76f16794c5.jpg','width'=>'','height'=>'']];
+         **/
+        $rules=[
+            'order_id'=>'required',
+            'receipt'=>'required',
+        ];
+        $message=[
+            'order_id.required'=>'请选择运输单',
+            'receipt.required'=>'请选择要上传的回单',
+        ];
+
+        $validator=Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where=[
+                ['delete_flag','=','Y'],
+                ['self_id','=',$order_id],
+            ];
+            $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name',
+                'gather_address','order_status','send_sheng_name','send_shi_name','send_qu_name','send_address', 'good_info','good_number','good_weight','good_volume','total_money',
+                'on_line_money'];
+            $wait_info=TmsLittleOrder::where($where)->select($select)->first();
+            if(!in_array($wait_info->order_status,[5,6])){
+                $msg['code']=301;
+                $msg['msg']='请确认订单已送达';
+                return $msg;
+            }
+            $data['self_id'] = generate_id('receipt_');
+            $data['receipt'] = img_for($receipt,'in');
+            $data['order_id'] = $order_id;
+            $data['create_time'] = $data['update_time'] = $now_time;
+            $data['group_code']  = $user_info->group_code;
+            $data['group_name']  = $user_info->group_name;
+
+            $id=TmsReceipt::insert($data);
+
+            $order_update['receipt_flag'] = 'Y';
+            $order_update['update_time']  = $now_time;
+            TmsLittleOrder::where($where)->update($order_update);
+            $operationing->old_info = (object)$wait_info;
+            $operationing->table_id = $order_id;
+            $operationing->new_info=$data;
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "上传成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "上传失败";
+                return $msg;
+            }
         }else{
             //前端用户验证没有通过
             $erro=$validator->errors()->all();
