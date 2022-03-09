@@ -168,6 +168,8 @@ Route::group([
         Route::any('/fastOrder/fastOrderCancel','FastOrderController@fastOrderCancel');//
         Route::any('/fastOrder/fastOrderDone','FastOrderController@fastOrderDone');//
         Route::any('/fastOrder/predictPrice','FastOrderController@predictPrice');//
+        Route::any('/fastOrder/getType','FastOrderController@getType');//
+        Route::any('/fastOrder/count_klio','FastOrderController@count_klio');//
 
         /**TMS联系人管理 - 用户端**/
         Route::any('/contacts/contactsPage', 'ContactsController@contactsPage');

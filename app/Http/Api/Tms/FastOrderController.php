@@ -5,6 +5,7 @@ use App\Models\Group\SystemGroup;
 use App\Models\Tms\AppSettingParam;
 use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsParam;
+use App\Models\Tms\TmsTypeCar;
 use App\Models\User\UserCapital;
 use App\Models\User\UserWallet;
 use Illuminate\Http\Request;
@@ -1021,6 +1022,118 @@ class FastOrderController extends Controller{
         if($km > 1000){
             $finally = $km*$scale_km_four;
             return $finally;
+        }
+    }
+
+    /***    拿去车辆类型数据     /api/fastOrder/getType
+     */
+    public function  getType(Request $request){
+        $where=[
+            ['delete_flag','=','Y'],
+            ['use_flag','=','Y'],
+        ];
+        $select=['self_id','parame_name','dimensions','allweight','allvolume','img'];
+        //dd($where);
+        $data['info']=TmsTypeCar::where($where)->select($select)->get();
+        if ($data['info']){
+            foreach ($data['info'] as $key =>$value){
+                $data['info'][$key]['weight'] = $value['allweight']/1000;
+                $data['info'][$key]['volume'] = $value['allvolume'];
+                $data['info'][$key]['img'] = img_for($value['img'],'no_json');
+                $data['info'][$key]['select_show'] = $value['parame_name'].'*核载：'.($value['allweight']/100).'吨/'.$value['allvolume'].'方';
+                $data['info'][$key]['allweight'] = ($value['allweight']/1000).'吨';
+                $data['info'][$key]['allvolume'] = $value['allvolume'].'方';
+                $data['info'][$key]['dimensions'] = $value['dimensions'].'米';
+
+            }
+        }
+//        dd($data['info']->toArray());
+        $msg['code']=200;
+        $msg['msg']="数据拉取成功";
+        $msg['data']=$data;
+
+        //dd($msg);
+        return $msg;
+    }
+
+    /**
+     * 预估价格
+     * */
+    public function count_klio(Request $request){
+        $input         = $request->all();
+        $car_type = $request->input('car_type');
+        $gather_address= $request->input('gather_address');
+        $send_address = $request->input('send_address');
+
+        /**虚拟数据
+        $input['gather_address']      = $gather_address      = [["area"=>"东城区","city"=> "北京市","info"=> "123123","pro"=> "北京市"]];
+        $input['send_address']        = $send_address        = [['area'=>'城关区',"city"=> "拉萨市","info"=>"1234区","pro"=> "西藏"]];
+        $input['car_type']            = $car_type           = 'type_202102051755118039490396';
+         * **/
+        $rules = [
+            'car_type'=>'required',
+            'gather_address'=>'required',
+            'send_address'=>'required',
+        ];
+        $message = [
+            'car_type.required'=>'请选择车辆类型',
+            'gather_address.required'=>'请选择发货地址',
+            'send_address.required'=>'请选择收货地址',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $startcity_str = $gather_address;
+            $endcity_str  = $send_address;
+            // 查询系数类型 2 整车
+            $type = 2;
+            // 起步价系数
+            $scale_startprice = 1;
+            // 里程偏离系数
+            $scale_km = 1;
+            // 单公里价格系数
+            $scale_price_km = 1;
+            // 查找选定的车型0
+            $car_type = TmsTypeCar::where('self_id','=',$car_type)->select('self_id','low_price','costkm_price','parame_name')->first();
+            // 查找系数比例
+            $scale = TmsParam::where('type','=',$type)->select('scale_startprice','scale_km','scale_price_km','type')->first();
+            if($scale->type){
+                $scale_startprice = $scale->scale_startprice;
+                $scale_km = $scale->scale_km;
+                $scale_price_km = $scale->scale_price_km;
+            }
+            $kilo = $this->countKlio(2,$startcity_str,$endcity_str);
+            // 计算起步价
+            $startPrice = $car_type->low_price*$scale_startprice/100;
+            // 运费 公里数*单价
+            $freight = $kilo*$car_type->costkm_price*$scale_price_km/100;
+            $allmoney = $startPrice+$freight;
+            $kilo1 = round($kilo);
+            // 总运费
+
+            $re_data['km'] = $kilo1;//预计里程数
+            $re_data['countprice'] = round($allmoney/100)*100;  //预计费用
+            $re_data['maxprice'] = round($allmoney*1.1/100)*100;//预计最大价格
+            if ($kilo1){
+                $msg['data'] = $re_data;
+                $msg['code'] = 200;
+                $msg['msg']  = "数据拉取成功";
+                return $msg;
+            }else{
+                $msg['code'] = 300;
+                $msg['msg']  = "查不到数据";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
         }
     }
 
