@@ -160,12 +160,15 @@ Route::group([
         Route::any('/order/userFreeRideList','OrderController@userFreeRideList');//顺风车列表
         Route::any('/order/freeRideList','OrderController@freeRideList');//顺风车列表
         Route::any('/order/liftOrder','OrderController@liftOrder');//顺风车列表
-        Route::any('/order/addFastOrder','OrderController@addFastOrder');//顺风车列表
-        Route::any('/order/fastOrderPage','OrderController@fastOrderPage');//顺风车列表
-        Route::any('/order/orderDetails','OrderController@orderDetails');//顺风车列表
-        Route::any('/order/fastOrderCancel','OrderController@fastOrderCancel');//顺风车列表
-        Route::any('/order/fastOrderDone','OrderController@fastOrderDone');//顺风车列表
-        Route::any('/order/predictPrice','OrderController@predictPrice');//顺风车列表
+
+        /*** 快捷下单***/
+        Route::any('/fastOrder/addFastOrder','FastOrderController@addFastOrder');//
+        Route::any('/fastOrder/fastOrderPage','FastOrderController@fastOrderPage');//
+        Route::any('/fastOrder/orderDetails','FastOrderController@orderDetails');//
+        Route::any('/fastOrder/fastOrderCancel','FastOrderController@fastOrderCancel');//
+        Route::any('/fastOrder/fastOrderDone','FastOrderController@fastOrderDone');//
+        Route::any('/fastOrder/predictPrice','FastOrderController@predictPrice');//
+
         /**TMS联系人管理 - 用户端**/
         Route::any('/contacts/contactsPage', 'ContactsController@contactsPage');
         Route::any('/contacts/addContacts','ContactsController@addContacts');

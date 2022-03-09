@@ -166,10 +166,7 @@ Route::group([
 	Route::any('/order/orderDone','OrderController@orderDone');
 	Route::any('/order/add_order','OrderController@add_order');
 	Route::any('/order/addUserFreeRide','OrderController@addUserFreeRide');
-	Route::any('/order/addFastOrder','OrderController@addFastOrder');
-	Route::any('/order/fastOrderPage','OrderController@fastOrderPage');
-	Route::any('/order/fastOrderCancel','OrderController@fastOrderCancel');
-	Route::any('/order/fastOrderDone','OrderController@fastOrderDone');
+
     Route::group([
         "middleware"=>['daily'],
     ], function(){
@@ -352,6 +349,12 @@ Route::group([
     Route::any('/param/paramList','ParamController@paramList');
     Route::any('/param/paramPage','ParamController@paramPage');
     Route::any('/param/paramAdd','ParamController@paramAdd');
+
+    /** 极速版tms***/
+    Route::any('/fastOrder/addFastOrder','FastOrderController@addFastOrder');
+    Route::any('/fastOrder/fastOrderPage','FastOrderController@fastOrderPage');
+    Route::any('/fastOrder/fastOrderCancel','FastOrderController@fastOrderCancel');
+    Route::any('/fastOrder/fastOrderDone','FastOrderController@fastOrderDone');
 });
 
 
