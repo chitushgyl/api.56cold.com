@@ -8,6 +8,8 @@ use App\Models\Tms\TmsCarriage;
 use App\Models\Tms\TmsCarriageDispatch;
 use App\Models\Tms\TmsCarriageDriver;
 use App\Models\Tms\TmsFastCarriage;
+use App\Models\Tms\TmsFastCarriageDriver;
+use App\Models\Tms\TmsFastDispatch;
 use App\Models\Tms\TmsGroup;
 use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
@@ -2083,44 +2085,48 @@ class TakeController extends Controller{
                 $car = TmsCar::where($car_where)->first();
                 //调度订单修改订单状态
                 $order_where = [
-                    ['self_id','=',$wait_info->self_id]
+                    ['self_id','=',$wait_info->order_id]
                 ];
                 $order_update['order_status'] = 4;
                 $order_update['update_time']  = $now_time;
-                $order_update['dispatch_flag']  = 'N';
-                $order = TmsLittleOrder::where($order_where)->update($order_update);
+                $order = TmsOrder::where($order_where)->update($order_update);
+                TmsOrderDispatch::where($where)->update($order_update);
 
-                $order_list['self_id']            = generate_id('carriage_');
-                $order_list['order_id']           = $wait_info->self_id;
-                $order_list['total_user_id']      = $user_info->total_user_id;
+                $carriage_id = generate_id('carriage_');
+
+                $list['self_id']            =generate_id('c_d_');
+                $list['order_id']        = $dispatch_id;
+                $list['carriage_id']        = $carriage_id;
+                $list['total_user_id']         = $user_info->total_user_id;
+                $list['create_user_id']     = $user_info->total_user_id;
+                $list['create_time']        =$list['update_time']=$now_time;
+
+                $order_list['self_id']            =generate_id('driver_');
+                $order_list['carriage_id']        = $carriage_id;
+                $order_list['total_user_id']         = $user_info->total_user_id;
                 $order_list['create_user_id']     = $user_info->total_user_id;
-                $order_list['create_time']        = $order_list['update_time']=$now_time;
-                $order_list['car_id']             = $car_id;
-                $order_list['car_number']         = $car->car_number;
-                $order_list['driver_name']        = $contacts;
-                $order_list['driver_tel']         = $tel;
-                $order_list['price']              = $wait_info->total_money;
+                $order_list['create_time']        =$order_list['update_time']=$now_time;
+                $order_list['car_id']   = $car_id;
 
-                /**保存应付费用**/
-//            $money['self_id']           = generate_id('order_money_');
-//            $money['shouk_group_code']           = $user_info->group_code;
-//            $money['shouk_type']                 = 'COMPANY';
-//            $money['fk_total_user_id']           = $user_info->total_user_id;
-//            $money['fk_type']                    = 'USER';
-//            $money['ZIJ_total_user_id']          = $user_info->total_user_id;
-//
-//
-//            $money['order_id']                   = $dispatch_id;
-//            $money['create_time']                = $now_time;
-//            $money['update_time']                = $now_time;
-//            $money['money']                      = $total_money;
-//            $money['money_type']                 = 'freight';
-//            $money['type']                       = 'in';
+                $order_list['car_number']   =  $car->car_number;
+                $order_list['contacts']   =  $contacts;
+                $order_list['tel']   = $tel;
+                $order_list['price'] = $wait_info->total_money;
 
+                $data['self_id']            = $carriage_id;
+                $data['create_user_id']     = $user_info->admin_id;
+                $data['create_user_name']   = $user_info->name;
+                $data['create_time']        = $data['update_time']=$now_time;
+                $data['total_user_id']        = $user_info->total_user_id;
+                $data['total_money']        = $wait_info->on_line_money;
+                $data['carriage_flag']   =  'compose';
+                $data['order_status']   =  2;
 
-              $id =   TmsFastCarriage::insert($order_list);
+                $id = TmsFastCarriage::insert($data);
+                TmsFastDispatch::insert($list);
+                TmsFastCarriageDriver::insert($order_list);
 
-                if($id){
+                if($order){
                     $msg['code'] = 200;
                     $msg['msg'] = "操作成功";
                     return $msg;
