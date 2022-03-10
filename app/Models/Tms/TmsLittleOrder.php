@@ -71,7 +71,7 @@ class TmsLittleOrder extends Model{
     public function tmsFastDispatch(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
-        return $this->hasOne('App\Models\Tms\TmsFastDispatch','self_id','order_id');
+        return $this->hasOne('App\Models\Tms\TmsFastDispatch','order_id','self_id');
     }
 
 

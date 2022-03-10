@@ -3265,7 +3265,7 @@ class DispatchController extends CommonController{
                     $query->select($select3);
                 }]);
             }])->where($where)->select($select)->first();
-//            dump($wait_info->toArray());
+//            dd($wait_info->toArray());
             //调度订单修改订单状态
             $order_where = [
                 ['self_id','=',$wait_info->self_id]
@@ -3286,14 +3286,13 @@ class DispatchController extends CommonController{
             $list['delete_flag']         = 'N';
             $list['update_time']         = $now_time;
 
-            TmsFastDispatch::where('self_id',$wait_info->tmsCarriageDispatch->self_id)->update($list);
-            foreach ($wait_info->tmsCarriageDispatch->tmsCarriage as $key => $value){
-
+            TmsFastDispatch::where('self_id',$wait_info->tmsFastDispatch->self_id)->update($list);
+            foreach ($wait_info->tmsFastDispatch->tmsFastCarriage as $key => $value){
                 TmsFastCarriage::where('self_id',$value->self_id)->update($list);
                 if ($value->carriage_flag == 'carriers'){
 
                 }else{
-                    foreach($wait_info->tmsFastDispatch->tmsCarriageDriver as $k => $v){
+                    foreach($wait_info->tmsFastDispatch->tmsFastCarriageDriver as $k => $v){
                         TmsFastCarriageDriver::where('self_id',$v->self_id)->update($list);
                     }
                 }
