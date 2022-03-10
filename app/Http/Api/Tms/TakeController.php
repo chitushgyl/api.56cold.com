@@ -10,6 +10,7 @@ use App\Models\Tms\TmsCarriageDriver;
 use App\Models\Tms\TmsFastCarriage;
 use App\Models\Tms\TmsFastCarriageDriver;
 use App\Models\Tms\TmsFastDispatch;
+use App\Models\Tms\TmsFastReceipt;
 use App\Models\Tms\TmsGroup;
 use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
@@ -2315,7 +2316,7 @@ class TakeController extends Controller{
                 ['self_id','=',$order_id],
             ];
             $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag','gather_sheng_name','gather_shi_name','gather_qu_name','order_status',
-                'gather_address', 'send_sheng_name','send_shi_name','send_qu_name','send_address','good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
+                'gather_address', 'send_sheng_name','send_shi_name','send_qu_name','send_address','good_info','good_number','good_weight','good_volume','total_money'];
             $wait_info=TmsLittleOrder::where($where)->select($select)->first();
             if(!in_array($wait_info->order_status,[5,6])){
                 $msg['code']=301;
@@ -2331,7 +2332,7 @@ class TakeController extends Controller{
             $data['create_time'] = $data['update_time'] = $now_time;
             $data['total_user_id']  = $user_info->total_user_id;
 
-            $id=TmsReceipt::insert($data);
+            $id=TmsFastReceipt::insert($data);
 
             if($id){
                 $msg['code'] = 200;
