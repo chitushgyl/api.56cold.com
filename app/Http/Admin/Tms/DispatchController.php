@@ -3083,7 +3083,7 @@ class DispatchController extends CommonController{
                     }
                 }else{
                     $list['self_id']            =generate_id('c_d_');
-                    $list['order_dispatch_id']        = $v->self_id;
+                    $list['order_id']        = $v->self_id;
                     $list['carriage_id']        = $carriage_id;
                     $list['group_code']         = $group_info->group_code;
                     $list['group_name']         = $group_info->group_name;
