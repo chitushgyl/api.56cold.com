@@ -2089,8 +2089,7 @@ class TakeController extends Controller{
                 ];
                 $order_update['order_status'] = 4;
                 $order_update['update_time']  = $now_time;
-                $order = TmsOrder::where($order_where)->update($order_update);
-                TmsOrderDispatch::where($where)->update($order_update);
+                TmsLittleOrder::where($where)->update($order_update);
 
                 $carriage_id = generate_id('carriage_');
 
