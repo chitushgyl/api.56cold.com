@@ -3122,22 +3122,6 @@ class DispatchController extends CommonController{
                     $order_info[]=$order_list;
                     $car_list[] = $car_list_info->car_possess;
 
-//                    $money['self_id']                    = generate_id('order_money_');
-//                    $money['shouk_driver_id']            = $order_list['self_id'];
-//                    $money['shouk_type']                 = 'DRIVER';
-//                    $money['fk_group_code']              = $group_info->group_code;
-//                    $money['fk_type']                    = 'GROUP_CODE';
-//                    $money['ZIJ_group_code']             = $group_info->group_code;
-//                    $money['carriage_id']                = $carriage_id;
-//                    $money['create_time']                = $now_time;
-//                    $money['update_time']                = $now_time;
-//                    $money['money']                      = $value['price']*100;
-//                    $money['money_type']                 = 'freight';
-//                    $money['type']                       = 'out';
-//                    $money['driver_id']                  = $order_list['self_id'];
-//                    $money['carriage_id']                = $carriage_id;
-//                    $order_money[] = $money;
-
                 }
             }
             if($cando == 'N'){
@@ -3260,13 +3244,13 @@ class DispatchController extends CommonController{
             ];
             $dispatch_where = [
                 ['delete_flag','=','Y'],
-                ['order_dispatch_id','=',$dispatch_id],
+                ['order_id','=',$dispatch_id],
             ];
 
             $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
-                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address','receiver_id',
-                'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
+                'good_info','good_number','good_weight','good_volume','total_money'];
 
             $select1 = ['self_id','carriage_id','order_id'];
             $select2 = ['self_id','company_id','company_name','carriage_flag','total_money'];
@@ -3284,31 +3268,12 @@ class DispatchController extends CommonController{
 //            dump($wait_info->toArray());
             //调度订单修改订单状态
             $order_where = [
-                ['self_id','=',$wait_info->order_id]
+                ['self_id','=',$wait_info->self_id]
             ];
 
             $dispatch_where = [
-                ['order_id','=',$wait_info->order_id]
+                ['order_id','=',$wait_info->self_id]
             ];
-
-            //判断是否所有的运输单状态是否都为调度，是修改订单状态为已接单
-            $tmsOrderDispatch = TmsLittleOrder::where($dispatch_where)->select(['self_id'])->get();
-//            if ($tmsOrderDispatch){
-//                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
-//                $orderStatus = TmsLittleOrder::where('self_id','!=',$dispatch_id)->whereIn('self_id',$dispatch_list)->select(['order_status'])->get();
-//                $arr = array_unique(array_column($orderStatus->toArray(),'order_status'));
-//                if (count($arr) >= 1){
-//                    if (implode('',$arr) == 3){
-//                        $order_update['order_status'] = 3;
-//                        $order_update['update_time']  = $now_time;
-//                        $order = TmsOrder::where($order_where)->update($order_update);
-//                    }
-//                }else{
-//                    $order_update['order_status'] = 3;
-//                    $order_update['update_time']  = $now_time;
-//                    $order = TmsOrder::where($order_where)->update($order_update);
-//                }
-//            }
 
             //修改当前运输单状态及同一调度运输单状态
             $dispatch_order['order_status']  = 3;
@@ -3321,36 +3286,14 @@ class DispatchController extends CommonController{
             $list['delete_flag']         = 'N';
             $list['update_time']         = $now_time;
 
-//            dump($wait_info->toArray());
             TmsFastDispatch::where('self_id',$wait_info->tmsCarriageDispatch->self_id)->update($list);
             foreach ($wait_info->tmsCarriageDispatch->tmsCarriage as $key => $value){
 
                 TmsFastCarriage::where('self_id',$value->self_id)->update($list);
                 if ($value->carriage_flag == 'carriers'){
-//                    $money_where = [
-//                        ['fk_group_code','=',$wait_info->receiver_id],
-//                        ['fk_type','=','GROUP_CODE'],
-//                        ['shouk_company_id','=',$value->company_id],
-//                        ['shouk_type','=','COMPANY'],
-//                        ['type','=','out'],
-//                        ['carriage_id','=',$value->self_id],
-////                        ['dispatch_id','=',$dispatch_id]
-//                    ];
-//                    TmsOrderCost::where($money_where)->update($list);
+
                 }else{
                     foreach($wait_info->tmsFastDispatch->tmsCarriageDriver as $k => $v){
-//                        dump($v);
-//                        $money_where = [
-//                            ['fk_group_code','=',$wait_info->receiver_id],
-//                            ['fk_type','=','GROUP_CODE'],
-//                            ['shouk_driver_id','=',$v->self_id],
-//                            ['shouk_type','=','DRIVER'],
-//                            ['type','=','out'],
-//                            ['carriage_id','=',$v->carriage_id],
-//                            ['driver_id','=',$v->self_id],
-//                            ['money','=',$v->price]
-//                        ];
-//                        TmsOrderCost::where($money_where)->update($list);
                         TmsFastCarriageDriver::where('self_id',$v->self_id)->update($list);
                     }
                 }
