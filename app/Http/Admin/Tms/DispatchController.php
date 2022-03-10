@@ -3268,7 +3268,7 @@ class DispatchController extends CommonController{
                 'send_sheng_name','send_shi_name','send_qu_name','send_address','receiver_id',
                 'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
 
-            $select1 = ['self_id','carriage_id','order_dispatch_id'];
+            $select1 = ['self_id','carriage_id','order_id'];
             $select2 = ['self_id','company_id','company_name','carriage_flag','total_money'];
             $select3 = ['carriage_id','car_number','contacts','tel','price','car_id','self_id'];
             $wait_info = TmsLittleOrder::with(['tmsFastDispatch'=>function($query)use($select,$select1,$select2,$select3,$dispatch_where){
