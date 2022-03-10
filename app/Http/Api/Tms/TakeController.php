@@ -2121,12 +2121,21 @@ class TakeController extends Controller{
                 $data['total_money']        = $wait_info->on_line_money;
                 $data['carriage_flag']   =  'compose';
                 $data['order_status']   =  2;
+                DB::beginTransaction();
+                try {
+                    $id = TmsFastCarriage::insert($data);
+                    TmsFastDispatch::insert($list);
+                    TmsFastCarriageDriver::insert($order_list);
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollBack();
+                    $msg['code'] = 302;
+                    $msg['msg'] = "操作失败";
+                    return $msg;
+                }
 
-                $id = TmsFastCarriage::insert($data);
-                TmsFastDispatch::insert($list);
-                TmsFastCarriageDriver::insert($order_list);
 
-                if($order){
+                if($id){
                     $msg['code'] = 200;
                     $msg['msg'] = "操作成功";
                     return $msg;

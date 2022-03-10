@@ -2913,7 +2913,7 @@ class DispatchController extends CommonController{
             ];
 
             $select=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
-                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id','receiver_id','group_code',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','receiver_id','group_code',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address','order_status',
                 'good_info','good_number','good_weight','good_volume','total_money'];
 
@@ -2931,33 +2931,6 @@ class DispatchController extends CommonController{
                     return $msg;
                 }
             }
-            //调度订单修改订单状态
-            $order_where = [
-                ['self_id','=',$wait_info->order_id]
-            ];
-            $dispatch_where = [
-                ['order_id','=',$wait_info->order_id]
-            ];
-            $flag = 'Y';
-            //判断是否所有的运输单状态是否都为调度，是修改订单状态为已接单
-            $tmsOrderDispatch = TmsOrderDispatch::where($dispatch_where)->select(['self_id'])->get();
-
-            if ($tmsOrderDispatch){
-                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
-                $orderStatus = TmsOrderDispatch::where('self_id','!=',$dispatch_id)->whereIn('self_id',$dispatch_list)->select(['order_status'])->get();
-                $arr = array_unique(array_column($orderStatus->toArray(),'order_status'));
-//                dump($arr);
-                if (count($arr) >= 1){
-                    if (implode('',$arr) == 5){
-                        $flag = 'Y';
-                    }else{
-                        $flag = 'N';
-                    }
-                }else{
-                    $flag = 'Y';
-                }
-            }
-            //修改当前运输单状态
 
             $dispatch_order['update_time']   = $now_time;
 
@@ -2969,7 +2942,7 @@ class DispatchController extends CommonController{
                 $dispatch_order['order_status']  = 5;
             }
             $order_update['update_time']  = $now_time;
-            $id = TmsLittleDispatch::where($where)->update($dispatch_order);
+            $id = TmsLittleOrder::where($where)->update($dispatch_order);
 
 
             if($id){
