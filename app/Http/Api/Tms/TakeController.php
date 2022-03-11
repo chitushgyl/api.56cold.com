@@ -1901,7 +1901,7 @@ class TakeController extends Controller{
             }else{
                 $order_details3['name'] = '提货时间';
                 $order_details3['value'] = $info->send_time;
-                $order_details5['color'] = '#000000';
+                $order_details3['color'] = '#000000';
             }
             $order_details6['name'] = '订单备注';
             $order_details6['value'] = $info->remark;
@@ -1911,22 +1911,18 @@ class TakeController extends Controller{
             $order_details10['value'] = $info->receipt;
 
             $order_details[] = $order_details1;
-//            $order_details[]= $order_details2;
-
+            
             if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 if ($info->kilometre){
                     $order_details[] = $order_details2;
                 }
                 $order_details[] = $order_details3;
                 $order_details[]= $order_details4;
-                $order_details[]= $order_details5;
                 $order_details[]= $order_details6;
             }else{
-//                $order_details[]= $order_details7;
-//                $order_details[]= $order_details8;
+
                 $order_details[]= $order_details3;
                 $order_details[]= $order_details4;
-                $order_details[]= $order_details5;
                 $order_details[]= $order_details6;
             }
 
