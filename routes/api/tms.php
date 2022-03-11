@@ -170,6 +170,7 @@ Route::group([
         Route::any('/fastOrder/predictPrice','FastOrderController@predictPrice');//
         Route::any('/fastOrder/getType','FastOrderController@getType');//
         Route::any('/fastOrder/count_klio','FastOrderController@count_klio');//
+        Route::any('/fastOrder/count_price','FastOrderController@count_price');//
 
         /**TMS联系人管理 - 用户端**/
         Route::any('/contacts/contactsPage', 'ContactsController@contactsPage');

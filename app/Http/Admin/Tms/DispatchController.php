@@ -3351,7 +3351,7 @@ class DispatchController extends CommonController{
             $data['group_name']  = $user_info->group_name;
 
             $id=TmsFastReceipt::insert($data);
-            
+
             $order_update['receipt_flag'] = 'Y';
             $order_update['update_time']  = $now_time;
             TmsLittleOrder::where($where)->update($order_update);

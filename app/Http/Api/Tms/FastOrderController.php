@@ -1139,7 +1139,7 @@ class FastOrderController extends Controller{
         }
     }
 
-    /***整车预估价格  /api/order/count_price
+    /***整车预估价格  /api/fastOrder/count_price
 
      **/
     public function count_price(Request $request){
