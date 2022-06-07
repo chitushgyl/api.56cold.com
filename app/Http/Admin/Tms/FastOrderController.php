@@ -679,7 +679,111 @@ class FastOrderController extends CommonController{
      * 极速下单完成
      * */
     public function fastOrderDone(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $input         = $request->all();
+        $now_time    = date('Y-m-d H:i:s',time());
+        $self_id     = $request->input('self_id');
+        $rules = [
+            'self_id'=>'required',
+        ];
+        $message = [
+            'self_id.required'=>'请选择订单',
+        ];
+        /**虚拟数据
+        $input['self_id']       = $self_id       = 'order_202104101356286664799683';
+         **/
 
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $where = [
+                ['self_id','=',$self_id],
+                ['order_status','!=',7]
+            ];
+            $select = ['self_id','order_status','total_money','pay_type'];
+            $order = TmsLittleOrder::where($where)->select($select)->first();
+            if ($order->order_status == 6){
+                $msg['code'] = 301;
+                $msg['msg'] = '订单已完成';
+                return $msg;
+            }
+            $update['update_time'] = $now_time;
+            $update['order_status'] = 6;
+            $id = TmsLittleOrder::where($where)->update($update);
+
+            /** 查找所有的运输单 修改运输状态**/
+            $TmsOrderDispatch = TmsFastDispatch::where('order_id',$self_id)->select('self_id')->get();
+            if ($TmsOrderDispatch){
+                $dispatch_list = array_column($TmsOrderDispatch->toArray(),'self_id');
+                $orderStatus = TmsFastDispatch::where('delete_flag','=','Y')->whereIn('self_id',$dispatch_list)->update($update);
+
+                /*** 订单完成后，如果订单是在线支付，添加运费到承接司机或3pl公司余额 **/
+                if ($orderStatus){
+//                    if ($order->pay_type == 'online'){
+//                        dd($dispatch_list);
+                    foreach ($dispatch_list as $key => $value){
+
+                        $carriage_order = TmsFastDispatch::where('self_id','=',$value)->first();
+                        $idit = substr($carriage_order->receiver_id,0,5);
+                        if ($idit == 'user_'){
+                            $wallet_where = [
+                                ['total_user_id','=',$carriage_order->receiver_id]
+                            ];
+                            $data['wallet_type'] = 'user';
+                            $data['total_user_id'] = $carriage_order->receiver_id;
+                        }else{
+                            $wallet_where = [
+                                ['group_code','=',$carriage_order->receiver_id]
+                            ];
+                            $data['wallet_type'] = '3PLTMS';
+                            $data['group_code'] = $carriage_order->receiver_id;
+                        }
+                        $wallet = UserCapital::where($wallet_where)->select(['self_id','money'])->first();
+
+                        $money['money'] = $wallet->money + $carriage_order->on_line_money;
+                        $data['money'] = $carriage_order->on_line_money;
+                        if ($carriage_order->group_code == $carriage_order->receiver_id){
+                            $money['money'] = $wallet->money + $carriage_order->total_money;
+                            $data['money'] = $carriage_order->total_money;
+                        }
+
+                        $money['update_time'] = $now_time;
+                        UserCapital::where($wallet_where)->update($money);
+
+                        $data['self_id'] = generate_id('wallet_');
+                        $data['produce_type'] = 'in';
+                        $data['capital_type'] = 'wallet';
+                        $data['create_time'] = $now_time;
+                        $data['update_time'] = $now_time;
+                        $data['now_money'] = $money['money'];
+                        $data['now_money_md'] = get_md5($money['money']);
+                        $data['wallet_status'] = 'SU';
+
+                        UserWallet::insert($data);
+                    }
+//                    }
+                }
+            }
+
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
     }
 
 
