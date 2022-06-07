@@ -778,21 +778,6 @@ class TakeController extends Controller{
             $order_list['price'] = $wait_info->total_money;
 
             /**保存应付费用**/
-//            $money['self_id']           = generate_id('order_money_');
-//            $money['shouk_group_code']           = $user_info->group_code;
-//            $money['shouk_type']                 = 'COMPANY';
-//            $money['fk_total_user_id']           = $user_info->total_user_id;
-//            $money['fk_type']                    = 'USER';
-//            $money['ZIJ_total_user_id']          = $user_info->total_user_id;
-//
-//
-//            $money['order_id']                   = $dispatch_id;
-//            $money['create_time']                = $now_time;
-//            $money['update_time']                = $now_time;
-//            $money['money']                      = $total_money;
-//            $money['money_type']                 = 'freight';
-//            $money['type']                       = 'in';
-
 
             $data['self_id']            = $carriage_id;
             $data['create_user_id']     = $user_info->admin_id;
@@ -1911,7 +1896,7 @@ class TakeController extends Controller{
             $order_details10['value'] = $info->receipt;
 
             $order_details[] = $order_details1;
-            
+
             if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 if ($info->kilometre){
                     $order_details[] = $order_details2;

@@ -87,15 +87,16 @@ class FastOrderController extends Controller{
                 $group_info    =SystemGroup::where($where_group)->select('group_code','group_name')->first();
             }
             /***开始做二次效验**/
-            if (empty($good_name_n)) {
-                $msg['code'] = 306;
-                $msg['msg'] = '货物名称不能为空！';
-                return $msg;
-            }
+
             if ($order_type == 'line'){
                 if (empty($good_weight_n) || $good_weight_n <= 0) {
                     $msg['code'] = 308;
                     $msg['msg'] = '货物重量错误！';
+                    return $msg;
+                }
+                if (empty($good_name_n)) {
+                    $msg['code'] = 306;
+                    $msg['msg'] = '货物名称不能为空！';
                     return $msg;
                 }
             }
@@ -896,7 +897,7 @@ class FastOrderController extends Controller{
                     $prescription = $value->prescription;
                 }
             }
-            $msg['info'] = $price;
+            $msg['info'] = rount($price);
             $msg['kilo'] = round($kilo);
             $msg['prescription'] = $prescription.'天';
             $msg['code'] = 200;

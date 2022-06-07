@@ -3295,7 +3295,7 @@ class DispatchController extends CommonController{
     }
 
     /**
-     * 快捷订单确认送达
+     * 快捷订单上传回单
      * */
     public function dispatchUploadReceipt(Request $request){
         $user_info = $request->get('user_info');//接收中间件产生的参数
