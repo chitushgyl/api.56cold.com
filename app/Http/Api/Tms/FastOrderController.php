@@ -135,17 +135,18 @@ class FastOrderController extends Controller{
                     $msg['msg'] = $send_t.'地址不存在';
                     return $msg;
                 }
+                if ($order_type == 'line'){
+                    if (empty($v['good_name'])) {
+                        $msg['code'] = 306;
+                        $msg['msg']  = '货物名称不能为空！';
+                        return $msg;
+                    }
 
-                if (empty($v['good_name'])) {
-                    $msg['code'] = 306;
-                    $msg['msg']  = '货物名称不能为空！';
-                    return $msg;
-                }
-
-                if (empty($v['good_weight']) || $v['good_weight'] <= 0) {
-                    $msg['code'] = 308;
-                    $msg['msg']  = '货物重量错误！';
-                    return $msg;
+                    if (empty($v['good_weight']) || $v['good_weight'] <= 0) {
+                        $msg['code'] = 308;
+                        $msg['msg']  = '货物重量错误！';
+                        return $msg;
+                    }
                 }
 
                 if (empty($v['clod'])) {
