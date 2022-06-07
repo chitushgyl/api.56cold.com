@@ -899,7 +899,7 @@ class FastOrderController extends Controller{
                     $prescription = $value->prescription;
                 }
             }
-            $msg['info'] = rount($price);
+            $msg['info'] = round($price);
             $msg['kilo'] = round($kilo);
             $msg['prescription'] = $prescription.'天';
             $msg['code'] = 200;
