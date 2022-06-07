@@ -3,6 +3,7 @@ namespace App\Http\Admin\Tms;
 use App\Http\Controllers\FileController as File;
 use App\Http\Controllers\TmsController as Tms;
 use App\Models\Group\SystemGroup;
+use App\Models\Tms\TmsFastDispatch;
 use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsOrder;
 use App\Models\User\UserCapital;
