@@ -549,27 +549,27 @@ class FastOrderController extends Controller{
             'gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_time','send_time',
             'gather_address','send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_address',
             'remark','total_money','price','good_name','good_number','good_weight','good_volume','info','good_info','clod','pay_type'];
-
+        $select1 = ['self_id','order_id','receipt','group_code','group_name','total_user_id'];
         $where = [
             ['delete_flag','=','Y'],
             ['self_id','=',$self_id],
         ];
 
-        $info = TmsLittleOrder::where($where)->select($select)->first();
+        $info = TmsLittleOrder::with(['TmsReceipt' => function($query) use($select1){
+              $query->select($select1);
+        }])->where($where)->select($select)->first();
         if($info) {
             $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
             $info->order_type_show   = $tms_order_type[$info->order_type] ??null;
             $info->pay_status = $tms_pay_type[$info->pay_type];
             $receipt_info = [];
             $receipt_info_list= [];
+            if ($info->tmsReceipt){
+                $receipt_info = img_for($info->tmsReceipt->receipt,'more');
+                $receipt_info_list[] = $receipt_info;
 
-            /** 零担发货收货仓**/
-            $line_info = [];
-            $pick_store_info = [];
-            $send_store_info = [];
-
-
-//            $info->receipt = $receipt_info_list;
+            }
+            $info->receipt = $receipt_info_list;
             $order_info              = json_decode($info->info,true);
             $send_info = [];
             $gather_info = [];

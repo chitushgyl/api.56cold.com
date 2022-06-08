@@ -2695,12 +2695,14 @@ class DispatchController extends CommonController{
             'gather_tel','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','send_name','send_tel','send_sheng_name',
             'send_shi_name','send_qu_name','info','kilometre', 'send_address','total_money','good_info','good_number','good_weight','good_volume',
             'dispatch_flag','on_line_flag', 'clod','total_money','gather_time','send_time','receiver_id','total_user_id','pay_type'];
-
+        $select1 = ['self_id','order_id','receipt','group_code','group_name','total_user_id'];
         $where = [
             ['self_id','=',$self_id],
         ];
 
-        $info = TmsLittleOrder::where($where)->select($select)->first();
+        $info = TmsLittleOrder::with(['TmsReceipt' => function($query) use($select1){
+            $query->select($select1);
+        }])->where($where)->select($select)->first();
         if($info){
             $tms_order_type        =array_column(config('tms.tms_order_type'),'name','key');
             $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
@@ -2736,7 +2738,17 @@ class DispatchController extends CommonController{
             $info->color = '#FF7A1A';
             $info->order_id_show = '订单编号'.$info->self_id_show;
             $order_details = [];
-            $receipt_list = [];
+            
+            $receipt_info = [];
+            $receipt_info_list= [];
+            if ($info->tmsReceipt){
+                $receipt_info = img_for($info->tmsReceipt->receipt,'more');
+                $receipt_info_list[] = $receipt_info;
+
+            }
+            $info->receipt = $receipt_info_list;
+
+
             $car_info = [];
             $order_details1['name'] = '应收运费';
             $order_details1['value'] = '¥'.$info->total_money;
