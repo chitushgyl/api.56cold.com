@@ -2738,7 +2738,7 @@ class DispatchController extends CommonController{
             $info->color = '#FF7A1A';
             $info->order_id_show = '订单编号'.$info->self_id_show;
             $order_details = [];
-            
+
             $receipt_info = [];
             $receipt_info_list= [];
             if ($info->tmsReceipt){
@@ -2797,6 +2797,7 @@ class DispatchController extends CommonController{
             if(!empty($info->car_info)){
                 $car_info[] = $order_details9;
             }
+            $receipt_list = [];
             if (!empty($info->receipt)){
                 $receipt_list[] = $order_details10;
             }
