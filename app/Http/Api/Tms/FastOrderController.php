@@ -543,7 +543,7 @@ class FastOrderController extends Controller{
         $tms_pay_type    = array_column(config('tms.pay_type'),'name','key');
         $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
         $self_id = $request->input('self_id');
-         $self_id = 'order_202206080955520179364806';
+//         $self_id = 'order_202206080955520179364806';
         $table_name = 'tms_little_order';
         $select = ['self_id','group_code','group_name','create_user_name','create_time','use_flag','order_type','order_status','gather_address_id',
             'gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_time','send_time',
