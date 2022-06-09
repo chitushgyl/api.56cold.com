@@ -51,7 +51,11 @@ class TmsFastCarriage extends Model{
     ];
 
 //一对一
-
+    public function tmsFastCarriageDriver(){
+        //参数：关联模型名称，外键，主键
+        //如果主键是id可以省略
+        return $this->hasOne('App\Models\Tms\TmsFastCarriageDriver','self_id','carriage_id');
+    }
 
 
 }

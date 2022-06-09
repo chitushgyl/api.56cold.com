@@ -543,21 +543,35 @@ class FastOrderController extends Controller{
         $tms_pay_type    = array_column(config('tms.pay_type'),'name','key');
         $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
         $self_id = $request->input('self_id');
-//         $self_id = 'order_202106231835153294998879';
+         $self_id = 'order_202206080955520179364806';
         $table_name = 'tms_little_order';
         $select = ['self_id','group_code','group_name','create_user_name','create_time','use_flag','order_type','order_status','gather_address_id',
             'gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_time','send_time',
             'gather_address','send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_address',
             'remark','total_money','price','good_name','good_number','good_weight','good_volume','info','good_info','clod','pay_type'];
         $select1 = ['self_id','order_id','receipt','group_code','group_name','total_user_id'];
+        $select2 = ['self_id','order_id','carriage_id'];
+        $select3 = ['self_id'];
+        $select4 = ['self_id','carriage_id','use_flag','delete_flag','group_code','group_name','car_id','car_number','contacts','tel','price'];
+
         $where = [
             ['delete_flag','=','Y'],
             ['self_id','=',$self_id],
         ];
 
-        $info = TmsLittleOrder::with(['TmsReceipt' => function($query) use($select1){
-              $query->select($select1);
-        }])->where($where)->select($select)->first();
+        $info = TmsLittleOrder::with(['tmsFastDispatch'=>function($query)use($select1,$select2,$select3,$select4){
+            $query->select($select2);
+            $query->with(['tmsFastCarriage'=>function($query)use($select3,$select4){
+                $query->select($select3);
+            }]);
+            $query->with(['tmsFastCarriageDriver'=>function($query)use($select4){
+                $query->select($select4);
+            }]);
+        }])
+            ->with(['TmsReceipt' => function($query) use($select1){
+                $query->select($select1);
+            }])->where($where)->select($select)->first();
+//        dd($info->toArray());
         if($info) {
             $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
             $info->order_type_show   = $tms_order_type[$info->order_type] ??null;
@@ -591,7 +605,19 @@ class FastOrderController extends Controller{
             $info->order_id_show = '订单编号'.$info->self_id_show;
             $order_details = [];
             $receipt_list = [];
-            $car_info = [];
+
+            $car_list = [];
+//            dd($info->tmsFastDispatch->toArray());
+
+            foreach ($info->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
+                   $carList['car_id'] = $vv->car_id;
+                   $carList['car_number'] = $vv->car_number;
+                   $carList['tel'] = $vv->tel;
+                   $carList['contacts'] = $vv->contacts;
+                   $car_list[] = $carList;
+            }
+            $info->car_info = $car_list;
+
             $order_details1['name'] = '订单金额';
             $order_details1['value'] = '¥'.$info->total_money;
             $order_details1['color'] = '#FF7A1A';
