@@ -543,7 +543,7 @@ class FastOrderController extends Controller{
         $tms_pay_type    = array_column(config('tms.pay_type'),'name','key');
         $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
         $self_id = $request->input('self_id');
-//         $self_id = 'order_202206080955520179364806';
+//         $self_id = 'order_202206091709464394176728';
         $table_name = 'tms_little_order';
         $select = ['self_id','group_code','group_name','create_user_name','create_time','use_flag','order_type','order_status','gather_address_id',
             'gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_time','send_time',
@@ -587,7 +587,7 @@ class FastOrderController extends Controller{
             $order_info              = json_decode($info->info,true);
             $send_info = [];
             $gather_info = [];
-
+            $car_info = [];
             $info->info = $order_info;
 
             $info->send_info = $send_info;
@@ -608,17 +608,18 @@ class FastOrderController extends Controller{
 
             $car_list = [];
 //            dd($info->tmsFastDispatch->toArray());
-            if($info->tmsFastDispatch->tmsFastCarriageDriver){
-                foreach ($info->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
-                    $carList['car_id'] = $vv->car_id;
-                    $carList['car_number'] = $vv->car_number;
-                    $carList['tel'] = $vv->tel;
-                    $carList['contacts'] = $vv->contacts;
-                    $car_list[] = $carList;
+            if ($info->tmsFastDispatch){
+                if($info->tmsFastDispatch->tmsFastCarriageDriver){
+                    foreach ($info->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
+                        $carList['car_id'] = $vv->car_id;
+                        $carList['car_number'] = $vv->car_number;
+                        $carList['tel'] = $vv->tel;
+                        $carList['contacts'] = $vv->contacts;
+                        $car_list[] = $carList;
+                    }
+                    $info->car_info = $car_list;
                 }
-                $info->car_info = $car_list;
             }
-
 
             $order_details1['name'] = '订单金额';
             $order_details1['value'] = '¥'.$info->total_money;
@@ -668,7 +669,6 @@ class FastOrderController extends Controller{
                 $receipt_list[] = $order_details10;
             }
 
-//            dd($info->toArray());
             $data['info'] = $info;
             $data['order_details'] = $order_details;
             $data['receipt_list'] = $receipt_list;
