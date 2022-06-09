@@ -2075,7 +2075,7 @@ class TakeController extends Controller{
 
                 $carriage_id = generate_id('carriage_');
 
-                $list['self_id']            =generate_id('c_d_');
+                $list['self_id']            =generate_id('patch_');
                 $list['order_id']        = $dispatch_id;
                 $list['carriage_id']        = $carriage_id;
                 $list['total_user_id']         = $user_info->total_user_id;
