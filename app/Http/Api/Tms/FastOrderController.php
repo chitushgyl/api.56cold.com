@@ -608,15 +608,17 @@ class FastOrderController extends Controller{
 
             $car_list = [];
 //            dd($info->tmsFastDispatch->toArray());
-
-            foreach ($info->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
-                   $carList['car_id'] = $vv->car_id;
-                   $carList['car_number'] = $vv->car_number;
-                   $carList['tel'] = $vv->tel;
-                   $carList['contacts'] = $vv->contacts;
-                   $car_list[] = $carList;
+            if($info->tmsFastDispatch->tmsFastCarriageDriver){
+                foreach ($info->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
+                    $carList['car_id'] = $vv->car_id;
+                    $carList['car_number'] = $vv->car_number;
+                    $carList['tel'] = $vv->tel;
+                    $carList['contacts'] = $vv->contacts;
+                    $car_list[] = $carList;
+                }
+                $info->car_info = $car_list;
             }
-            $info->car_info = $car_list;
+
 
             $order_details1['name'] = '订单金额';
             $order_details1['value'] = '¥'.$info->total_money;
