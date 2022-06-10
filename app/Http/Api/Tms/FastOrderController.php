@@ -3,7 +3,7 @@ namespace App\Http\Api\Tms;
 use App\Http\Controllers\TmsController as Tms;
 use App\Models\Group\SystemGroup;
 use App\Models\Tms\AppSettingParam;
-use App\Models\Tms\TmsLittleOrder;
+use App\Models\Tms\TmsFastDispatch;use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsParam;
 use App\Models\Tms\TmsTypeCar;
 use App\Models\User\UserCapital;
@@ -829,44 +829,53 @@ class FastOrderController extends Controller{
 
             /** 查找所有的运输单 修改运输状态**/
             /*** 订单完成后，如果订单是在线支付，添加运费到承接司机或3pl公司余额 **/
+            $TmsOrderDispatch = TmsFastDispatch::where('order_id',$self_id)->select('self_id')->get();
+            if ($TmsOrderDispatch) {
+                $dispatch_list = array_column($TmsOrderDispatch->toArray(), 'self_id');
+                $orderStatus = TmsFastDispatch::where('delete_flag', '=', 'Y')->whereIn('self_id', $dispatch_list)->update($update);
+                if ($orderStatus) {
 
-            $idit = substr($order->receiver_id,0,5);
-            if ($idit == 'user_'){
-                $wallet_where = [
-                    ['total_user_id','=',$order->receiver_id]
-                ];
-                $data['wallet_type'] = 'user';
-                $data['total_user_id'] = $order->receiver_id;
-            }else{
-                $wallet_where = [
-                    ['group_code','=',$order->receiver_id]
-                ];
-                $data['wallet_type'] = '3PLTMS';
-                $data['group_code'] = $order->receiver_id;
+                    foreach ($dispatch_list as $key => $value) {
+
+                        $carriage_order = TmsFastDispatch::where('self_id', '=', $value)->first();
+                        if ($carriage_order->total_user_id) {
+                            $wallet_where = [
+                                ['total_user_id', '=', $carriage_order->total_user_id]
+                            ];
+                            $data['wallet_type'] = 'user';
+                            $data['total_user_id'] = $carriage_order->total_user_id;
+                        } else {
+                            $wallet_where = [
+                                ['group_code', '=', $carriage_order->group_code]
+                            ];
+                            $data['wallet_type'] = '3PLTMS';
+                            $data['group_code'] = $carriage_order->group_code;
+                        }
+                        $wallet = UserCapital::where($wallet_where)->select(['self_id', 'money'])->first();
+
+                        $money['money'] = $wallet->money + $order->total_money;
+                        $data['money'] = $order->total_money;
+                        if ($order->group_code == $order->receiver_id) {
+                            $money['money'] = $wallet->money + $order->total_money;
+                            $data['money'] = $order->total_money;
+                        }
+
+                        $money['update_time'] = $now_time;
+                        UserCapital::where($wallet_where)->update($money);
+
+                        $data['self_id'] = generate_id('wallet_');
+                        $data['produce_type'] = 'in';
+                        $data['capital_type'] = 'wallet';
+                        $data['create_time'] = $now_time;
+                        $data['update_time'] = $now_time;
+                        $data['now_money'] = $money['money'];
+                        $data['now_money_md'] = get_md5($money['money']);
+                        $data['wallet_status'] = 'SU';
+
+                        UserWallet::insert($data);
+                    }
+                }
             }
-            $wallet = UserCapital::where($wallet_where)->select(['self_id','money'])->first();
-
-            $money['money'] = $wallet->money + $order->total_money;
-            $data['money'] = $order->total_money;
-            if ($order->group_code == $order->receiver_id){
-                $money['money'] = $wallet->money + $order->total_money;
-                $data['money'] = $order->total_money;
-            }
-
-            $money['update_time'] = $now_time;
-            UserCapital::where($wallet_where)->update($money);
-
-            $data['self_id'] = generate_id('wallet_');
-            $data['produce_type'] = 'in';
-            $data['capital_type'] = 'wallet';
-            $data['create_time'] = $now_time;
-            $data['update_time'] = $now_time;
-            $data['now_money'] = $money['money'];
-            $data['now_money_md'] = get_md5($money['money']);
-            $data['wallet_status'] = 'SU';
-
-            UserWallet::insert($data);
-
             if($id){
                 $msg['code'] = 200;
                 $msg['msg'] = "操作成功";

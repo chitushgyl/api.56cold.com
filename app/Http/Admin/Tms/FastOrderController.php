@@ -690,9 +690,9 @@ class FastOrderController extends CommonController{
         $message = [
             'self_id.required'=>'请选择订单',
         ];
-        /**虚拟数据
-        $input['self_id']       = $self_id       = 'order_202104101356286664799683';
-         **/
+//        /**虚拟数据
+        $input['self_id']       = $self_id       = 'order_202206101133087638395345';
+//         **/
 
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {
@@ -717,6 +717,7 @@ class FastOrderController extends CommonController{
                 $dispatch_list = array_column($TmsOrderDispatch->toArray(),'self_id');
                 $orderStatus = TmsFastDispatch::where('delete_flag','=','Y')->whereIn('self_id',$dispatch_list)->update($update);
 
+
                 /*** 订单完成后，如果订单是在线支付，添加运费到承接司机或3pl公司余额 **/
                 if ($orderStatus){
 //                    if ($order->pay_type == 'online'){
@@ -724,22 +725,20 @@ class FastOrderController extends CommonController{
                     foreach ($dispatch_list as $key => $value){
 
                         $carriage_order = TmsFastDispatch::where('self_id','=',$value)->first();
-                        $idit = substr($carriage_order->receiver_id,0,5);
-                        if ($idit == 'user_'){
+                        if ($carriage_order->total_user_id){
                             $wallet_where = [
-                                ['total_user_id','=',$carriage_order->receiver_id]
+                                ['total_user_id','=',$carriage_order->total_user_id]
                             ];
                             $data['wallet_type'] = 'user';
-                            $data['total_user_id'] = $carriage_order->receiver_id;
+                            $data['total_user_id'] = $carriage_order->total_user_id;
                         }else{
                             $wallet_where = [
-                                ['group_code','=',$carriage_order->receiver_id]
+                                ['group_code','=',$carriage_order->group_code]
                             ];
                             $data['wallet_type'] = '3PLTMS';
-                            $data['group_code'] = $carriage_order->receiver_id;
+                            $data['group_code'] = $carriage_order->group_code;
                         }
                         $wallet = UserCapital::where($wallet_where)->select(['self_id','money'])->first();
-
                         $money['money'] = $wallet->money + $carriage_order->on_line_money;
                         $data['money'] = $carriage_order->on_line_money;
                         if ($carriage_order->group_code == $carriage_order->receiver_id){
@@ -765,15 +764,15 @@ class FastOrderController extends CommonController{
                 }
             }
 
-            if($id){
-                $msg['code'] = 200;
-                $msg['msg'] = "操作成功";
-                return $msg;
-            }else{
-                $msg['code'] = 302;
-                $msg['msg'] = "操作失败";
-                return $msg;
-            }
+//            if($id){
+//                $msg['code'] = 200;
+//                $msg['msg'] = "操作成功";
+//                return $msg;
+//            }else{
+//                $msg['code'] = 302;
+//                $msg['msg'] = "操作失败";
+//                return $msg;
+//            }
         }else{
             //前端用户验证没有通过
             $erro = $validator->errors()->all();
