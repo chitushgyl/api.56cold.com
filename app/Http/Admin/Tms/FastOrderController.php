@@ -690,9 +690,9 @@ class FastOrderController extends CommonController{
         $message = [
             'self_id.required'=>'请选择订单',
         ];
-//        /**虚拟数据
+        /**虚拟数据
         $input['self_id']       = $self_id       = 'order_202206101133087638395345';
-//         **/
+         **/
 
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {
