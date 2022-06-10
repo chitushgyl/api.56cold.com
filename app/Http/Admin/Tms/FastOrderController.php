@@ -739,11 +739,11 @@ class FastOrderController extends CommonController{
                             $data['group_code'] = $carriage_order->group_code;
                         }
                         $wallet = UserCapital::where($wallet_where)->select(['self_id','money'])->first();
-                        $money['money'] = $wallet->money + $carriage_order->on_line_money;
-                        $data['money'] = $carriage_order->on_line_money;
-                        if ($carriage_order->group_code == $carriage_order->receiver_id){
-                            $money['money'] = $wallet->money + $carriage_order->total_money;
-                            $data['money'] = $carriage_order->total_money;
+                        $money['money'] = $wallet->money + $order->total_money;
+                        $data['money'] = $order->total_money;
+                        if ($carriage_order->group_code == $carriage_order->group_code){
+                            $money['money'] = $wallet->money + $order->total_money;
+                            $data['money'] = $order->total_money;
                         }
 
                         $money['update_time'] = $now_time;

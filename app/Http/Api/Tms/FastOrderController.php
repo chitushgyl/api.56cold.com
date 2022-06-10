@@ -855,7 +855,7 @@ class FastOrderController extends Controller{
 
                         $money['money'] = $wallet->money + $order->total_money;
                         $data['money'] = $order->total_money;
-                        if ($order->group_code == $order->receiver_id) {
+                        if ($order->group_code == $carriage_order->group_code) {
                             $money['money'] = $wallet->money + $order->total_money;
                             $data['money'] = $order->total_money;
                         }
