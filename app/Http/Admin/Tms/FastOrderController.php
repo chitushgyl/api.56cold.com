@@ -505,17 +505,17 @@ class FastOrderController extends CommonController{
                 if($value->id == 161){
                     $button3[] = $value;
                 }
-                if ($value->id == 184){
+                if ($value->id == 183){
                     $button4[] = $value;
                     $button5[] = $value;
                 }
                 if ($value->id == 162){
                     $button6[] = $value;
                 }
-                if ($value->id == 236){
+                if ($value->id == 235){
                     $button7[] = $value;
                 }
-                if ($value->id == 239){
+                if ($value->id == 238){
                     $button8[] = $value;
                 }
                 if ($v->order_status == 3 || $v->order_status == 2){
