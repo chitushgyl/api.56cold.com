@@ -469,7 +469,7 @@ class FastOrderController extends Controller{
                         if ($v->order_status == 5){
                             $v->button  = $button2;
                         }
-                        if ($v->order_status  == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+                        if ($v->order_status  == 5 && $v->pay_type == 'offline' && $v->pay_status == 'N'){
                             $v->button  = $button3;
                         }
                         if($v->order_status == 6 && $v->discuss_flag == 'N'){
@@ -478,7 +478,7 @@ class FastOrderController extends Controller{
                         if($v->order_status == 6 && $v->discuss_flag == 'Y' && $v->follow_flag == 'N'){
                             $v->button = $button6;
                         }
-                        if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+                        if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_status == 'N'){
                             $v->button  = $button4;
                         }
                     }
