@@ -121,10 +121,10 @@ Route::any('/alipay/depositWechatNotify', 'Pay\AlipayController@depositWechatNot
 Route::group([
     "middleware"=>['frontCheck','userCheck'],
 ], function(){
-    Route::any('/pay/fastOrderAlipay', 'Pay\payController@fastOrderAlipay');
-    Route::any('/pay/fastOrderBalancePay', 'Pay\payController@fastOrderBalancePay');
+    Route::any('/pay/fastOrderAlipay', 'Pay\PayController@fastOrderAlipay');
+    Route::any('/pay/fastOrderBalancePay', 'Pay\PayController@fastOrderBalancePay');
 });
-Route::any('/pay/fastOrderAlipayNotify', 'Pay\payController@fastOrderAlipayNotify');
+Route::any('/pay/fastOrderAlipayNotify', 'Pay\PayController@fastOrderAlipayNotify');
 
 
 Route::group([
