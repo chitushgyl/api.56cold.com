@@ -1823,7 +1823,22 @@ class TakeController extends Controller{
             'gather_address_latitude','send_address_id','send_contacts_id','send_name','send_tel', 'send_sheng','send_shi','send_time','gather_time',
             'send_qu','send_sheng_name','send_shi_name','send_qu_name','send_address','send_address_longitude','send_address_latitude','pay_type','info'
         ];
-        $info = TmsLittleOrder::where('self_id',$self_id)->select($select)->first();
+        $select1 = ['self_id','order_id','receipt','group_code','group_name','total_user_id'];
+        $select2 = ['self_id','order_id','carriage_id'];
+        $select3 = ['self_id'];
+        $select4 = ['self_id','carriage_id','use_flag','delete_flag','group_code','group_name','car_id','car_number','contacts','tel','price'];
+        $info = TmsLittleOrder::with(['tmsFastDispatch'=>function($query)use($select1,$select2,$select3,$select4){
+            $query->select($select2);
+            $query->with(['tmsFastCarriage'=>function($query)use($select3,$select4){
+                $query->select($select3);
+            }]);
+            $query->with(['tmsFastCarriageDriver'=>function($query)use($select4){
+                $query->select($select4);
+            }]);
+        }])
+            ->with(['TmsReceipt' => function($query) use($select1){
+                $query->select($select1);
+            }])->where('self_id',$self_id)->select($select)->first();
 
         if($info){
             $tms_order_type          =array_column(config('tms.tms_order_type'),'name','key');
@@ -1850,7 +1865,18 @@ class TakeController extends Controller{
                 $temperture[$key] = $value;
             }
             $car_list = [];
-
+            if ($info->tmsFastDispatch){
+                if($info->tmsFastDispatch->tmsFastCarriageDriver){
+                    foreach ($info->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
+                        $carList['car_id'] = $vv->car_id;
+                        $carList['car_number'] = $vv->car_number;
+                        $carList['tel'] = $vv->tel;
+                        $carList['contacts'] = $vv->contacts;
+                        $car_list[] = $carList;
+                    }
+                    $info->car_info = $car_list;
+                }
+            }
             $info->temperture = implode(',',$temperture);
             if ($info->tmsReceipt){
                 $receipt_info = img_for($info->tmsReceipt->receipt,'more');
@@ -1892,6 +1918,8 @@ class TakeController extends Controller{
             $order_details6['value'] = $info->remark;
             $order_details6['color'] = '#000000';
 
+            $order_details9['name'] = '运输信息';
+            $order_details9['value'] = $info->car_info;
             $order_details10['name'] = '回单信息';
             $order_details10['value'] = $info->receipt;
 
@@ -1910,7 +1938,9 @@ class TakeController extends Controller{
                 $order_details[]= $order_details4;
                 $order_details[]= $order_details6;
             }
-
+            if(!empty($info->car_info)){
+                $car_info[] = $order_details9;
+            }
             if (!empty($info->receipt)){
                 $receipt_list[] = $order_details10;
             }
