@@ -764,15 +764,15 @@ class FastOrderController extends CommonController{
                 }
             }
 
-//            if($id){
-//                $msg['code'] = 200;
-//                $msg['msg'] = "操作成功";
-//                return $msg;
-//            }else{
-//                $msg['code'] = 302;
-//                $msg['msg'] = "操作失败";
-//                return $msg;
-//            }
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg'] = "操作成功";
+                return $msg;
+            }else{
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
+            }
         }else{
             //前端用户验证没有通过
             $erro = $validator->errors()->all();
