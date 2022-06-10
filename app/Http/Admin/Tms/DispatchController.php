@@ -2696,13 +2696,25 @@ class DispatchController extends CommonController{
             'send_shi_name','send_qu_name','info','kilometre', 'send_address','total_money','good_info','good_number','good_weight','good_volume',
             'dispatch_flag','on_line_flag', 'clod','total_money','gather_time','send_time','receiver_id','total_user_id','pay_type'];
         $select1 = ['self_id','order_id','receipt','group_code','group_name','total_user_id'];
+        $select2 = ['self_id','order_id','carriage_id'];
+        $select3 = ['self_id'];
+        $select4 = ['self_id','carriage_id','use_flag','delete_flag','group_code','group_name','car_id','car_number','contacts','tel','price'];
         $where = [
             ['self_id','=',$self_id],
         ];
 
-        $info = TmsLittleOrder::with(['TmsReceipt' => function($query) use($select1){
-            $query->select($select1);
-        }])->where($where)->select($select)->first();
+        $info = TmsLittleOrder::with(['tmsFastDispatch'=>function($query)use($select1,$select2,$select3,$select4){
+            $query->select($select2);
+            $query->with(['tmsFastCarriage'=>function($query)use($select3,$select4){
+                $query->select($select3);
+            }]);
+            $query->with(['tmsFastCarriageDriver'=>function($query)use($select4){
+                $query->select($select4);
+            }]);
+        }])
+            ->with(['TmsReceipt' => function($query) use($select1){
+                $query->select($select1);
+            }])->where($where)->select($select)->first();
         if($info){
             $tms_order_type        =array_column(config('tms.tms_order_type'),'name','key');
             $tms_control_type        =array_column(config('tms.tms_control_type'),'name','key');
@@ -2750,6 +2762,20 @@ class DispatchController extends CommonController{
 
 
             $car_info = [];
+            $car_list = [];
+//            dd($info->tmsFastDispatch->toArray());
+            if ($info->tmsFastDispatch){
+                if($info->tmsFastDispatch->tmsFastCarriageDriver){
+                    foreach ($info->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
+                        $carList['car_id'] = $vv->car_id;
+                        $carList['car_number'] = $vv->car_number;
+                        $carList['tel'] = $vv->tel;
+                        $carList['contacts'] = $vv->contacts;
+                        $car_list[] = $carList;
+                    }
+                    $info->car_info = $car_list;
+                }
+            }
             $order_details1['name'] = '应收运费';
             $order_details1['value'] = '¥'.$info->total_money;
             $order_details1['color'] = '#FF7A1A';
@@ -2781,6 +2807,7 @@ class DispatchController extends CommonController{
 
             $order_details[] = $order_details1;
 //            $order_details[]= $order_details2;
+
             if(!empty($info->tmsCarriage)){
                 $car_info[] = $order_details11;
             }
