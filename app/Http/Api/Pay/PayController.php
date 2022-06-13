@@ -426,6 +426,7 @@ class PayController extends Controller{
             $order_update['on_line_flag'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
+            file_put_contents(base_path('/vendor/alipay123.txt'),$id);
             /**修改费用数据为可用**/
 //            $money['delete_flag']                = 'Y';
 //            $money['settle_flag']                = 'W';
