@@ -308,7 +308,7 @@ class PayController extends Controller{
      * 极速版微信支付
      * */
     public function wechat(Request $request){
-        $pay_type  = array_column(config('tms.wechat_notify'),'notify','key');
+        $pay_type  = array_column(config('tms.fast_wechat_notify'),'notify','key');
         $input = $request->all();
         $user_info = $request->get('user_info');//接收中间件产生的参数
         $self_id = $request->input('self_id');//订单ID
@@ -373,7 +373,6 @@ class PayController extends Controller{
         ini_set('date.timezone','Asia/Shanghai');
         error_reporting(E_ERROR);
         $result = file_get_contents('php://input', 'r');
-        file_put_contents(base_path('/vendor/alipay123444.txt'),$result);
         $array_data = json_decode(json_encode(simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
         if ($array_data['return_code'] == 'SUCCESS') {
             $now_time = date('Y-m-d H:i:s',time());
@@ -419,8 +418,8 @@ class PayController extends Controller{
             $wallet['now_money'] = $capital->money;
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
-            $wallet11 = UserWallet::insert($wallet);
-            file_put_contents(base_path('/vendor/alipay123444.txt'),$wallet11);
+            UserWallet::insert($wallet);
+
             if ($order->order_type == 'line'){
                 $order_update['order_status'] = 3;
             }else{
@@ -428,8 +427,7 @@ class PayController extends Controller{
             }
             $order_update['on_line_flag'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
-            file_put_contents(base_path('/vendor/alipay123.txt'),$order_update);
-            file_put_contents(base_path('/vendor/alipay1234.txt'),$array_data['out_trade_no']);
+
             $id = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
             file_put_contents(base_path('/vendor/alipay123.txt'),$id);
             /**修改费用数据为可用**/
