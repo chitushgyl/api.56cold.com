@@ -1,6 +1,10 @@
 <?php
 namespace App\Http\Api\Pay;
+use App\Models\Group\SystemGroup;
 use App\Models\Tms\TmsLittleOrder;
+use App\Models\Tms\TmsOrder;
+use App\Models\Tms\TmsOrderCost;
+use App\Models\Tms\TmsOrderDispatch;
 use App\Models\Tms\TmsPayment;
 use App\Models\User\UserCapital;
 use App\Models\User\UserWallet;
@@ -296,6 +300,165 @@ class PayController extends Controller{
             $msg['code'] = 303;
             $msg['msg']  = '支付失败！';
             return $msg;
+        }
+    }
+
+
+    /*
+     * 极速版微信支付
+     * */
+    public function wechat(Request $request){
+        $pay_type  = array_column(config('tms.wechat_notify'),'notify','key');
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $self_id = $request->input('self_id');//订单ID
+        $price = $request->input('price');//支付金额
+        $type  = $request->input('type');
+        $user_type  = $request->input('user_type');
+        if (empty($type)){
+            $msg['code'] = 303;
+            $msg['msg']  = '请选择支付类型';
+            return $msg;
+        }
+//        $price = 0.01;
+        /**虚拟数据
+        $user_id = 'user_15615612312454564';
+        $price = 0.01;
+        $type = 1;
+        $self_id = 'order_202103090937308279552773';
+         * */
+        if($type == 3){
+            $payment = TmsPayment::where('dispatch_id',$self_id)->select('dispatch_id','pay_result','paytype','state')->first();
+            if($payment){
+                $msg['code'] = 302;
+                $msg['msg']  = '此订单不能重复上线';
+                return $msg;
+            }
+        }
+        if ($user_info->type == 'user'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+        include_once base_path( '/vendor/wxAppPay/weixin.php');
+        $out_trade_no = $self_id;
+        $noturl = $pay_type[$type];
+        if ($user_type == 'user'){
+            $config    = config('tms.wechat_config_user');//引入配置文件参数
+        }else{
+            $config    = config('tms.wechat_config_driver');//引入配置文件参数
+        }
+
+        $appid  = $config['appid'];
+        $mch_id = $config['mch_id'];
+        $key    = $config['key'];
+
+        $notify_url = $noturl;
+        $wechatAppPay = new \wxAppPay($appid,$mch_id,$notify_url,$key);
+        $params['body'] = '订单支付';                       //商品描述
+        $params['out_trade_no'] = $out_trade_no;    //自定义的订单号
+        $params['total_fee'] = $price*100;                       //订单金额 只能为整数 单位为分
+        $params['trade_type'] = 'APP';                      //交易类型 JSAPI | NATIVE | APP | WAP
+        $params['attach'] = $user_id;                      //附加参数（用户ID）
+        $result = $wechatAppPay->unifiedOrder($params);
+        // print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
+        //2.创建APP端预支付参数
+        /** @var TYPE_NAME $result */
+        $data = @$wechatAppPay->getAppPayParams($result['prepay_id']);
+        return json_encode($data);
+    }
+
+    /*** 微信支付回调**/
+    public function wechatNotify(Request $request){
+        ini_set('date.timezone','Asia/Shanghai');
+        error_reporting(E_ERROR);
+        $result = file_get_contents('php://input', 'r');
+        $array_data = json_decode(json_encode(simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        if ($array_data['return_code'] == 'SUCCESS') {
+            $now_time = date('Y-m-d H:i:s',time());
+            $pay['order_id'] = $array_data['out_trade_no'];//订单号
+            $pay['pay_number'] = $array_data['total_fee'];//价格
+            $pay['platformorderid'] = $array_data['transaction_id'];//微信交易号
+            $pay['create_time']  = $pay['update_time'] = $now_time;
+            $pay['payname'] = $array_data['openid'];//微信账号
+            $pay['paytype'] = 'WECHAT';//微信账号
+            $pay['pay_result'] = 'SU';//微信账号
+            $pay['state'] = 'in';//支付状态
+            $pay['self_id'] = generate_id('pay_');//微信账号
+            $order = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+            if ($order->order_status == 2 || $order->order_status == 3){
+                echo 'success';
+                return false;
+            }
+            $payment_info = TmsPayment::where('order_id',$array_data['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+            if ($payment_info){
+                echo 'success';
+                return false;
+            }
+            if ($order->total_user_id){
+                $pay['total_user_id'] = $array_data['attach'];
+                $wallet['total_user_id'] = $array_data['attach'];
+                $where['total_user_id'] = $array_data['attach'];
+            }else{
+                $pay['group_code'] = $array_data['attach'];
+                $pay['group_name'] = $order->group_name;
+                $wallet['group_code'] = $array_data['attach'];
+                $wallet['group_name'] = $order->group_name;
+                $where['group_code'] = $array_data['attach'];
+            }
+            TmsPayment::insert($pay);
+            $capital = UserCapital::where($where)->first();
+            $wallet['self_id'] = generate_id('wallet_');
+            $wallet['produce_type'] = 'out';
+            $wallet['capital_type'] = 'wallet';
+            $wallet['money'] = $array_data['total_fee'];
+            $wallet['create_time'] = $now_time;
+            $wallet['update_time'] = $now_time;
+            $wallet['now_money'] = $capital->money;
+            $wallet['now_money_md'] = get_md5($capital->money);
+            $wallet['wallet_status'] = 'SU';
+            UserWallet::insert($wallet);
+            if ($order->order_type == 'line'){
+                $order_update['order_status'] = 3;
+            }else{
+                $order_update['order_status'] = 2;
+            }
+            $order_update['update_time'] = date('Y-m-d H:i:s',time());
+            $id = TmsOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
+            /**修改费用数据为可用**/
+            $money['delete_flag']                = 'Y';
+            $money['settle_flag']                = 'W';
+            $tmsOrderCost = TmsOrderCost::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
+            if ($tmsOrderCost){
+                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+            }
+            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
+            if ($tmsOrderDispatch){
+                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
+                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
+            }
+            /**推送**/
+            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
+            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
+//                        $A = $this->send_push_message($push_contnect,$data['send_shi_name']);
+            if ($order->order_type == 'vehicle') {
+                if ($order->group_code) {
+                    $group = SystemGroup::where('self_id', $order->group_code)->select('self_id', 'group_name', 'company_type')->first();
+                    if ($group->company_type != 'TMS3PL') {
+                        $A = $this->send_push_msg('订单信息', '有新订单', $center_list);
+                    }
+                } else {
+                    $A = $this->send_push_msg('订单信息', '有新订单', $center_list);
+                }
+            }
+            if ($id){
+                echo 'success';
+            }else{
+                echo 'fail';
+            }
+        }else{
+            echo 'fail';
         }
     }
 
