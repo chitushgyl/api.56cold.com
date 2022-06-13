@@ -395,6 +395,7 @@ class PayController extends Controller{
                 echo 'success';
                 return false;
             }
+            file_put_contents(base_path('/vendor/alipay123444.txt'),$order);
             if ($order->total_user_id){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
@@ -431,18 +432,7 @@ class PayController extends Controller{
             $id = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
             file_put_contents(base_path('/vendor/alipay123.txt'),$id);
             /**修改费用数据为可用**/
-//            $money['delete_flag']                = 'Y';
-//            $money['settle_flag']                = 'W';
-//            $tmsOrderCost = TmsOrderCost::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
-//            if ($tmsOrderCost){
-//                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
-//                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
-//            }
-//            $tmsOrderDispatch = TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
-//            if ($tmsOrderDispatch){
-//                $dispatch_list = array_column($tmsOrderDispatch->toArray(),'self_id');
-//                $orderStatus = TmsOrderDispatch::whereIn('self_id',$dispatch_list)->update($order_update);
-//            }
+
 //            /**推送**/
 //            $center_list = '有从'. $order['send_shi_name'].'发往'.$order['gather_shi_name'].'的整车订单';
 //            $push_contnect = array('title' => "赤途承运端",'content' => $center_list , 'payload' => "订单信息");
