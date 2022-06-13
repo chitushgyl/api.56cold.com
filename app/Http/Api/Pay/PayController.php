@@ -202,7 +202,7 @@ class PayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
-//            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
+            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
             $order = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
 
             $payment_info = TmsPayment::where('order_id',$_POST['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
@@ -547,10 +547,6 @@ class PayController extends Controller{
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
             $order = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
-            if ($order->order_status == 2 || $order->order_status == 3){
-                echo 'success';
-                return false;
-            }
             $payment_info = TmsPayment::where('order_id',$array_data['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
             if ($payment_info){
                 echo 'success';
