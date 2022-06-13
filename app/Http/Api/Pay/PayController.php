@@ -417,7 +417,8 @@ class PayController extends Controller{
             $wallet['now_money'] = $capital->money;
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
-            UserWallet::insert($wallet);
+            $wallet11 = UserWallet::insert($wallet);
+            file_put_contents(base_path('/vendor/alipay123444.txt'),$wallet11);
             if ($order->order_type == 'line'){
                 $order_update['order_status'] = 3;
             }else{
