@@ -373,6 +373,7 @@ class PayController extends Controller{
         ini_set('date.timezone','Asia/Shanghai');
         error_reporting(E_ERROR);
         $result = file_get_contents('php://input', 'r');
+        file_put_contents(base_path('/vendor/alipay123444.txt'),$result);
         $array_data = json_decode(json_encode(simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
         if ($array_data['return_code'] == 'SUCCESS') {
             $now_time = date('Y-m-d H:i:s',time());
@@ -395,7 +396,7 @@ class PayController extends Controller{
                 echo 'success';
                 return false;
             }
-            file_put_contents(base_path('/vendor/alipay123444.txt'),$order);
+
             if ($order->total_user_id){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
