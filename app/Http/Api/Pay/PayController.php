@@ -184,10 +184,85 @@ class PayController extends Controller{
     }
 
     /*
-     * 极速版货到付款支付
+     * 极速版货到付款支付回调
      * */
     public function fastPaymentAlipayNotify(Request $request){
+        include_once base_path( '/vendor/alipay/aop/AopClient.php');
+        $aop = new \AopClient();
+        $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
+        $flag = $aop->rsaCheckV1($_POST, NULL, "RSA2");
+        if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
+            $now_time = date('Y-m-d H:i:s',time());
+            $pay['order_id'] = $_POST['out_trade_no'];
+            $pay['pay_number'] = $_POST['total_amount'] * 100;
+            $pay['platformorderid'] = $_POST['trade_no'];
+            $pay['create_time'] = $pay['update_time'] = $now_time;
+            $pay['payname'] = $_POST['buyer_logon_id'];
+            $pay['paytype'] = 'ALIPAY';//
+            $pay['pay_result'] = 'SU';//
+            $pay['state'] = 'in';//支付状态
+            $pay['self_id'] = generate_id('pay_');
+//            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
+            $order = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
 
+            $payment_info = TmsPayment::where('order_id',$_POST['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
+            if ($payment_info){
+                echo 'success';
+                return false;
+            }
+            if ($order->total_user_id){
+                $pay['total_user_id'] = $_POST['passback_params'];
+                $wallet['total_user_id'] = $_POST['passback_params'];
+                $where = [
+                    ['total_user_id','=',$_POST['passback_params']]
+                ];
+            }else{
+                $pay['group_code'] = $_POST['passback_params'];
+                $pay['group_code'] = $_POST['passback_params'];
+                $wallet['group_code'] = $_POST['passback_params'];
+                $wallet['group_name'] = $order->group_name;
+                $where = [
+                    ['group_code','=',$_POST['passback_params']]
+                ];
+            }
+            TmsPayment::insert($pay);
+            $capital = UserCapital::where($where)->first();
+            $wallet['self_id'] = generate_id('wallet_');
+            $wallet['produce_type'] = 'out';
+            $wallet['capital_type'] = 'wallet';
+            $wallet['money'] = $_POST['total_amount'] * 100;
+            $wallet['create_time'] = $now_time;
+            $wallet['update_time'] = $now_time;
+            $wallet['now_money'] = $capital->money;
+            $wallet['now_money_md'] = get_md5($capital->money);
+            $wallet['wallet_status'] = 'SU';
+            UserWallet::insert($wallet);
+
+            if ($order->order_type == 'line'){
+                $order_update['order_status'] = 2;
+            }else{
+                $order_update['order_status'] = 2;
+            }
+            $order_update['on_line_flag'] = 'Y';
+            $order_update['update_time'] = date('Y-m-d H:i:s',time());
+            $id = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
+            /**修改费用数据为可用**/
+//            $money['delete_flag']                = 'Y';
+//            $money['settle_flag']                = 'W';
+//            $tmsOrderCost = TmsOrderCost::where('order_id',$_POST['out_trade_no'])->select('self_id')->get();
+//            if ($tmsOrderCost){
+//                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+//                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+//            }
+            if ($id){
+                echo 'success';
+            }else{
+                echo 'fail';
+            }
+
+        } else {
+            echo 'fail';
+        }
     }
 
     /**
@@ -475,8 +550,8 @@ class PayController extends Controller{
             $pay['pay_result'] = 'SU';//微信账号
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');//微信账号
-            $order = TmsOrder::where('self_id',$array_data['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_state'])->first();
-            if ($order->pay_state == 'Y'){
+            $order = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
+            if ($order->order_status == 2 || $order->order_status == 3){
                 echo 'success';
                 return false;
             }
@@ -507,23 +582,18 @@ class PayController extends Controller{
             $wallet['now_money'] = $capital->money;
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
-//            $order_update['order_status'] = 6;
-            $order_update['pay_state'] = 'Y';
+            UserWallet::insert($wallet);
+
+            if ($order->order_type == 'line'){
+                $order_update['order_status'] = 3;
+            }else{
+                $order_update['order_status'] = 2;
+            }
+            $order_update['on_line_flag'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
-            $id = TmsOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
-            if($order->order_type == 'vehicle'){
-                $dispatch_where['pay_status'] = 'Y';
-                $dispatch_where['update_time'] = $now_time;
-                TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->update($dispatch_where);
-            }
-            /**修改费用数据为可用**/
-            $money['delete_flag']                = 'Y';
-            $money['settle_flag']                = 'W';
-            $tmsOrderCost = TmsOrderCost::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
-            if ($tmsOrderCost){
-                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
-                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
-            }
+
+            $id = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
+
             if ($id){
                 echo 'success';
             }else{
