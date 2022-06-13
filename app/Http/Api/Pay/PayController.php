@@ -238,12 +238,8 @@ class PayController extends Controller{
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
 
-            if ($order->order_type == 'line'){
-                $order_update['order_status'] = 2;
-            }else{
-                $order_update['order_status'] = 2;
-            }
-            $order_update['on_line_flag'] = 'Y';
+
+            $order_update['pay_status'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
             /**修改费用数据为可用**/
@@ -583,13 +579,7 @@ class PayController extends Controller{
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
-
-            if ($order->order_type == 'line'){
-                $order_update['order_status'] = 3;
-            }else{
-                $order_update['order_status'] = 2;
-            }
-            $order_update['on_line_flag'] = 'Y';
+            $order_update['pay_status'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
 
             $id = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
