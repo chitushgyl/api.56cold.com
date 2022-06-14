@@ -125,6 +125,8 @@ Route::group([
     Route::any('/pay/fastOrderBalancePay', 'Pay\PayController@fastOrderBalancePay');
     Route::any('/pay/wechat', 'Pay\PayController@wechat');
     Route::any('/pay/paymentBalancePay', 'Pay\PayController@paymentBalancePay');
+    Route::any('/pay/nativePay', 'Pay\PayController@nativePay');
+    Route::any('/pay/qrcodeAlipay', 'Pay\PayController@qrcodeAlipay');
 });
 Route::any('/pay/fastOrderAlipayNotify', 'Pay\PayController@fastOrderAlipayNotify');
 Route::any('/pay/fastPaymentAlipayNotify', 'Pay\PayController@fastPaymentAlipayNotify');

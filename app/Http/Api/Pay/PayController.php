@@ -722,5 +722,77 @@ class PayController extends Controller{
 
     }
 
+    /*** 支付宝扫码支付**/
+     public function  qrcodeAlipay(Request $request){
+         $config    = config('tms.alipay_config');//引入配置文件参数
+         $input     = $request->all();
+         $user_info = $request->get('user_info');//接收中间件产生的参数
+         $type      = $request->input('type'); // 1  2  3
+         $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
+         $self_id   = $request->input('self_id');// 订单ID
+         $price     = $request->input('price');// 支付金额
+//        $price     = 0.01;
+         $type      = 3;
+         if (!$user_info){
+             $msg['code'] = 401;
+             $msg['msg']  = '未登录，请完成登录！';
+             return $msg;
+         }
+         /**虚拟数据
+         $user_id = 'user_15615612312454564';
+         $price = 0.01;
+         $type = 1;
+         $self_id = 'order_2021030945673082733451';
+          * */
+         if ($user_info->type == 'user' || $user_info->type == 'carriage'){
+             $user_id = $user_info->total_user_id;
+         }else{
+             $user_id = $user_info->group_code;
+         }
+         include_once base_path( '/vendor/alipay/aop/AopClient.php');
+         include_once base_path( '/vendor/alipay/aop/request/AlipayTradePrecreateRequest.php');
+         $aop = new \AopClient();
+//        $request = new \AlipayTradeAppPayRequest();
+         $request = new \AlipayTradePrecreateRequest();
+         $aop->gatewayUrl = $config['gatewayUrl'];
+         $aop->appId = $config['app_id'];
+         $aop->rsaPrivateKey = $config['merchant_private_key'];
+         $aop->format = $config['format'];
+         $aop->charset = $config['charset'];
+         $aop->signType = $config['sign_type'];
+         //运单支付
+         $subject = '订单支付';
+         $notifyurl = "https://ytapi.56cold.com/alipay/qrcode_notify";
+
+         $aop->alipayrsaPublicKey = $config['alipay_public_key'];
+         $bizcontent = json_encode([
+             'body' => '支付宝支付',
+             'subject' => $subject,
+             'out_trade_no' => $self_id,//此订单号为商户唯一订单号
+             'total_amount' => $price,//保留两位小数
+             'product_code' => 'FACE_TO_FACE_PAYMENT',
+             'passback_params' => $user_id,
+         ]);
+
+         $request->setNotifyUrl($notifyurl);
+         $request->setBizContent($bizcontent);
+         //这里和普通的接口调用不同，使用的是execute
+         $result = $aop->execute($request);
+         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
+         $resultCode = $result->$responseNode->code;
+         $qr_code_url = $result->$responseNode->qr_code;
+//        dd($qr_code_url);
+         $res = $this->qrcode($qr_code_url);
+         if($res){
+             $msg['code'] = 200;
+             $msg['msg'] = '请求成功';
+             $msg['data'] = 'https://ytapi.56cold.com/'.$res;
+             return $msg;
+         }else{
+             $msg['code'] = 301;
+             $msg['msg'] = '请求失败，请刷新重试';
+             return $msg;
+         }
+     }
 }
 ?>

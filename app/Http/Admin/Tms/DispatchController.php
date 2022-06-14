@@ -2399,7 +2399,7 @@ class DispatchController extends CommonController{
                 ['receiver_id','=',$group_code],
                 ['order_type','!=','lift'],
             ];
-            $select=['self_id','receiver_id','create_time','create_time','group_name','group_code','order_type',
+            $select=['self_id','receiver_id','create_time','create_time','group_name','group_code','order_type','pay_status',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_status','receipt_flag','remark',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address','clod','total_user_id','delete_flag','total_money',
                 'good_info','good_number','good_weight','good_volume','total_money','send_time','gather_time','pay_type','dispatch_flag'];
