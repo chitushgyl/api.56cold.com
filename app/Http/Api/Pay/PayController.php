@@ -548,10 +548,10 @@ class PayController extends Controller{
             $pay['self_id'] = generate_id('pay_');//微信账号
             $order = TmsLittleOrder::where('self_id',$array_data['out_trade_no'])->select(['self_id','total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name'])->first();
             $payment_info = TmsPayment::where('order_id',$array_data['out_trade_no'])->select(['pay_result','state','order_id','dispatch_id'])->first();
-            if ($payment_info){
-                echo 'success';
-                return false;
-            }
+//            if ($payment_info){
+//                echo 'success';
+//                return false;
+//            }
             if ($order->total_user_id){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
