@@ -1552,7 +1552,7 @@ class TakeController extends Controller{
         $project_type     = $request->get('project_type');
         $button_info      = $request->get('buttonInfo');
 
-        $select=['self_id','order_type','order_status','group_code','group_name','use_flag','on_line_flag','total_money','good_info',
+        $select=['self_id','order_type','order_status','group_code','group_name','use_flag','on_line_flag','total_money','good_info','pay_status',
             'good_number','good_weight','good_volume','gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi',
             'gather_qu','gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','clod','create_time','receipt_flag','gather_address_longitude',
             'gather_address_latitude','send_address_id','send_contacts_id','send_name','send_tel', 'send_sheng','send_shi','send_time','gather_time',
