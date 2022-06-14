@@ -762,7 +762,7 @@ class PayController extends Controller{
          $aop->signType = $config['sign_type'];
          //运单支付
          $subject = '订单支付';
-         $notifyurl = "https://ytapi.56cold.com/alipay/qrcode_notify";
+         $notifyurl = "https://api.56cold.com/alipay/qrcode_notify";
 
          $aop->alipayrsaPublicKey = $config['alipay_public_key'];
          $bizcontent = json_encode([
@@ -794,5 +794,48 @@ class PayController extends Controller{
              return $msg;
          }
      }
+
+    /**
+     * 生成二维码
+     * */
+    public function qrcode($value){
+        include_once base_path('/vendor/phpqrcode/phpqrcode.php');
+//         include_once base_path('/vendor/wxpay/lib/phpqrcode.php');
+        $qrcode = new \QRcode();
+        //二维码内容
+//        $value = 'https://api.56cold.com/alipay/getClientType';
+        $errorCorrectionLevel = 'H';//容错级别
+        $matrixPointSize = 5;//生成图片大小
+        //生成二维码图片
+        $qrcode->png($value,'qrcode.png',$errorCorrectionLevel, $matrixPointSize, 5,false);
+//        return $QrCode;
+        $logo =  base_path('/uploads/logo/logo.png');//准备好的logo图片
+        $QR = 'qrcode.png';//已经生成的原始二维码图
+        if ($logo !== FALSE) {
+            $QR = imagecreatefromstring(file_get_contents($QR));
+            $logo = imagecreatefromstring(file_get_contents($logo));
+            $QR_width = imagesx($QR);//二维码图片宽度
+            $QR_height = imagesy($QR);//二维码图片高度
+            $logo_width = imagesx($logo);//logo图片宽度
+            $logo_height = imagesy($logo);//logo图片高度
+            $logo_qr_width = $QR_width / 5;
+            $scale = $logo_width/$logo_qr_width;
+            $logo_qr_height = $logo_height/$scale;
+            $from_width = ($QR_width - $logo_qr_width) / 2;
+            //重新组合图片并调整大小
+            imagecopyresampled($QR, $logo, $from_width, $from_width, 0, 0, $logo_qr_width,
+                $logo_qr_height, $logo_width, $logo_height);
+        }
+        //输出图片
+//        $path = base_path('uploads/qrcode').'/';
+        $path = 'uploads/qrcode/';
+        $filename = $path.date('YmdHis').'.png';
+//        Header("Content-type: image/png");
+//        imagepng($QR);
+        imagepng($QR,$filename);
+//        imagedestroy($QR);
+        return $filename;
+
+    }
 }
 ?>
