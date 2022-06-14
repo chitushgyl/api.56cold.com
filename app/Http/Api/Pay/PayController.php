@@ -552,6 +552,7 @@ class PayController extends Controller{
 //                echo 'success';
 //                return false;
 //            }
+            file_put_contents(base_path('/vendor/wechat1.txt'),$pay);
             if ($order->total_user_id){
                 $pay['total_user_id'] = $array_data['attach'];
                 $wallet['total_user_id'] = $array_data['attach'];
