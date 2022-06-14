@@ -670,6 +670,57 @@ class PayController extends Controller{
                return $msg;
            }
        }
+       //微信扫码支付
+    public function nativePay(Request $request){
+        $input = $request->all();
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+//        $input = $request->post();
+        $self_id = $request->input('self_id');//订单ID
+        $price = $request->input('price');//支付金额
+        if ($user_info->type == 'user'|| $user_info->type == 'carriage'){
+            $user_id = $user_info->total_user_id;
+        }else{
+            $user_id = $user_info->group_code;
+        }
+//        $price = 0.01;
+        $body = '订单支付';
+        $out_trade_no = $self_id;
+        $notify_url = 'https://api.56cold.com/alipay/nativeNotify';
+        include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
+        include_once base_path('/vendor/wxpay/NativePay.php');
+        $notify = new \NativePay;
+        $params = new \WxPayUnifiedOrder;
+        $params->SetBody($body);//商品描述
+        $params->SetAttach($user_id);//设置附加数据，在查询API和支付通知中原样返回
+        $params->SetOut_trade_no($out_trade_no);//订单ID
+        $params->SetTotal_fee($price*100);//支付金额
+        $params->SetTime_start(date("YmdHis"));
+        $params->SetTime_expire(date("YmdHis", time() + 15*60));
+        $params->SetGoods_tag("test");//设置商品标记，代金券或立减优惠功能的参数 */
+        $params->SetNotify_url($notify_url);//回调地址
+        $params->SetTrade_type("NATIVE");//支付类型
+        $params->SetProduct_id($out_trade_no);//商品ID
+        $result = $notify->GetPayUrl($params);
+        $url = $result["code_url"];
+        $res = $this->qrcode($url);
+        if($res){
+            $msg['code'] = 200;
+            $msg['msg'] = '请求成功';
+            $msg['data'] = 'https://api.56cold.com/'.$res;
+            return $msg;
+        }else{
+            $msg['code'] = 301;
+            $msg['msg'] = '请求失败，请刷新重试';
+            return $msg;
+        }
+    }
+
+    /*
+     * 微信扫码支付回调
+     * */
+    public function nativeNotify(Request $request){
+
+    }
 
 }
 ?>
