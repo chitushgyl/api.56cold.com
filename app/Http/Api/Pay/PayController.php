@@ -814,7 +814,7 @@ class PayController extends Controller{
          $aop->signType = $config['sign_type'];
          //运单支付
          $subject = '订单支付';
-         $notifyurl = "https://api.56cold.com/pay/qrcode_notify";
+         $notifyurl = "https://api.56cold.com/pay/qrcodeNotify";
 
          $aop->alipayrsaPublicKey = $config['alipay_public_key'];
          $bizcontent = json_encode([
@@ -848,7 +848,7 @@ class PayController extends Controller{
      }
 
      /*** 支付宝扫码支付回调 **/
-     public function qrcode_notify(Request $request){
+     public function qrcodeNotify(Request $request){
          include_once base_path( '/vendor/alipay/aop/AopClient.php');
          $aop = new \AopClient();
          $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';

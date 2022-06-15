@@ -2515,16 +2515,7 @@ class DispatchController extends CommonController{
 
 
                     if ($value->order_status == 3){
-                        if ($value->order_type == 'line'){
-                            if ($value->group_code == $value->receiver_id || $value->receiver_id == $value->total_user_id){
-                                $value->button  = $button3;
-                            }else{
-                                $value->button  = $button1;
-                            }
-                        }else{
-                            $value->button  = $button3;
-                        }
-
+                        $value->button  = $button1;
                     }
                     if ($value->order_status == 4){
                         $value->button  = $button2;
