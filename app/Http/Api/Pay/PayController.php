@@ -814,7 +814,7 @@ class PayController extends Controller{
          $aop->signType = $config['sign_type'];
          //运单支付
          $subject = '订单支付';
-         $notifyurl = "https://api.56cold.com/alipay/qrcode_notify";
+         $notifyurl = "https://api.56cold.com/pay/qrcode_notify";
 
          $aop->alipayrsaPublicKey = $config['alipay_public_key'];
          $bizcontent = json_encode([

@@ -132,6 +132,8 @@ Route::any('/pay/fastOrderAlipayNotify', 'Pay\PayController@fastOrderAlipayNotif
 Route::any('/pay/fastPaymentAlipayNotify', 'Pay\PayController@fastPaymentAlipayNotify');
 Route::any('/pay/wechatNotify', 'Pay\PayController@wechatNotify');
 Route::any('/pay/paymentWechatNotify', 'Pay\PayController@paymentWechatNotify');
+Route::any('/pay/nativeNotify', 'Pay\PayController@nativeNotify');
+Route::any('/pay/qrcode_notify', 'Pay\PayController@qrcode_notify');
 
 Route::group([
     "middleware"=>['frontCheck','userCheck','holdCheck'],
