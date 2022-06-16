@@ -413,11 +413,11 @@ class PayController extends Controller{
         include_once base_path( '/vendor/wxAppPay/weixin.php');
         $out_trade_no = $self_id;
         $noturl = $pay_type[$type];
-        if ($user_type == 'user'){
+//        if ($user_type == 'user'){
             $config    = config('tms.fast_wechat_config_user');//引入配置文件参数
-        }else{
-            $config    = config('tms.fast_wechat_config_driver');//引入配置文件参数
-        }
+//        }else{
+//            $config    = config('tms.fast_wechat_config_driver');//引入配置文件参数
+//        }
 
         $appid  = $config['appid'];
         $mch_id = $config['mch_id'];
