@@ -136,12 +136,9 @@ class PayController extends Controller{
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
-            file_put_contents(base_path('/vendor/alipay1.txt'),$wallet);
-            if ($order->order_type == 'line'){
-                $order_update['order_status'] = 2;
-            }else{
-                $order_update['order_status'] = 2;
-            }
+
+
+            $order_update['order_status'] = 2;
             $order_update['on_line_flag'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsLittleOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
@@ -324,11 +321,8 @@ class PayController extends Controller{
         $wallet['wallet_status'] = 'SU';
         UserWallet::insert($wallet);
         TmsPayment::insert($pay);
-        if ($order->order_type == 'line'){
-            $order_update['order_status'] = 2;
-        }else{
-            $order_update['order_status'] = 2;
-        }
+
+        $order_update['order_status'] = 2;
         $order_update['on_line_flag'] = 'Y';
         $order_update['update_time'] = date('Y-m-d H:i:s',time());
         $id = TmsLittleOrder::where('self_id',$self_id)->update($order_update);
@@ -490,11 +484,7 @@ class PayController extends Controller{
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
 
-            if ($order->order_type == 'line'){
-                $order_update['order_status'] = 3;
-            }else{
-                $order_update['order_status'] = 2;
-            }
+            $order_update['order_status'] = 2;
             $order_update['on_line_flag'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
 
