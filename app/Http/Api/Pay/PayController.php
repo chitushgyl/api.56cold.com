@@ -647,8 +647,6 @@ class PayController extends Controller{
 
            $id = TmsLittleOrder::where('self_id',$self_id)->update($order_update);
 
-
-
            if ($id){
                $msg['code'] = 200;
                $msg['msg']  = '支付成功！';
