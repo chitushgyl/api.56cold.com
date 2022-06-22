@@ -412,6 +412,19 @@ class FastOrderController extends Controller{
             $v->self_id_show = substr($v->self_id,15);
             $v->clod=json_decode($v->clod,true);
             $v->send_time = date('m-d H:i',strtotime($v->send_time));
+            $car_list = [];
+            if ($v->tmsFastDispatch){
+                if($v->tmsFastDispatch->tmsFastCarriageDriver){
+                    foreach ($v->tmsFastDispatch->tmsFastCarriageDriver as $kk => $vv) {
+                        $carList['car_id'] = $vv->car_id;
+                        $carList['car_number'] = $vv->car_number;
+                        $carList['tel'] = $vv->tel;
+                        $carList['contacts'] = $vv->contacts;
+                        $car_list[] = $carList;
+                    }
+                    $v->car_info = $car_list;
+                }
+            }
             $info_clod = $v->clod;
             foreach ($info_clod as $key => $value){
                 $info_clod[$key]=$tms_control_type[$value];
