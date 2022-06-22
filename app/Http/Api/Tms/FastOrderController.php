@@ -327,9 +327,9 @@ class FastOrderController extends Controller{
             'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
             'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time'];
         $select1 = ['self_id','parame_name'];
-        $select2 = ['self_id','carriage_id','order_dispatch_id'];
-        $select3 = ['self_id','company_id','company_name','carriage_flag','total_money'];
-        $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
+        $select2 = ['self_id','order_id','carriage_id'];
+        $select3 = ['self_id'];
+        $select4 = ['self_id','carriage_id','use_flag','delete_flag','group_code','group_name','car_id','car_number','contacts','tel','price'];
         $data['info'] = TmsLittleOrder::with(['tmsCarType'=>function($query)use($select1){
             $query->select($select1);
         }])
