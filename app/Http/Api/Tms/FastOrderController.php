@@ -3,7 +3,8 @@ namespace App\Http\Api\Tms;
 use App\Http\Controllers\TmsController as Tms;
 use App\Models\Group\SystemGroup;
 use App\Models\Tms\AppSettingParam;
-use App\Models\Tms\TmsFastDispatch;use App\Models\Tms\TmsLittleOrder;
+use App\Models\Tms\TmsFastDispatch;
+use App\Models\Tms\TmsLittleOrder;
 use App\Models\Tms\TmsParam;
 use App\Models\Tms\TmsTypeCar;
 use App\Models\User\UserCapital;
@@ -13,9 +14,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\StatusController as Status;
-use App\Http\Controllers\DetailsController as Details;
-use App\Models\Tms\TmsCar;
+use App\Models\Tms\TmsCarriageDispatch;
+use App\Models\Tms\TmsCarriageDriver;
 
 use App\Models\Tms\TmsCarType;
 
@@ -333,15 +333,12 @@ class FastOrderController extends Controller{
         $data['info'] = TmsLittleOrder::with(['tmsCarType'=>function($query)use($select1){
             $query->select($select1);
         }])
-            ->with(['tmsCarriageDispatch'=>function($query)use($select2,$select3,$select4){
-                $query->where('delete_flag','=','Y');
+            ->with(['tmsFastDispatch'=>function($query)use($select2,$select3,$select4){
                 $query->select($select2);
-                $query->with(['tmsCarriage'=>function($query)use($select3){
-                    $query->where('delete_flag','=','Y');
+                $query->with(['tmsFastCarriage'=>function($query)use($select3,$select4){
                     $query->select($select3);
                 }]);
-                $query->with(['tmsCarriageDriver'=>function($query)use($select4){
-                    $query->where('delete_flag','=','Y');
+                $query->with(['tmsFastCarriageDriver'=>function($query)use($select4){
                     $query->select($select4);
                 }]);
             }])
