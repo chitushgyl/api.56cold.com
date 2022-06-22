@@ -326,7 +326,28 @@ class FastOrderController extends Controller{
             'gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address','follow_flag',
             'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
             'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time'];
-        $data['info'] = TmsLittleOrder::where($where);
+        $select1 = ['self_id','parame_name'];
+        $select2 = ['self_id','carriage_id','order_dispatch_id'];
+        $select3 = ['self_id','company_id','company_name','carriage_flag','total_money'];
+        $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
+        $data['info'] = TmsLittleOrder::with(['tmsCarType'=>function($query)use($select1){
+            $query->select($select1);
+        }])
+            ->with(['tmsCarriageDispatch'=>function($query)use($select2,$select3,$select4){
+                $query->where('delete_flag','=','Y');
+                $query->select($select2);
+                $query->with(['tmsCarriage'=>function($query)use($select3){
+                    $query->where('delete_flag','=','Y');
+                    $query->select($select3);
+                }]);
+                $query->with(['tmsCarriageDriver'=>function($query)use($select4){
+                    $query->where('delete_flag','=','Y');
+                    $query->select($select4);
+                }]);
+            }])
+            ->where($where);
+
+
 
         switch ($project_type){
             case 'user':
