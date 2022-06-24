@@ -28,7 +28,7 @@ class PayController extends Controller{
         $pay_type  = array_column(config('tms.fast_alipay_notify'),'notify','key');
         $self_id   = $request->input('self_id');// 订单ID
         $price     = $request->input('price');// 支付金额
-        $price     = 0.01;
+//        $price     = 0.01;
         if (!$user_info){
             $msg['code'] = 401;
             $msg['msg']  = '未登录，请完成登录！';
@@ -384,7 +384,7 @@ class PayController extends Controller{
             $msg['msg']  = '请选择支付类型';
             return $msg;
         }
-        $price = 0.01;
+//        $price = 0.01;
         /**虚拟数据
         $user_id = 'user_15615612312454564';
         $price = 0.01;
@@ -669,10 +669,10 @@ class PayController extends Controller{
         }else{
             $user_id = $user_info->group_code;
         }
-        $price = 0.01;
+//        $price = 0.01;
         $body = '订单支付';
         $out_trade_no = $self_id;
-        $notify_url = 'https://api.56cold.com/pay/nativeNotify';
+        $notify_url = 'https://ytapi.56cold.com/pay/nativeNotify';
         include_once base_path('/vendor/wxpay/lib/WxPay.Data.php');
         include_once base_path('/vendor/wxpay/NativePay.php');
         $notify = new \NativePay;
@@ -693,7 +693,7 @@ class PayController extends Controller{
         if($res){
             $msg['code'] = 200;
             $msg['msg'] = '请求成功';
-            $msg['data'] = 'https://api.56cold.com/'.$res;
+            $msg['data'] = 'https://ytapi.56cold.com/'.$res;
             return $msg;
         }else{
             $msg['code'] = 301;
@@ -771,7 +771,7 @@ class PayController extends Controller{
          $pay_type  = array_column(config('tms.alipay_notify'),'notify','key');
          $self_id   = $request->input('self_id');// 订单ID
          $price     = $request->input('price');// 支付金额
-        $price     = 0.01;
+//        $price     = 0.01;
          $type      = 3;
          if (!$user_info){
              $msg['code'] = 401;
@@ -826,7 +826,7 @@ class PayController extends Controller{
          if($res){
              $msg['code'] = 200;
              $msg['msg'] = '请求成功';
-             $msg['data'] = 'https://api.56cold.com/'.$res;
+             $msg['data'] = 'https://ytapi.56cold.com/'.$res;
              return $msg;
          }else{
              $msg['code'] = 301;
