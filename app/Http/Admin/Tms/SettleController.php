@@ -46,10 +46,17 @@ class SettleController extends CommonController{
 		$warehouse_id   =$request->input('warehouse_id');
 		$gathering_flag   =$request->input('gathering_flag');
         $area           =$request->input('area');
+        $start_time     =$request->input('start_time');
+        $end_time     =$request->input('end_time');
         $listrows       =$num;
         $firstrow       =($page-1)*$listrows;
-//        $group_code = 'group_202102241012208109979539';
-//        $group_info['group_id'] = 'one';
+
+        if ($start_time){
+            $start_time = $start_time.' 00:00:00';
+        }
+        if ($end_time){
+            $end_time = $end_time.' 23:59:59';
+        }
         $search=[
             ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
             ['type'=>'all','name'=>'use_flag','value'=>$use_flag],
@@ -57,8 +64,9 @@ class SettleController extends CommonController{
             ['type'=>'=','name'=>'company_id','value'=>$company_id],
 			['type'=>'=','name'=>'warehouse_id','value'=>$warehouse_id],
 			['type'=>'=','name'=>'gathering_flag','value'=>$gathering_flag],
+            ['type'=>'>=','name'=>'create_time','value'=>$start_time],
+            ['type'=>'<','name'=>'create_time','value'=>$end_time],
         ];
-
 
         $where=get_list_where($search);
 
