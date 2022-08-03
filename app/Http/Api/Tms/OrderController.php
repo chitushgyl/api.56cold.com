@@ -2173,7 +2173,7 @@ class OrderController extends Controller{
             'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
 
         $select2 = ['self_id','carriage_id','order_dispatch_id'];
-        $select3 = ['self_id','company_id','company_name','carriage_flag','total_money'];
+        $select3 = ['self_id','company_id','company_name','carriage_flag','total_money','carriage_flag'];
         $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
         $selectList = ['self_id','receipt','order_id','total_user_id','group_code','group_name'];
         $info = TmsOrder::with(['TmsOrderDispatch' => function($query) use($list_select,$selectList,$select1,$select2,$select3,$select4){
@@ -2238,6 +2238,11 @@ class OrderController extends Controller{
                             $car_list[] = $carList;
                         }
                         $info->car_info = $car_list;
+                    }else{
+                        $v->car_info = '021-59111020';
+                        $carriage_company = TmsGroup::where(['self_id'=>$v->tmsCarriageDispatch->tmsCarriage->company_id],['type'=>'carriers'])->select('
+                        tel','contacts')->first();
+                        $v->car_info = '021-59111020/'.$carriage_company->tel;
                     }
                 }
             }
@@ -2365,9 +2370,14 @@ class OrderController extends Controller{
             $order_details8['name'] = '时效';
             $order_details8['value'] = $info->trunking;
             $order_details8['color'] = '#000000';
+            if($info->tmsOrderDispatch->tmsCarriageDispatch->tmsCarriage->carriage_flag == 'carriers'){
+                $order_details9['name'] = '调度信息';
+                $order_details9['value'] = $info->car_info;
+            }else{
+                $order_details9['name'] = '运输信息';
+                $order_details9['value'] = $info->car_info;
+            }
 
-            $order_details9['name'] = '运输信息';
-            $order_details9['value'] = $info->car_info;
 
             $order_details10['name'] = '回单信息';
             $order_details10['value'] = $info->receipt;
