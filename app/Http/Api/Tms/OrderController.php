@@ -2248,7 +2248,7 @@ class OrderController extends Controller{
                         $carriage_company = TmsGroup::where($carriage_where)->select('tel','contacts')->first();
                         $carList['car_id']     = '';
                         $carList['car_number'] = '';
-                        $carList['tel'] = '021-59111020/'.$carriage_company->tel;
+                        $carList['tel'] = $carriage_company->tel;
                         $carList['contacts'] = '';
                         $car_list[] = $carList;
                         $info->car_info = $car_list;
