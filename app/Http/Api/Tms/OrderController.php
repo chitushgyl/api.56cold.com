@@ -2246,7 +2246,12 @@ class OrderController extends Controller{
                             ['self_id','=',$v->tmsCarriageDispatch['tmsCarriage'][0]['company_id']]
                         ];
                         $carriage_company = TmsGroup::where($carriage_where)->select('tel','contacts')->first();
-                        $info->car_info = '021-59111020/'.$carriage_company->tel;
+                        $carList['car_id']     = '';
+                        $carList['car_number'] = '';
+                        $carList['tel'] = '021-59111020/'.$carriage_company->tel;
+                        $carList['contacts'] = '';
+                        $car_list[] = $carList;
+                        $info->car_info = $car_list;
                     }
                 }
             }
