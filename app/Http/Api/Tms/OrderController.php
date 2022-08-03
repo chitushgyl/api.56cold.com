@@ -2380,7 +2380,10 @@ class OrderController extends Controller{
                 $order_details9['value'] = $info->car_info;
             }
 
-
+            $msg['code'] = 200;
+            $msg['msg']  = "数据拉取成功";
+            $msg['data'] = $info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'];
+            return $msg;
             $order_details10['name'] = '回单信息';
             $order_details10['value'] = $info->receipt;
 
