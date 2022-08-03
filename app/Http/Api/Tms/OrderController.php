@@ -2240,7 +2240,7 @@ class OrderController extends Controller{
                         }
                         $info->car_info = $car_list;
                     }
-                    if($v->tmsCarriageDispatch->tmsCarriage->carriage_flag == 'carriers'){
+                    if($v->tmsCarriageDispatch['tmsCarriage'][0]['carriage_flag'] == 'carriers'){
                         $carriage_where = [
                             ['type','=','carriers'],
                             ['self_id','=',$v->tmsCarriageDispatch['tmsCarriage'][0]['company_id']]
