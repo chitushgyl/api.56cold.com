@@ -2241,7 +2241,7 @@ class OrderController extends Controller{
                         $info->car_info = $car_list;
                     }else{
                         $v->car_info = '021-59111020';
-                        $carriage_company = TmsGroup::where(['self_id'=>$v->tmsCarriageDispatch['tmsCarriage']->company_id],['type'=>'carriers'])->select('
+                        $carriage_company = TmsGroup::where(['self_id'=>$v->tmsCarriageDispatch['tmsCarriage'][0]['company_id']],['type'=>'carriers'])->select('
                         tel','contacts')->first();
                         $v->car_info = '021-59111020/'.$carriage_company->tel;
                     }
@@ -2380,10 +2380,6 @@ class OrderController extends Controller{
                 $order_details9['value'] = $info->car_info;
             }
 
-            $msg['code'] = 200;
-            $msg['msg']  = "数据拉取成功";
-            $msg['data'] = $info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'];
-            return $msg;
             $order_details10['name'] = '回单信息';
             $order_details10['value'] = $info->receipt;
 
