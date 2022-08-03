@@ -2196,10 +2196,7 @@ class OrderController extends Controller{
             }]);
 
         }])->where($where)->select($select)->first();
-        $msg['code'] = 200;
-        $msg['msg']  = "数据拉取成功";
-        $msg['data'] = $info;
-        return $msg;
+
         if($info) {
             $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
             $info->order_type_show   = $tms_order_type[$info->order_type] ??null;
@@ -2375,7 +2372,7 @@ class OrderController extends Controller{
             $order_details8['value'] = $info->trunking;
             $order_details8['color'] = '#000000';
 
-            if($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage->carriage_flag == 'carriers'){
+            if($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'] == 'carriers'){
                 $order_details9['name'] = '调度信息';
                 $order_details9['value'] = $info->car_info;
             }else{
