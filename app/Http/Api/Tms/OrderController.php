@@ -2240,17 +2240,17 @@ class OrderController extends Controller{
                         }
                         $info->car_info = $car_list;
                     }else{
-                        $v->car_info = '021-59111020';
+                        $msg['code'] = 200;
+                        $msg['msg']  = "数据拉取成功";
+                        $msg['data'] = 123;
+                        return $msg;
                         $carriage_where = [
                             ['type','=','carriers'],
                             ['self_id','=',$v->tmsCarriageDispatch['tmsCarriage'][0]['company_id']]
                         ];
                         $carriage_company = TmsGroup::where($carriage_where)->select('tel','contacts')->first();
                         $v->car_info = '021-59111020/'.$carriage_company->tel;
-                        $msg['code'] = 200;
-                        $msg['msg']  = "数据拉取成功";
-                        $msg['data'] = $carriage_company;
-                        return $msg;
+
                     }
                 }
             }
