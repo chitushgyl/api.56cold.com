@@ -2230,6 +2230,11 @@ class OrderController extends Controller{
                 }
                 $car_list = [];
                 if ($v->tmsCarriageDispatch){
+                    $msg['code'] = 200;
+                    $msg['msg']  = "数据拉取成功";
+                    $msg['data'] = $v->tmsCarriageDispatch;
+                    $msg['data1'] = $v->tmsCarriageDispatch->tmsCarriageDriver;
+                    return $msg;
                     if ($v->tmsCarriageDispatch->tmsCarriageDriver){
                         foreach ($v->tmsCarriageDispatch->tmsCarriageDriver as $kk => $vv){
                             $carList['car_id']     = $vv->car_id;
@@ -2240,10 +2245,6 @@ class OrderController extends Controller{
                         }
                         $info->car_info = $car_list;
                     }else{
-                        $msg['code'] = 200;
-                        $msg['msg']  = "数据拉取成功";
-                        $msg['data'] = 123;
-                        return $msg;
                         $carriage_where = [
                             ['type','=','carriers'],
                             ['self_id','=',$v->tmsCarriageDispatch['tmsCarriage'][0]['company_id']]
