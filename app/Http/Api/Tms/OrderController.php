@@ -2230,12 +2230,7 @@ class OrderController extends Controller{
                 }
                 $car_list = [];
                 if ($v->tmsCarriageDispatch){
-                    $msg['code'] = 200;
-                    $msg['msg']  = "数据拉取成功";
-                    $msg['data'] = $v->tmsCarriageDispatch;
-                    $msg['data1'] = $v->tmsCarriageDispatch->tmsCarriageDriver;
-                    return $msg;
-                    if ($v->tmsCarriageDispatch->tmsCarriageDriver){
+                    if (!empty($v->tmsCarriageDispatch->tmsCarriageDriver)){
                         foreach ($v->tmsCarriageDispatch->tmsCarriageDriver as $kk => $vv){
                             $carList['car_id']     = $vv->car_id;
                             $carList['car_number'] = $vv->car_number;
