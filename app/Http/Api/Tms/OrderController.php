@@ -2249,7 +2249,10 @@ class OrderController extends Controller{
                     }
                 }
             }
-
+            $msg['code'] = 200;
+            $msg['msg']  = "数据拉取成功";
+            $msg['data'] = $info->car_info;
+            return $msg;
             /** 零担发货收货仓**/
             $line_info = [];
             $pick_store_info = [];
