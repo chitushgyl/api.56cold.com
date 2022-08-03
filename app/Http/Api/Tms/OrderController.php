@@ -2370,7 +2370,7 @@ class OrderController extends Controller{
             $order_details8['name'] = '时效';
             $order_details8['value'] = $info->trunking;
             $order_details8['color'] = '#000000';
-            if($info->tmsOrderDispatch->tmsCarriageDispatch->tmsCarriage->carriage_flag == 'carriers'){
+            if($info->tmsOrderDispatch[0]["tmsCarriageDispatch->tmsCarriage->carriage_flag"] == 'carriers'){
                 $order_details9['name'] = '调度信息';
                 $order_details9['value'] = $info->car_info;
             }else{
