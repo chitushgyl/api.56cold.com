@@ -2063,7 +2063,7 @@ class OrderController extends CommonController{
             'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
 
         $select2 = ['self_id','carriage_id','order_dispatch_id'];
-        $select3 = ['self_id','company_id','company_name','carriage_flag','total_money'];
+        $select3 = ['self_id','company_id','company_name','carriage_flag','total_money','carriage_flag'];
         $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
         $selectList = ['self_id','receipt','order_id','total_user_id','group_code','group_name'];
         $info = TmsOrder::with(['TmsOrderDispatch' => function($query) use($list_select,$selectList,$select1,$select2,$select3,$select4){
@@ -2130,6 +2130,19 @@ class OrderController extends CommonController{
                             $carList['contacts'] = $vv->contacts;
                             $car_list[] = $carList;
                         }
+                        $info->car_info = $car_list;
+                    }
+                    if($v->tmsCarriageDispatch['tmsCarriage'][0]['carriage_flag'] == 'carriers'){
+                        $carriage_where = [
+                            ['type','=','carriers'],
+                            ['self_id','=',$v->tmsCarriageDispatch['tmsCarriage'][0]['company_id']]
+                        ];
+                        $carriage_company = TmsGroup::where($carriage_where)->select('tel','contacts')->first();
+                        $carList['car_id']     = '';
+                        $carList['car_number'] = '';
+                        $carList['tel'] = $carriage_company->tel;
+                        $carList['contacts'] = '';
+                        $car_list[] = $carList;
                         $info->car_info = $car_list;
                     }
                 }
@@ -2259,8 +2272,13 @@ class OrderController extends CommonController{
             $order_details8['value'] = $info->trunking;
             $order_details8['color'] = '#000000';
 
-            $order_details9['name'] = '运输信息';
-            $order_details9['value'] = $info->car_info;
+            if($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'] == 'carriers'){
+                $order_details9['name'] = '调度信息';
+                $order_details9['value'] = $info->car_info;
+            }else{
+                $order_details9['name'] = '运输信息';
+                $order_details9['value'] = $info->car_info;
+            }
 
             $order_details10['name'] = '回单信息';
             $order_details10['value'] = $info->receipt;
