@@ -2378,17 +2378,14 @@ class OrderController extends Controller{
             $order_details8['name'] = '时效';
             $order_details8['value'] = $info->trunking;
             $order_details8['color'] = '#000000';
-            $msg['code'] = 200;
-            $msg['msg']  = "数据拉取成功";
-            $msg['data'] = $info;
-            return $msg;
-            if($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'] == 'carriers'){
-                $order_details9['name'] = '调度信息';
-                $order_details9['value'] = $info->car_info;
-            }else{
+//            if ($info->tmsOrderDispatch[0]["tmsCarriageDispatch"])
+//            if($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'] == 'carriers'){
+//                $order_details9['name'] = '调度信息';
+//                $order_details9['value'] = $info->car_info;
+//            }else{
                 $order_details9['name'] = '运输信息';
                 $order_details9['value'] = $info->car_info;
-            }
+//            }
 
             $order_details10['name'] = '回单信息';
             $order_details10['value'] = $info->receipt;
