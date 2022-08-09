@@ -2272,12 +2272,12 @@ class OrderController extends CommonController{
             $order_details8['value'] = $info->trunking;
             $order_details8['color'] = '#000000';
 
-            if($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'] == 'carriers'){
-                $order_details9['name'] = '调度信息';
-                $order_details9['value'] = $info->car_info;
-            }else{
-                $order_details9['name'] = '运输信息';
-                $order_details9['value'] = $info->car_info;
+            $order_details9['name'] = '运输信息';
+            $order_details9['value'] = $info->car_info;
+            if ($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]){
+                if($info->tmsOrderDispatch[0]["tmsCarriageDispatch"]->tmsCarriage[0]['carriage_flag'] == 'carriers'){
+                    $order_details9['name'] = '调度信息';
+                }
             }
 
             $order_details10['name'] = '回单信息';
