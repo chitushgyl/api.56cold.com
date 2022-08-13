@@ -837,6 +837,16 @@ class DispatchController extends CommonController{
             $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
             $info->self_id_show = substr($info->self_id,15);
             $info->driver_price = 0;
+
+            if ($info->pay_status == 'Y' && $info->pay_type == 'offline'){
+                $info->pay_state = '已付款';
+            }elseif($info->pay_type == 'online'){
+                $info->pay_state = '已付款';
+            }elseif($info->pay_type == 'offline' && $info->pay_status == 'N'){
+                $info->pay_state = '未付款';
+            }elseif(!$info->pay_type && $info->pay_status == 'N'){
+                $info->pay_state = '未付款';
+            }
             $cold = $info->clod;
             foreach ($cold as $key => $value){
                 $cold[$key] =$tms_control_type[$value];
@@ -903,6 +913,9 @@ class DispatchController extends CommonController{
             if ($info->group_code != $info->receiver_id || $info->total_user_id != $info->receiver_id){
                 $order_details1['value'] = '¥'.$info->on_line_money;
             }
+            $order_details7['name'] = '是否付款';
+            $order_details7['value'] = $info->pay_state;
+            $order_details7['color'] = '#FF7A1A';
             $order_details2['name'] = '里程';
             $order_details2['value'] = $info->kilometre.'km';
             $order_details2['color'] = '#FF7A1A';
@@ -962,7 +975,7 @@ class DispatchController extends CommonController{
             $order_details11['color'] = '#000000';
 
             $order_details[] = $order_details1;
-//            $order_details[]= $order_details2;
+            $order_details[]= $order_details7;
             if(!empty($info->tmsCarriage)){
                 $car_info[] = $order_details11;
             }
