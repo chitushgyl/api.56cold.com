@@ -2190,6 +2190,9 @@ class OrderController extends Controller{
                     $query->select($select4);
                 }]);
             }]);
+//            $query->with(['tmsCarriageDriver'=>function($query)use($select4) {
+//
+//            }]);
             $query->with(['tmsReceipt'=>function($query)use($selectList) {
                 $query->where('delete_flag', '=', 'Y');
                 $query->select($selectList);

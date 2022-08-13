@@ -182,6 +182,16 @@ class TakeController extends Controller{
             $info->info=json_decode($info->info,true);
             $info->order_type_show=$tms_order_type[$info->order_type]??null;
             $info->pay_type_show = $tms_pay_type[$info->pay_type]??null;
+            $info->pay_status = $tms_pay_type[$info->pay_type];
+            if ($info->pay_state == 'Y' && $info->pay_type == 'offline'){
+                $info->pay_state = '已付款';
+            }elseif($info->pay_type == 'online'){
+                $info->pay_state = '已付款';
+            }elseif($info->pay_type == 'offline' && $info->pay_state == 'N'){
+                $info->pay_state = '未付款';
+            }elseif(!$info->pay_type && $info->pay_state == 'N'){
+                $info->pay_state = '未付款';
+            }
             $info_clod = $info->clod;
             $info->self_id_show  = substr($info->self_id,15);
             foreach ($info_clod as $key => $value){
@@ -232,6 +242,9 @@ class TakeController extends Controller{
             $order_details1['name'] = '订单金额';
             $order_details1['value'] = '¥'.$info->on_line_money;
             $order_details1['color'] = '#FF7A1A';
+            $order_details7['name'] = '是否付款';
+            $order_details7['value'] = $info->pay_state;
+            $order_details7['color'] = '#FF7A1A';
             $order_details2['name'] = '里程';
             $order_details2['value'] = $info->kilometre.'km';
             $order_details2['color'] = '#FF7A1A';
@@ -289,7 +302,7 @@ class TakeController extends Controller{
             $order_details10['value'] = $info->receipt;
 
             $order_details[] = $order_details1;
-//            $order_details[]= $order_details2;
+            $order_details[]= $order_details7;
 
             if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 if ($info->kilometre){
@@ -1008,6 +1021,9 @@ class TakeController extends Controller{
             foreach ($wait_info->tmsCarriageDispatch->tmsCarriage as $key => $value){
                 TmsCarriage::where('self_id',$value->self_id)->update($carriage_order);
             }
+
+            /*** 添加冻结余额**/
+
 
             if($id){
                 $msg['code'] = 200;
