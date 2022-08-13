@@ -182,7 +182,6 @@ class TakeController extends Controller{
             $info->info=json_decode($info->info,true);
             $info->order_type_show=$tms_order_type[$info->order_type]??null;
             $info->pay_type_show = $tms_pay_type[$info->pay_type]??null;
-            $info->pay_status = $tms_pay_type[$info->pay_type];
             if ($info->pay_state == 'Y' && $info->pay_type == 'offline'){
                 $info->pay_state = '已付款';
             }elseif($info->pay_type == 'online'){
@@ -192,6 +191,7 @@ class TakeController extends Controller{
             }elseif(!$info->pay_type && $info->pay_state == 'N'){
                 $info->pay_state = '未付款';
             }
+            $info->pay_status = $tms_pay_type[$info->pay_type];
             $info_clod = $info->clod;
             $info->self_id_show  = substr($info->self_id,15);
             foreach ($info_clod as $key => $value){
