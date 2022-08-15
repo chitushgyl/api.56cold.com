@@ -583,6 +583,7 @@ class UserController extends Controller{
                     if ($user_info){
                         if ($user_info->type == 'user' ||$user_info->type == 'carriage'){
                             $user_info->userCapital->money = $money = number_format($user_info->userCapital->money/100,2);
+                            $user_info->userCapital->_wait_money = number_format($user_info->userCapital->wait_money/100,2);
                         }else{
                             $admin_where=[
                                 ['group_code','=',$user_info->group_code],
@@ -591,6 +592,7 @@ class UserController extends Controller{
                             $select_capital=['self_id','money','wait_money'];
                             $money_info=UserCapital::where($admin_where)->select($select_capital)->first();
                             $user_info->userCapital->money = $money = number_format($money_info->money/100,2);
+                            $user_info->userCapital->wait_money = number_format($money_info->wait_money/100,2);
                         }
                     }
                     foreach ($v->sysFoot as $kkk => $vvv){
