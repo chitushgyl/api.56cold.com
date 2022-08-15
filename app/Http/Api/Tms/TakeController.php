@@ -1037,6 +1037,7 @@ class TakeController extends Controller{
             $data['capital_type'] = 'wallet';
             $data['create_time'] = date('Y-m-d H:i:s',time());
             $data['update_time'] = date('Y-m-d H:i:s',time());
+            $data['total_user_id'] = $wait_info->receiver_id;
             $data['wallet_status'] = 'SU';
 
             UserWallet::insert($data);
