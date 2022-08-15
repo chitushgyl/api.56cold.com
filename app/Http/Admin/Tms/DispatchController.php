@@ -1601,6 +1601,24 @@ class DispatchController extends CommonController{
                 TmsCarriage::where('self_id',$value->self_id)->update($carriage_order);
             }
 
+            /*** 添加冻结金额  **/
+            $wallet = UserCapital::where('total_user_id',$wait_info->receiver_id)->select(['self_id', 'money','wait_money'])->first();
+
+            $money['wait_money'] = $wallet->wait_money + $wait_info->on_line_money;
+            $data['money'] = $wait_info->on_line_money;
+
+            $money['update_time'] = date('Y-m-d H:i:s',time());
+            UserCapital::where('total_user_id',$wait_info->receiver_id)->update($money);
+
+            $data['self_id'] = generate_id('wallet_');
+            $data['produce_type'] = 'in';
+            $data['capital_type'] = 'wallet';
+            $data['create_time'] = date('Y-m-d H:i:s',time());
+            $data['update_time'] = date('Y-m-d H:i:s',time());
+            $data['group_code'] = $wait_info->receiver_id;
+            $data['wallet_status'] = 'SU';
+            UserWallet::insert($data);
+
             if($id){
                 $msg['code'] = 200;
                 $msg['msg'] = "操作成功";

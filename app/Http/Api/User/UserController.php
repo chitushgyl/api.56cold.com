@@ -583,7 +583,7 @@ class UserController extends Controller{
                     if ($user_info){
                         if ($user_info->type == 'user' ||$user_info->type == 'carriage'){
                             $user_info->userCapital->money = $money = number_format($user_info->userCapital->money/100,2);
-                            $user_info->userCapital->_wait_money = number_format($user_info->userCapital->wait_money/100,2);
+                            $user_info->userCapital->wait_money = number_format($user_info->userCapital->wait_money/100,2);
                         }else{
                             $admin_where=[
                                 ['group_code','=',$user_info->group_code],
