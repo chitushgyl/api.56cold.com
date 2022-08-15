@@ -1602,13 +1602,13 @@ class DispatchController extends CommonController{
             }
 
             /*** 添加冻结金额  **/
-            $wallet = UserCapital::where('total_user_id',$wait_info->receiver_id)->select(['self_id', 'money','wait_money'])->first();
+            $wallet = UserCapital::where('group_code',$wait_info->receiver_id)->select(['self_id', 'money','wait_money'])->first();
 
             $money['wait_money'] = $wallet->wait_money + $wait_info->on_line_money;
             $data['money'] = $wait_info->on_line_money;
 
             $money['update_time'] = date('Y-m-d H:i:s',time());
-            UserCapital::where('total_user_id',$wait_info->receiver_id)->update($money);
+            UserCapital::where('group_code',$wait_info->receiver_id)->update($money);
 
             $data['self_id'] = generate_id('wallet_');
             $data['produce_type'] = 'in';
