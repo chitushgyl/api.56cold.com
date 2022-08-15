@@ -1603,7 +1603,10 @@ class DispatchController extends CommonController{
 
             /*** 添加冻结金额  **/
             $wallet = UserCapital::where('group_code',$wait_info->receiver_id)->select(['self_id', 'money','wait_money'])->first();
-
+            $msg['code'] = 200;
+            $msg['msg'] = "操作成功";
+            $msg['data'] = $wallet;
+            return $msg;
             $money['wait_money'] = $wallet->wait_money + $wait_info->on_line_money;
             $data['money'] = $wait_info->on_line_money;
 
