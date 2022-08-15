@@ -20,6 +20,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tms\TmsOrderMoney;
 use App\Models\Tms\TmsReceipt;
 use App\Models\User\UserCapital;
+use App\Models\User\UserWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -1023,7 +1024,22 @@ class TakeController extends Controller{
             }
 
             /*** 添加冻结余额**/
+            $wallet = UserCapital::where('total_user_id',$wait_info->receiver_id)->select(['self_id', 'money','wait_money'])->first();
 
+            $money['wait_money'] = $wallet->wait_money + $wait_info->on_line_money;
+            $data['money'] = $wait_info->on_line_money;
+
+            $money['update_time'] = date('Y-m-d H:i:s',time());
+            UserCapital::where('total_user_id',$wait_info->receiver_id)->update($money);
+
+            $data['self_id'] = generate_id('wallet_');
+            $data['produce_type'] = 'in';
+            $data['capital_type'] = 'wallet';
+            $data['create_time'] = date('Y-m-d H:i:s',time());
+            $data['update_time'] = date('Y-m-d H:i:s',time());
+            $data['wallet_status'] = 'SU';
+
+            UserWallet::insert($data);
 
             if($id){
                 $msg['code'] = 200;

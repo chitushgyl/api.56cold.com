@@ -301,75 +301,6 @@ class UserController extends Controller{
                         }
                     }
                     break;
-//                case 'carriers_order':
-//                    foreach ($v->sysFoot as $kkk => $vvv){
-//                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
-//                        $vvv->number=0;
-//                    }
-//                    if ($user_info){
-//                        $user_order_where=[
-//                            ['company_id','=',$user_info->company_id],
-//                            ['use_flag','=','Y'],
-//                            ['delete_flag','=','Y']
-//                        ];
-//                        $order_number=TmsCarriage::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
-//
-//                        if($order_number){
-//                            foreach ($order_number as $kk => $vv){
-//                                $abcd='status';
-//                                if ($vv->order_status == 1){
-//                                    $abcd = 'status1';
-//                                }
-//                                if ($vv->order_status == 2 || $vv->order_status == 3){
-//                                    $abcd = 'status2';
-//                                }
-////                                if ($vv->order_status == 4){
-////                                    $abcd = 'status3';
-////                                }
-//                                foreach ($v->sysFoot as $kkk => $vvv){
-//                                    if($vvv->type == $abcd){
-//                                        $vvv->number+=$vv->num;
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    break;
-//                case 'customer_order':
-//                    foreach ($v->sysFoot as $kkk => $vvv){
-//                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
-//                        $vvv->number=0;
-//                    }
-//                    $user_order_where=[
-//                        ['company_id','=',$user_info->company_id],
-//                        ['read_flag','=','N'],
-//                    ];
-//                    $order_number=TmsOrder::where($user_order_where)->select('order_status',DB::raw('count(*) as num'))->groupBy('order_status')->get();
-////                    dump($order_number->toArray());
-//                    if($order_number){
-//                        foreach ($order_number as $kk => $vv){
-//                            $abcd='status';
-//                            if ($vv->order_status == 3){
-//                                $abcd='status2';
-//                            }
-//                            if ($vv->order_status == 4 || $vv->order_status == 5){
-//                                $abcd='status3';
-//                            }
-////                            if ($vv->order_status == 6){
-////                                $abcd='status4';
-////                            }
-//                            if ($vv->order_status == 7){
-//                                $abcd='status5';
-//                            }
-//                            foreach ($v->sysFoot as $kkk => $vvv){
-//                                if($vvv->type == $abcd){
-//                                    $vvv->number+=$vv->num;
-//                                }
-//                            }
-//                        }
-//                    }
-//                    break;
                 case 'TMS3PL_order':
                     foreach ($v->sysFoot as $kkk => $vvv){
                         $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
@@ -557,9 +488,6 @@ class UserController extends Controller{
                                 if ($vv->order_status == 4 || $vv->order_status == 5){
                                     $abcd='status2';
                                 }
-//                            if ($vv->order_status == 6){
-//                                $abcd='status3';
-//                            }
                                 foreach ($v->sysFoot as $kkk => $vvv){
                                     if($vvv->type == $abcd){
                                         $vvv->number += $vv->num;
@@ -573,12 +501,6 @@ class UserController extends Controller{
                     }
                     break;
 
-//                case 'driver_order':
-//                    foreach ($v->sysFoot as $kkk => $vvv){
-//                        $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
-//                        $vvv->number=0;
-//                    }
-//                    break;
                 case 'carriage_order':
                     foreach ($v->sysFoot as $kkk => $vvv){
                         $vvv->inactive_img=img_for($vvv->inactive_img,'no_json');
@@ -601,9 +523,6 @@ class UserController extends Controller{
                                 if ($vv->order_status == 4 || $vv->order_status == 5){
                                     $abcd='status2';
                                 }
-//                            if ($vv->order_status == 6){
-//                                $abcd='status3';
-//                            }
                                 foreach ($v->sysFoot as $kkk => $vvv){
                                     if($vvv->type == $abcd){
                                         $vvv->number += $vv->num;
@@ -662,36 +581,22 @@ class UserController extends Controller{
                     }
 
                     if ($user_info){
-//                        ($user_info->type == 'TMS3PL' || $user_info->type == 'company')
                         if ($user_info->type == 'user' ||$user_info->type == 'carriage'){
-//                            if($user_info->userCapital->money>1000000){
-//                                $user_info->userCapital->money = $money =number_format($user_info->userCapital->money/1000000, 2).'万';                 //用户余额
-//                            }else{
-//                                $user_info->userCapital->money = $money =number_format($user_info->userCapital->money/100, 2);                          //用户余额
-//                            }
                             $user_info->userCapital->money = $money = number_format($user_info->userCapital->money/100,2);
-//                            dd($money);
                         }else{
                             $admin_where=[
                                 ['group_code','=',$user_info->group_code],
                                 ['delete_flag','=','Y'],
                             ];
-                            $select_capital=['self_id','money'];
+                            $select_capital=['self_id','money','wait_money'];
                             $money_info=UserCapital::where($admin_where)->select($select_capital)->first();
                             $user_info->userCapital->money = $money = number_format($money_info->money/100,2);
-//                            if($money_info->money>=1000000){
-//                                $user_info->userCapital->money = $money =number_format($money_info->money/1000000, 2).'万';                 //用户余额
-//                            }else{
-//                                $user_info->userCapital->money = $money =number_format($money_info->money/100, 2);                          //用户余额
-//                            }
                         }
                     }
-//                    dd($money);
                     foreach ($v->sysFoot as $kkk => $vvv){
                         if($vvv->type == 'car'){
                             $vvv->number = $car_number;
                         }elseif($vvv->type == 'money'){
-//                            $vvv->number = number_format($money,2);
                             $vvv->number = $money;
                         }elseif($vvv->type == 'bank'){
                             $vvv->number = $bank_number;
@@ -703,8 +608,6 @@ class UserController extends Controller{
 
                     }
                     break;
-//                case '':
-//                    break;
                 default:
 
                     foreach ($v->sysFoot as $kkk => $vvv){

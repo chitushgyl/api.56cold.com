@@ -63,28 +63,29 @@ class CrondtabController extends Controller {
                                 $data['group_code'] = $carriage_order->receiver_id;
                             }
 
-                            $wallet = UserCapital::where($wallet_where)->select(['self_id', 'money'])->first();
-
+                            $wallet = UserCapital::where($wallet_where)->select(['self_id', 'money','wait_money'])->first();
                             $money['money'] = $wallet->money + $carriage_order->on_line_money;
+                            $money['wait_money'] = $wallet->wait_money - $carriage_order->on_line_money;
                             $data['money'] = $carriage_order->on_line_money;
                             if ($carriage_order->group_code == $carriage_order->receiver_id) {
                                 $money['money'] = $wallet->money + $carriage_order->total_money;
-                                $data['money'] = $carriage_order->total_money;
+                                $money['wait_money'] = $wallet->wait_money - $carriage_order->total_money;
+
                             }
 
                             $money['update_time'] = date('Y-m-d H:i:s',time());
                             UserCapital::where($wallet_where)->update($money);
 
-                            $data['self_id'] = generate_id('wallet_');
-                            $data['produce_type'] = 'in';
-                            $data['capital_type'] = 'wallet';
-                            $data['create_time'] = date('Y-m-d H:i:s',time());
-                            $data['update_time'] = date('Y-m-d H:i:s',time());
-                            $data['now_money'] = $money['money'];
-                            $data['now_money_md'] = get_md5($money['money']);
-                            $data['wallet_status'] = 'SU';
-
-                            UserWallet::insert($data);
+//                            $data['self_id'] = generate_id('wallet_');
+//                            $data['produce_type'] = 'in';
+//                            $data['capital_type'] = 'wallet';
+//                            $data['create_time'] = date('Y-m-d H:i:s',time());
+//                            $data['update_time'] = date('Y-m-d H:i:s',time());
+//                            $data['now_money'] = $money['money'];
+//                            $data['now_money_md'] = get_md5($money['money']);
+//                            $data['wallet_status'] = 'SU';
+//
+//                            UserWallet::insert($data);
                         }
 
                     }
