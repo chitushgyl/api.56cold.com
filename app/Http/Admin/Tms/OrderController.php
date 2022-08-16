@@ -2527,7 +2527,7 @@ class OrderController extends CommonController{
                             $data['wallet_type'] = '3PLTMS';
                             $data['group_code'] = $carriage_order->receiver_id;
                         }
-                        $wallet = UserCapital::where($wallet_where)->select(['self_id','money'])->first();
+                        $wallet = UserCapital::where($wallet_where)->select(['self_id','money','wait_money'])->first();
 
                         $money['money'] = $wallet->money + $carriage_order->on_line_money;
                         $money['wait_money'] = $wallet->wait_money - $carriage_order->on_line_money;
