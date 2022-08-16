@@ -496,7 +496,7 @@ function direction($lat1, $lng1, $lat2, $lng2){
     if(empty($lat1) || empty($lng1) || empty($lat2) || empty($lng2)){
         return '';
     }
-    $ak ="PaC1MWoU0dYwg1ZHB6IgKEFOhy3PIpvc";
+    $ak ="27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg";
     $url = "http://api.map.baidu.com/direction/v2/driving?output=json&tactics=0&origin=".$lat1.",".$lng1."&destination=".$lat2.",".$lng2."&ak=".$ak;
 
     $renderOption = file_get_contents($url);
