@@ -77,7 +77,7 @@ class TmsOrderDispatch extends Model{
     public function userTotal(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
-        return $this->hasOne('App\Models\User\UserTotal','total_user_id','receiver_id');
+        return $this->hasOne('App\Models\User\UserTotal','self_id','receiver_id');
     }
 
     public function systemGroup(){
