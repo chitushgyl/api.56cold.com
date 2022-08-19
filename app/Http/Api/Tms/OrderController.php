@@ -2168,7 +2168,7 @@ class OrderController extends Controller{
         ];
 
         $select1=['self_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
-            'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
+            'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','',
             'send_sheng_name','send_shi_name','send_qu_name','send_address','order_id',
             'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
 
@@ -2176,7 +2176,9 @@ class OrderController extends Controller{
         $select3 = ['self_id','company_id','company_name','carriage_flag','total_money','carriage_flag'];
         $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
         $selectList = ['self_id','receipt','order_id','total_user_id','group_code','group_name'];
-        $info = TmsOrder::with(['TmsOrderDispatch' => function($query) use($list_select,$selectList,$select1,$select2,$select3,$select4){
+        $select5 = ['self_id','total_user_id','tel'];
+        $select6 = ['self_id','group_code','group_name','tel'];
+        $info = TmsOrder::with(['TmsOrderDispatch' => function($query) use($list_select,$selectList,$select1,$select2,$select3,$select4,$select5,$select6){
             $query->select($list_select);
             $query->with(['tmsCarriageDispatch'=>function($query)use($select1,$select2,$select3,$select4){
                 $query->where('delete_flag','=','Y');
@@ -2190,9 +2192,14 @@ class OrderController extends Controller{
                     $query->select($select4);
                 }]);
             }]);
-//            $query->with(['tmsCarriageDriver'=>function($query)use($select4) {
-//
-//            }]);
+            $query->with(['userTotal'=>function($query)use($select5) {
+                $query->where('delete_flag','Y');
+                $query->select($select5);
+            }]);
+            $query->with(['SystemGroup'=>function($query)use($select6) {
+                $query->where('delete_flag','Y');
+                $query->select($select6);
+            }]);
             $query->with(['tmsReceipt'=>function($query)use($selectList) {
                 $query->where('delete_flag', '=', 'Y');
                 $query->select($selectList);
@@ -2333,6 +2340,16 @@ class OrderController extends Controller{
             $order_details2['name'] = '是否付款';
             $order_details2['value'] = $info->pay_state;
             $order_details2['color'] = '#FF7A1A';
+
+            if($info->order_status == 3){
+                $order_details11['name'] = '接单人电话';
+                if($info->userTotal){
+                    $order_details11['value'] = $info->userTotal->tel;
+                }else{
+                    $order_details11['value'] = $info->systemGroup->tel;
+                }
+                $order_details11['color'] = '#FF7A1A';
+            }
 
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
