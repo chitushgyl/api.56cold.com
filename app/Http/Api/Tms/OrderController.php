@@ -2192,14 +2192,14 @@ class OrderController extends Controller{
                     $query->select($select4);
                 }]);
             }]);
-            $query->with(['userTotal'=>function($query)use($select5) {
-                $query->where('delete_flag','Y');
-                $query->select($select5);
-            }]);
-            $query->with(['SystemGroup'=>function($query)use($select6) {
-                $query->where('delete_flag','Y');
-                $query->select($select6);
-            }]);
+//            $query->with(['userTotal'=>function($query)use($select5) {
+//                $query->where('delete_flag','Y');
+//                $query->select($select5);
+//            }]);
+//            $query->with(['systemGroup'=>function($query)use($select6) {
+//                $query->where('delete_flag','Y');
+//                $query->select($select6);
+//            }]);
             $query->with(['tmsReceipt'=>function($query)use($selectList) {
                 $query->where('delete_flag', '=', 'Y');
                 $query->select($selectList);
