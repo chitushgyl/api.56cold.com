@@ -2413,6 +2413,10 @@ class OrderController extends Controller{
             $order_details[] = $order_details1;
             $order_details[]= $order_details2;
 
+            if($info->order_status == 3){
+                $order_details[] = $order_details11;
+            }
+
             if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details[] = $order_details3;
                 $order_details[]= $order_details4;
