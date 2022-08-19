@@ -2176,7 +2176,7 @@ class OrderController extends Controller{
         $select3 = ['self_id','company_id','company_name','carriage_flag','total_money','carriage_flag'];
         $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
         $selectList = ['self_id','receipt','order_id','total_user_id','group_code','group_name'];
-        $select5 = ['self_id','total_user_id','tel'];
+        $select5 = ['self_id','tel'];
         $select6 = ['self_id','group_code','group_name','tel'];
         $info = TmsOrder::with(['TmsOrderDispatch' => function($query) use($list_select,$selectList,$select1,$select2,$select3,$select4,$select5,$select6){
             $query->select($list_select);
