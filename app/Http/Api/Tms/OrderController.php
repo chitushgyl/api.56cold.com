@@ -2206,10 +2206,7 @@ class OrderController extends Controller{
             }]);
 
         }])->where($where)->select($select)->first();
-        $msg['code'] = 200;
-        $msg['msg']  = "数据拉取成功";
-        $msg['data'] = $info;
-        return $msg;
+
         if($info) {
             $info->order_status_show = $tms_order_status_type[$info->order_status] ?? null;
             $info->order_type_show   = $tms_order_type[$info->order_type] ??null;
@@ -2346,12 +2343,13 @@ class OrderController extends Controller{
 
             if($info->order_status == 3){
                 $order_details11['name'] = '接单人电话';
-                $idit = substr($info->receiver_id, 0, 5);
-                if ($idit == 'user_') {
-                    $order_details11['value'] = $info->userTotal->tel;
-                } else {
-                    $order_details11['value'] = $info->systemGroup->tel;
-                }
+                $order_details11['value'] = '021-59111020';
+                    if($info->userTotal){
+                        $order_details11['value'] = $info->userTotal->tel;
+                    }
+                    if($info->systemGroup){
+                        $order_details11['value'] = $info->systemGroup->tel;
+                    }
                 $order_details11['color'] = '#FF7A1A';
             }
 
