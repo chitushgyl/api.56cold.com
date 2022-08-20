@@ -2267,6 +2267,13 @@ class OrderController extends Controller{
                         $info->car_info = $car_list;
                     }
                 }
+                $order_details11['value'] = '021-59111020';
+                if(!empty($v->userTotal)){
+                    $order_details11['value'] = $v->userTotal->tel;
+                }
+                if(!empty($v->systemGroup)){
+                    $order_details11['value'] = $v->systemGroup->tel;
+                }
             }
             /** 零担发货收货仓**/
             $line_info = [];
@@ -2346,13 +2353,6 @@ class OrderController extends Controller{
 
             if($info->order_status == 3){
                 $order_details11['name'] = '接单人电话';
-                $order_details11['value'] = '021-59111020';
-                    if(!empty($info->TmsOrderDispatch->userTotal)){
-                        $order_details11['value'] = $info->tmsOrderDispatch->userTotal->tel;
-                    }
-                    if(!empty($info->TmsOrderDispatch->systemGroup)){
-                        $order_details11['value'] = $info->tmsOrderDispatch->systemGroup->tel;
-                    }
                 $order_details11['color'] = '#FF7A1A';
             }
 
