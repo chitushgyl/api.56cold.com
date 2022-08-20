@@ -2346,10 +2346,8 @@ class OrderController extends Controller{
 
             if($info->order_status == 3){
                 $order_details11['name'] = '接单人电话';
-                if($info->userTotal){
-                    $order_details11['value'] = $info->userTotal->tel;
-                }else{
-                    $order_details11['value'] = $info->systemGroup->tel;
+                if($info->userTotal || $info->systemGroup){
+                    $order_details11['value'] = $info->userTotal->tel ?? $info->systemGroup->tel ;
                 }
                 $order_details11['color'] = '#FF7A1A';
             }
