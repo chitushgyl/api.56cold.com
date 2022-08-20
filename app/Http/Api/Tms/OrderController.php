@@ -2347,10 +2347,10 @@ class OrderController extends Controller{
             if($info->order_status == 3){
                 $order_details11['name'] = '接单人电话';
                 $order_details11['value'] = '021-59111020';
-                    if($info->tmsOrderDispatch->userTotal){
+                    if(!empty($info->tmsOrderDispatch->userTotal)){
                         $order_details11['value'] = $info->tmsOrderDispatch->userTotal->tel;
                     }
-                    if($info->tmsOrderDispatch->systemGroup){
+                    if(!empty($info->tmsOrderDispatch->systemGroup)){
                         $order_details11['value'] = $info->tmsOrderDispatch->systemGroup->tel;
                     }
                 $order_details11['color'] = '#FF7A1A';
