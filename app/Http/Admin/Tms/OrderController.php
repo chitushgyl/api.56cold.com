@@ -2050,7 +2050,7 @@ class OrderController extends CommonController{
             'line_gather_sheng','line_gather_shi','line_gather_qu','line_gather_sheng_name','line_gather_shi_name','line_gather_qu_name' , 'line_gather_address','remark',
             'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi',
             'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','clod','pick_flag','send_flag',
-            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag'
+            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag','receiver_id'
         ];
         $where = [
             ['delete_flag','=','Y'],
@@ -2066,7 +2066,9 @@ class OrderController extends CommonController{
         $select3 = ['self_id','company_id','company_name','carriage_flag','total_money','carriage_flag'];
         $select4 = ['carriage_id','car_number','contacts','tel','price','car_id'];
         $selectList = ['self_id','receipt','order_id','total_user_id','group_code','group_name'];
-        $info = TmsOrder::with(['TmsOrderDispatch' => function($query) use($list_select,$selectList,$select1,$select2,$select3,$select4){
+        $select5 = ['self_id','tel'];
+        $select6 = ['self_id','group_code','group_name','tel'];
+        $info = TmsOrder::with(['TmsOrderDispatch' => function($query) use($list_select,$selectList,$select1,$select2,$select3,$select4,$select5,$select6){
             $query->select($list_select);
             $query->with(['tmsCarriageDispatch'=>function($query)use($select1,$select2,$select3,$select4){
                 $query->where('delete_flag','=','Y');
@@ -2079,6 +2081,14 @@ class OrderController extends CommonController{
                     $query->where('delete_flag','=','Y');
                     $query->select($select4);
                 }]);
+            }]);
+            $query->with(['userTotal'=>function($query)use($select5) {
+                $query->where('delete_flag','Y');
+                $query->select($select5);
+            }]);
+            $query->with(['systemGroup'=>function($query)use($select6) {
+                $query->where('delete_flag','Y');
+                $query->select($select6);
             }]);
             $query->with(['tmsReceipt'=>function($query)use($selectList) {
                 $query->where('delete_flag', '=', 'Y');
@@ -2224,6 +2234,18 @@ class OrderController extends CommonController{
             $order_details2['value'] = $info->pay_state;
             $order_details2['color'] = '#FF7A1A';
 
+            if($info->order_status == 3){
+                $order_details11['name'] = '接单人电话';
+                $order_details11['value'] = '021-59111020';
+                if($info->userTotal){
+                    $order_details11['value'] = $info->userTotal->tel;
+                }
+                if($info->systemGroup){
+                    $order_details11['value'] = $info->systemGroup->tel;
+                }
+                $order_details11['color'] = '#FF7A1A';
+            }
+
             $order_details4['name'] = '收货时间';
             $order_details4['value'] = $info->gather_time;
             $order_details4['color'] = '#000000';
@@ -2285,6 +2307,10 @@ class OrderController extends CommonController{
 
             $order_details[] = $order_details1;
             $order_details[]= $order_details2;
+
+            if($info->order_status == 3){
+                $order_details[] = $order_details11;
+            }
 
             if ($info->order_type == 'vehicle' || $info->order_type == 'lcl' || $info->order_type == 'lift'){
                 $order_details[] = $order_details3;
