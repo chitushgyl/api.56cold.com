@@ -1724,6 +1724,34 @@ class UserController extends Controller{
         return $msg;
     }
 
+    /**获取历史登录用户手机号***/
+
+    public function getUserTel(Request $request){
+        $project_type       =$request->get('project_type');
+        $now_time   = date('Y-m-d H:i:s',time());
+        $user_info  = $request->get('user_info');//接收中间件产生的参数
+        $input		= $request->all();
+        $type       = $request->input('type');
+
+        $where['delete_flag'] = 'Y';
+
+        $where[] = ['delete_flag','=','Y'];
+        $where[] = ['type','!=','after'];
+        $where[] = ['create_time','<','2022-08-22 00:00:00'];
+        $where[] = ['create_time','>','2022-08-11 00:00:00'];
+        $select = ['self_id','user_id','user_token','create_time','type'];
+        $select1 = ['self_id','tel'];
+        $info = LogLogin::with(['userTotal'=>function($query)use($select1){
+            $query->where('delete_flag','=','Y');
+            $query->select($select1);
+        }])->where($where)->select($select)->get();
+
+        $msg['code'] = 200;
+        $msg['msg']  = '获取成功!';
+        $msg['data']  = $info;
+        return $msg;
+    }
+
 
 }
 ?>

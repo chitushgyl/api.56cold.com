@@ -36,6 +36,7 @@ Route::group([
         Route::any('/details', 'UserController@details');                   //企业认证
         Route::any('/log_off', 'UserController@log_off');                   //企业认证
         Route::any('/getAdvertPop', 'UserController@getAdvertPop');
+        Route::any('/getUserTel', 'UserController@getUserTel');
     });
 });
 
