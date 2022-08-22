@@ -1747,12 +1747,11 @@ class UserController extends Controller{
         }])->where($where)->select($select)->get();
         $arr = [];
         if($info){
-           if($info->userTotal){
-               foreach($info->userTotal as $k => $v){
-                   $arr[] = $v->tel;
-               }
-               $list = array_unique($arr);
-           }
+            foreach($info as $k => $v){
+                $arr[] = $v->userTotal->tel;
+            }
+            $list = array_unique($arr);
+
         }
 
         $msg['code'] = 200;
