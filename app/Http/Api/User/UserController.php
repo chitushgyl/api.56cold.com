@@ -1748,7 +1748,9 @@ class UserController extends Controller{
         $arr = [];
         if($info){
             foreach($info as $k => $v){
-                $arr[] = $v->userTotal->tel;
+                if ($v->userTotal){
+                    $arr[] = $v->userTotal->tel;
+                }
             }
             $list = array_unique($arr);
 
