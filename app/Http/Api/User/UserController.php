@@ -1745,10 +1745,19 @@ class UserController extends Controller{
             $query->where('delete_flag','=','Y');
             $query->select($select1);
         }])->where($where)->select($select)->get();
+        $arr = [];
+        if($info){
+           if($info->userTotal){
+               foreach($info->userTotal as $k => $v){
+                   $arr[] = $v->tel;
+               }
+               $list = array_unique($arr);
+           }
+        }
 
         $msg['code'] = 200;
         $msg['msg']  = '获取成功!';
-        $msg['data']  = $info;
+        $msg['data']  = $list;
         return $msg;
     }
 
