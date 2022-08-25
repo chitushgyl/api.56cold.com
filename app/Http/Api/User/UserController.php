@@ -1737,8 +1737,8 @@ class UserController extends Controller{
 
         $where[] = ['delete_flag','=','Y'];
         $where[] = ['type','!=','after'];
-        $where[] = ['create_time','<','2022-08-22 00:00:00'];
-        $where[] = ['create_time','>','2022-08-11 00:00:00'];
+        $where[] = ['create_time','<','2022-08-25 00:00:00'];
+        $where[] = ['create_time','>','2022-08-22 00:00:00'];
         $select = ['self_id','user_id','user_token','create_time','type'];
         $select1 = ['self_id','tel'];
         $info = LogLogin::with(['userTotal'=>function($query)use($select1){
