@@ -323,7 +323,7 @@ class SearchController extends CommonController{
                 ];
 
                 $old_info=WmsLibrarySige::where($where_sku)->orderBy('create_time', 'desc')->select($select)->get();
-	//dd($old_info->toArray());
+	dd($old_info->toArray());
                 //DUMP($old_info);
                 if(empty($old_info->toArray())){
                     $msg['code']=301;
