@@ -150,7 +150,7 @@ class SearchController extends CommonController{
             ];
 
             $select=['self_id','group_name','warehouse_id','warehouse_name','company_name','good_name','good_english_name','sku_id','spec',
-                'warehouse_sign_id','area','row','column','tier','good_unit','good_target_unit','good_scale','good_info',
+                'warehouse_sign_id','area','row','column','tier','good_unit','good_target_unit','good_scale','good_info','good_lot',
                 'production_date','expire_time','now_num','can_use',
                 'order_id','external_sku_id','company_id','group_code'];
 
@@ -186,7 +186,6 @@ class SearchController extends CommonController{
                 $andd["now_num_new"]        =$num;
 
                 $abc[0]=$andd;
-                dd($abc);
                 $change->change($abc,'change');
 
                 //dd(11111);
