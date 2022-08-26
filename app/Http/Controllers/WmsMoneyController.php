@@ -47,7 +47,7 @@ class WmsMoneyController extends Controller{
                 $money=0;
                 break;
         }
-
+        dd($data['warehouse_id']);
         $seld=generate_id('money_');
 
         $data_money['self_id']              =$seld;
