@@ -76,15 +76,15 @@ class WmsMoneyController extends Controller{
             foreach ($datalist as $k => $v){
 				//dd($v);
                 $list['self_id']                =generate_id('mlist_');
-//                $list['warehouse_id']           =$v['warehouse_id'];
-//                $list['warehouse_name']         =$v['warehouse_name'];
-//                $list['library_sige_id']        =$v['self_id'];
-//                $list['warehouse_sign_id']      =$v['warehouse_sign_id'];
-//                $list['area_id']                =$v['area_id'];
-//                $list['area']                   =$v['area'];
-//                $list['row']                    =$v['row'];
-//                $list['column']                 =$v['column'];
-//                $list['tier']                   =$v['tier'];
+                $list['warehouse_id']           =$v['warehouse_id'];
+                $list['warehouse_name']         =$v['warehouse_name'];
+                $list['library_sige_id']        =$v['self_id'];
+                $list['warehouse_sign_id']      =$v['warehouse_sign_id'];
+                $list['area_id']                =$v['area_id'];
+                $list['area']                   =$v['area'];
+                $list['row']                    =$v['row'];
+                $list['column']                 =$v['column'];
+                $list['tier']                   =$v['tier'];
                 $list['group_code']             =$v['group_code'];
                 $list['group_name']             =$v['group_name'];
                 $list['company_id']             =$v['company_id'];
