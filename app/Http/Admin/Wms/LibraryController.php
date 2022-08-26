@@ -980,7 +980,7 @@ class LibraryController extends CommonController{
             $data['order_status']       = 'S';
            //dd($data);
             $id=WmsLibraryOrder::insert($data);
-            dd($datalist);
+            dd($data);
             $operationing->table_id=$data['self_id'];
             $operationing->old_info=null;
             $operationing->new_info=$data;
