@@ -47,7 +47,7 @@ class WmsMoneyController extends Controller{
                 $money=0;
                 break;
         }
-        dd($data['warehouse_id']);
+
         $seld=generate_id('money_');
 
         $data_money['self_id']              =$seld;
@@ -76,8 +76,8 @@ class WmsMoneyController extends Controller{
             foreach ($datalist as $k => $v){
 				//dd($v);
                 $list['self_id']                =generate_id('mlist_');
-                $list['warehouse_id']           =$v['warehouse_id'];
-                $list['warehouse_name']         =$v['warehouse_name'];
+//                $list['warehouse_id']           =$v['warehouse_id'];
+//                $list['warehouse_name']         =$v['warehouse_name'];
                 $list['library_sige_id']        =$v['self_id'];
                 $list['warehouse_sign_id']      =$v['warehouse_sign_id'];
                 $list['area_id']                =$v['area_id'];

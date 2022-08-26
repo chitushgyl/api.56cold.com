@@ -907,8 +907,8 @@ class LibraryController extends CommonController{
                     $list["wms_high"]           =$getGoods->wms_high;
                     $list["wms_weight"]         =$getGoods->wms_weight;
                     $list["good_info"]          =json_encode($getGoods,JSON_UNESCAPED_UNICODE);
-//                    $list["warehouse_id"]       =$getWmsWarehouse->warehouse_id;
-//                    $list["warehouse_name"]     =$getWmsWarehouse->warehouse_name;
+                    $list["warehouse_id"]       =$getWmsWarehouse->warehouse_id;
+                    $list["warehouse_name"]     =$getWmsWarehouse->warehouse_name;
 //                    $list['warehouse_sign_id']  =$getWmsWarehouse->self_id;
 //                    $list['area_id']            =$getWmsWarehouse->area_id;
 //                    $list['area']               =$getWmsWarehouse->area;
