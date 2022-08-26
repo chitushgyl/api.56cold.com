@@ -47,10 +47,13 @@ class OrderController extends CommonController{
         $num                = $request->input('num') ?? 10;
         $page               = $request->input('page') ?? 1;
         $use_flag           = $request->input('use_flag');
-        $company_name       =$request->input('company_name');
-        $warehouse_name     =$request->input('warehouse_name');
-        $total_flag         =$request->input('total_flag');
-        $status            =$request->input('status');
+        $company_name       = $request->input('company_name');
+        $warehouse_name     = $request->input('warehouse_name');
+        $total_flag         = $request->input('total_flag');
+        $shop_id            = $request->input('shop_id');
+        $warehouse_id       = $request->input('warehouse_id');
+        $company_id         = $request->input('company_id');
+        $status             = $request->input('status');
         $listrows           = $num;
         $firstrow           = ($page - 1) * $listrows;
 
@@ -60,6 +63,9 @@ class OrderController extends CommonController{
             ['type'=>'all','name'=>'total_flag','value'=>$total_flag],
             ['type'=>'like','name'=>'company_name','value'=>$company_name],
             ['type'=>'like','name'=>'warehouse_name','value'=>$warehouse_name],
+            ['type'=>'=','name'=>'shop_id','value'=>$shop_id],
+            ['type'=>'=','name'=>'warehouse_id','value'=>$warehouse_id],
+            ['type'=>'=','name'=>'company_id','value'=>$company_id],
             ['type'=>'=','name'=>'status','value'=>$status],
         ];
 
