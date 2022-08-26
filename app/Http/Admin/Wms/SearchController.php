@@ -186,7 +186,7 @@ class SearchController extends CommonController{
                 $andd["now_num_new"]        =$num;
 
                 $abc[0]=$andd;
-                //DUMP($abc);
+                dd($abc);
                 $change->change($abc,'change');
 
                 //dd(11111);
