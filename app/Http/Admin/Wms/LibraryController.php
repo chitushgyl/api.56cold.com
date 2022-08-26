@@ -1569,7 +1569,7 @@ class LibraryController extends CommonController{
             $data['warehouse_sign_id'] = '';
             $data['area_id'] = '';
             $data['grounding_status'] = 'N';
-            $id = WmsLibrarySige::whereIn('self_id',explode(',',$sign_id))->update($data);
+            $id = WmsLibrarySige::whereIn('self_id',json_decode($sign_id,true))->update($data);
             if($id){
                 $msg['code'] = 200;
                 $msg['msg'] = '操作成功';
