@@ -374,6 +374,7 @@ class SearchController extends CommonController{
                     $list["good_unit"]          =$v->good_unit;
                     $list["good_unit"]          =$v->good_unit;
                     $list["good_lot"]          =$v->good_lot;
+                    $list["good_info"]          =$v->good_info;
                     $list["grounding_status"]   ="Y";
                     $list["warehouse_id"]       =$v->warehouse_id;
                     $list["warehouse_name"]     =$v->warehouse_name;
@@ -562,7 +563,7 @@ class SearchController extends CommonController{
 
 
         }
-            dd($old_change,$new_change);
+//            dd($old_change,$new_change);
             if($id){
                 $change->change($old_change,'moveout');
                 $change->change($new_change,'movein');
