@@ -563,7 +563,7 @@ class SearchController extends CommonController{
 
 
         }
-
+            dd($old_change,$new_change);
             if($id){
                 $change->change($old_change,'moveout');
                 $change->change($new_change,'movein');
