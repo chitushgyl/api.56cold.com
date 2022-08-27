@@ -1734,12 +1734,12 @@ class UserController extends Controller{
 
         $start_time      =$request->input('start_time')??'';
         $end_time        =$request->input('end_time')??'';
-     
+
 
         $where[] = ['delete_flag','=','Y'];
         $where[] = ['type','!=','after'];
-        $where[] = ['create_time','<','2022-08-27 00:00:00'];
-        $where[] = ['create_time','>','2022-08-25 00:00:00'];
+        $where[] = ['create_time','<',$end_time];
+        $where[] = ['create_time','>',$start_time];
         $select = ['self_id','user_id','user_token','create_time','type'];
         $select1 = ['self_id','tel'];
         $info = LogLogin::with(['userTotal'=>function($query)use($select1){
