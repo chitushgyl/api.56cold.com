@@ -5012,7 +5012,7 @@ class OrderController extends Controller{
             TmsOrder::where('self_id',$self_id)->update($data);
 
             $sub['self_id'] = generate_id('sub_');
-            $sub['add_price'] = $price*100;
+            $sub['price'] = $price*100;
             $sub['start_city'] = $start_city;
             $sub['end_city'] = $end_city;
             $sub['car_type'] = $car_type;
