@@ -4972,6 +4972,9 @@ class OrderController extends Controller{
         $good_info     = $request->input('good_info');
         $pay_type      = $request->input('pay_type');
         $info          = $request->input('info');
+        $group_code          = $request->input('group_code');
+        $group_name          = $request->input('group_name');
+        $total_user_id          = $request->input('total_user_id');
 
         /*** 虚拟数据
         $input['self_id']           = $start_city  = 'order_45456456456454';
@@ -4993,7 +4996,6 @@ class OrderController extends Controller{
             'car_type'=>'required',
             'good_info'=>'required',
             'pay_type'=>'required',
-            'info'=>'required'
         ];
         $message = [
             'self_id.required'=>'请选择订单！',
@@ -5012,13 +5014,18 @@ class OrderController extends Controller{
 
             $sub['self_id'] = generate_id('sub_');
             $sub['price'] = $price;
-            $sub['start_city'] = $price;
-            $sub['end_city'] = $price;
-            $sub['car_type'] = $price;
-            $sub['temperture'] = $price;
-            $sub['good_info'] = $price;
-            $sub['info'] = $price;
+            $sub['start_city'] = $start_city;
+            $sub['end_city'] = $end_city;
+            $sub['car_type'] = $car_type;
+            $sub['temperture'] = $temperture;
+            $sub['good_info'] = $good_info;
+            $sub['info'] = $info;
             $sub['order_id'] = $self_id;
+            $sub['create_time'] = $now_time;
+            $sub['update_time'] = $now_time;
+            $sub['group_code'] = $group_code;
+            $sub['group_name'] = $group_name;
+            $sub['total_user_id'] = $total_user_id;
             TmsSubOrder::insert($sub);
 
             /*** 修改运单价格**/
