@@ -5009,11 +5009,10 @@ class OrderController extends Controller{
             $data['price'] = $price;
             $data['add_price'] = $price;
             $data['total_money'] = $price + $info->total_money;
-
             TmsOrder::where('self_id',$self_id)->update($data);
 
             $sub['self_id'] = generate_id('sub_');
-            $sub['price'] = $price;
+            $sub['add_price'] = $price*100;
             $sub['start_city'] = $start_city;
             $sub['end_city'] = $end_city;
             $sub['car_type'] = $car_type;
@@ -5030,12 +5029,16 @@ class OrderController extends Controller{
 
             /*** 修改运单价格**/
             $select1 = ['self_id','order_id','on_line_money'];
-            $info1 = TmsOrderDispatch::where('order_id',$self_id)->get();
+            $info1 = TmsOrderDispatch::where('order_id',$self_id)->first();
 
+            $data1['add_price'] = $price*100;
+            $data1['on_line_money'] = $price + $info1->on_line_money;
+            TmsOrderDispatch::where('order_id',$self_id)->update($data1);
             /***修改费用**/
 
             $msg['code'] = 200;
             $msg['msg']  = '加价成功';
+            $msg['order_id'] = $sub['self_id'];
             return $msg;
         }else{
             //前端用户验证没有通过
