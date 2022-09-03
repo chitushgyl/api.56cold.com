@@ -601,6 +601,8 @@ class TakeController extends Controller{
                 TmsOrderCost::where($money_where)->update($money);
             }
 
+            /*** 发送短信通知用户已有司机接单**/
+
 
             if($id){
                 $msg['code'] = 200;
@@ -804,7 +806,7 @@ class TakeController extends Controller{
 
             $id = TmsCarriage::insert($data);
             TmsCarriageDispatch::insert($list);
-//            TmsOrderMoney::insert($money);
+
             TmsCarriageDriver::insert($order_list);
 
             if($order){

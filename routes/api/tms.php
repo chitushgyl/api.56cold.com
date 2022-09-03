@@ -176,6 +176,7 @@ Route::group([
         Route::any('/order/userFreeRideList','OrderController@userFreeRideList');//顺风车列表
         Route::any('/order/freeRideList','OrderController@freeRideList');//顺风车列表
         Route::any('/order/liftOrder','OrderController@liftOrder');//顺风车列表
+        Route::any('/order/addPrice','OrderController@addPrice');//加价
 
         /*** 快捷下单***/
         Route::any('/fastOrder/addFastOrder','FastOrderController@addFastOrder');//

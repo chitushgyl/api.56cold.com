@@ -15,6 +15,7 @@ use App\Models\Tms\TmsOrderCost;
 use App\Models\Tms\TmsOrderMoney;
 use App\Models\Tms\TmsParam;
 use App\Models\Tms\TmsPayment;
+use App\Models\Tms\TmsSubOrder;
 use App\Models\User\UserCapital;
 use App\Models\User\UserIdentity;
 use App\Models\User\UserWallet;
@@ -4952,6 +4953,95 @@ class OrderController extends Controller{
         $msg['msg']  = "数据拉取成功";
         $msg['data'] = $data;
         return $msg;
+    }
+
+
+    /***加价**/
+    public function addPrice(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $self_id       = $request->input('self_id');
+        $price         = $request->input('price');
+        $temperture    = $request->input('temperture');
+        $start_city    = $request->input('start_city');
+        $end_city      = $request->input('end_city');
+        $car_type      = $request->input('car_type');
+        $good_info     = $request->input('good_info');
+        $pay_type      = $request->input('pay_type');
+        $info          = $request->input('info');
+
+        /*** 虚拟数据
+        $input['self_id']           = $start_city  = 'order_45456456456454';
+        $input['price']             = $end_city    =300;
+        $input['start_city']             = $end_city    =300;
+        $input['end_city']             = $end_city    =300;
+        $input['temperture']             = $end_city    =300;
+        $input['car_type']             = $end_city    =300;
+        $input['good_info']             = $end_city    =300;
+        $input['pay_type']             = $end_city    =300;
+        $input['info']             = $end_city    =300;
+         **/
+        $rules = [
+            'self_id'=>'required',
+            'price'=>'required',
+            'temperture'=>'required',
+            'start_city'=>'required',
+            'end_city'=>'required',
+            'car_type'=>'required',
+            'good_info'=>'required',
+            'pay_type'=>'required',
+            'info'=>'required'
+        ];
+        $message = [
+            'self_id.required'=>'请选择订单！',
+            'price.required'=>'请填写加价金额！',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+            $select = ['self_id','total_money','price','send_money','pick_money'];
+            $info = TmsOrder::where('self_id',$self_id)->select($select)->first();
+            $data['price'] = $price;
+            $data['add_price'] = $price;
+            $data['total_money'] = $price + $info->total_money;
+
+            TmsOrder::where('self_id',$self_id)->update($data);
+
+            $sub['self_id'] = generate_id('sub_');
+            $sub['price'] = $price;
+            $sub['start_city'] = $price;
+            $sub['end_city'] = $price;
+            $sub['car_type'] = $price;
+            $sub['temperture'] = $price;
+            $sub['good_info'] = $price;
+            $sub['info'] = $price;
+            $sub['order_id'] = $self_id;
+            TmsSubOrder::insert($sub);
+
+            /*** 修改运单价格**/
+            $select1 = ['self_id','order_id','on_line_money'];
+            $info1 = TmsOrderDispatch::where('order_id',$self_id)->get();
+
+            /***修改费用**/
+
+            $msg['code'] = 200;
+            $msg['msg']  = '加价成功';
+            return $msg;
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+
     }
 
 }
