@@ -349,7 +349,7 @@ class AlipayController extends Controller{
             $wallet['now_money_md'] = get_md5($capital->money);
             $wallet['wallet_status'] = 'SU';
             UserWallet::insert($wallet);
-            file_put_contents(base_path('/vendor/alipay1.txt'),$wallet);
+//            file_put_contents(base_path('/vendor/alipay1.txt'),$wallet);
             if ($order->order_type == 'line'){
                 $order_update['order_status'] = 3;
             }else{
@@ -540,20 +540,27 @@ class AlipayController extends Controller{
 //            $order_update['order_status'] = 6;
             $order_update['pay_state'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
-            $id = TmsOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
+            $id = TmsSubOrder::where('self_id',$_POST['total_amount'])->update($order_update);
+            $update['total_money'] = $order->total_money + $_POST['total_amount'];
+            $update['add_price'] = $_POST['total_amount'];
+            $update['price'] = $_POST['total_amount'];
+            $update['update_time'] = $now_time;
+            TmsOrder::where('self_id',$info->order_id)->update($update);
             if($order->order_type == 'vehicle'){
-                $dispatch_where['pay_status'] = 'Y';
                 $dispatch_where['update_time'] = $now_time;
+                $dispatch_where['add_price'] = $_POST['total_amount'];
+                $dispatch_where['on_line_money'] = $_POST['total_amount'] + $order->total_money;
                 TmsOrderDispatch::where('order_id',$_POST['out_trade_no'])->update($dispatch_where);
             }
             /**修改费用数据为可用**/
-//            $money['delete_flag']                = 'Y';
-//            $money['settle_flag']                = 'W';
-//            $tmsOrderCost = TmsOrderCost::where('order_id',$_POST['out_trade_no'])->select('self_id')->get();
-//            if ($tmsOrderCost){
-//                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
-//                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
-//            }
+            $money['delete_flag']                = 'Y';
+            $money['settle_flag']                = 'W';
+            $tmsOrderCost = TmsOrderCost::where('order_id',$_POST['out_trade_no'])->select('self_id')->get();
+            if ($tmsOrderCost){
+                $money['money']                      = $update['total_money'];
+                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+            }
             if ($id){
                 echo 'success';
             }else{
@@ -957,6 +964,7 @@ class AlipayController extends Controller{
             $money['settle_flag']                = 'W';
             $tmsOrderCost = TmsOrderCost::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
             if ($tmsOrderCost){
+                $money['money']                      = $update['total_money'];
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
