@@ -75,6 +75,8 @@ Route::group([
     Route::any('/order/cityVehical','OrderController@cityVehical');
     Route::any('/order/discount_price','OrderController@discount_price');
     Route::any('/order/get_distance','OrderController@get_distance');//顺风车列表
+    Route::any('/order/getCancelOrder','OrderController@getCancelOrder');//查询取消订单
+    Route::any('/order/getDispatchOrder','OrderController@getDispatchOrder');//查询需要支付的接口
     Route::any('/message/messagePage','MessageController@messagePage');
 });
 
@@ -115,6 +117,8 @@ Route::any('/alipay/nativeNotify', 'Pay\AlipayController@nativeNotify');
 Route::any('/alipay/qrcode_notify', 'Pay\AlipayController@qrcode_notify');
 Route::any('/alipay/depositAlipayNotify', 'Pay\AlipayController@depositAlipayNotify');
 Route::any('/alipay/depositWechatNotify', 'Pay\AlipayController@depositWechatNotify');
+Route::any('/alipay/addPricenotify', 'Pay\AlipayController@addPricenotify');
+Route::any('/alipay/addApipay_notity', 'Pay\AlipayController@addApipay_notity');
 
 
 /**极速版支付***/

@@ -71,19 +71,27 @@ class MessageController extends Controller{
      */
 
 
-    public function message_send(Request $request,Send $send){
-        $tel='15000661376';
+    public function message_send($tel,$start_city,$end_city,Send $send){
+        $tel='18623716061';
         $aliyun     = config('aliyun.aliyun');      //短信配置参数
-        $templateCode   ='SMS_210765192';
+        $templateCode   ='SMS_250970604';
         switch ($templateCode){
-            case 'SMS_210765192':
-                $send_type      ='qita';
-                $name           ='张三';
+            case 'SMS_250970604':
+                $send_type      ='quxiao';
                 $smsData        = [
-                    'name'=>$name,
+                    'start_city'=>$start_city,
+                    'end_city'=>$end_city,
                 ];
 
                 break;
+            case 'SMS_251075600':
+                 $send_type      ='jiedan';
+                 $smsData        = [
+                     'start_city'=>$start_city,
+                     'end_city'=>$end_city,
+                 ];
+
+                 break;
         }
 
 

@@ -363,6 +363,63 @@ class CrondtabController extends Controller {
         }
     }
 
+    /**
+     * 定时取消未支付订单
+     * */
+    public function cancelPayOrder(Request $request){
+        $now_time  = time();
+        $where = [
+            ['order_status','=',4],
+            ['order_type','!=','line'],
+            ['order_type','!=','lcl'],
+            ['on_line_flag','=','Y']
+        ];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','on_line_flag','gather_time','order_id',];
+        $select1 = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','gather_time','total_money'];
+        $order_list = TmsOrderDispatch::where($where)->select($select)->get();
+        foreach ($order_list as $k => $v) {
+            if ($now_time > strtotime($v->gather_time)) {
+                $order = TmsOrder::where('self_id',$v->order_id)->select($select1)->first();
+                $update['order_status'] = 7;
+                $update['update_time']  = date('Y-m-d H:i:s',time());
+                TmsOrderDispatch::where('self_id',$v->self_id)->update($update);
+                TmsOrder::where('self_id',$v->order_id)->update($update);
+                if ($order->pay_type == 'online'){
+                    if ($order->total_user_id){
+                        $wallet = UserCapital::where('total_user_id',$order->total_user_id)->select(['self_id','money'])->first();
+                        $payment = TmsPayment::where('order_id',$v->order_id)->select('pay_number','order_id','dispatch_id')->first();
+                        $wallet_update['money'] = $payment->pay_number + $wallet->money;
+                        $wallet_update['update_time'] = date('Y-m-d H:i:s',time());
+                        UserCapital::where('total_user_id',$order->total_user_id)->update($wallet_update);
+                        $data['wallet_type'] = 'user';
+                        $data['total_user_id'] = $order->total_user_id;
+                        UserWallet::insert($data);
+                    }else{
+                        $wallet = UserCapital::where('group_code',$order->group_code)->select(['self_id','money'])->first();
+                        $payment = TmsPayment::where('order_id',$v->order_id)->select('pay_number','order_id','dispatch_id')->first();
+                        $wallet_update['money'] = $payment->pay_number + $wallet->money;
+                        $wallet_update['update_time'] = date('Y-m-d H:i:s',time());
+                        UserCapital::where('group_code',$order->group_code)->update($wallet_update);
+                        $data['group_code'] = $order->group_code;
+                        $data['wallet_type'] = 'company';
+                    }
+                    $data['self_id'] = generate_id('wallet_');
+                    $data['produce_type'] = 'refund';
+                    $data['capital_type'] = 'wallet';
+                    $data['money'] = $payment->pay_number;
+                    $data['create_time'] = $now_time;
+                    $data['update_time'] = $now_time;
+                    $data['now_money'] = $wallet_update['money'];
+                    $data['now_money_md'] = get_md5($wallet_update['money']);
+                    $data['wallet_status'] = 'SU';
+                    UserWallet::insert($data);
+
+                }
+            }
+        }
+    }
+
+
 
 
 

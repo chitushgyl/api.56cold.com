@@ -5054,5 +5054,81 @@ class OrderController extends Controller{
 
     }
 
+    /**
+     * 查询取消订单
+     */
+    public function getCancelOrder(Request $request){
+        $user_info     =   $request->get('user_info');//接收中间件产生的参数
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $type                = $request->input('type');
+        $group_code          = $request->input('group_code');
+        $total_user_id       = $request->input('total_user_id');
+
+        /*** 虚拟数据
+        $input['type']                   = $type  = 'company';
+        $input['group_code']             = $group_code    = 'group_202109071459575059349124';
+        $input['total_user_id']           = $total_user_id  = '';
+         **/
+        $search=[
+            ['type'=>'=','name'=>'cancel_flag','value'=>'P'],
+            ['type'=>'=','name'=>'order_status','value'=>7],
+        ];
+        if($type == 'company'){
+            ['type'=>'=','name'=>'group_code','value'=>$group_code];
+        }else{
+            ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
+        }
+        $where  = get_list_where($search);
+        $info = TmsOrder::where($where)->select(['gather_shi_name','send_shi_name'])->get();
+
+        $msg['code'] = 200;
+        $msg['msg']  = '';
+        $msg['data'] = $info;
+        return $msg;
+
+    }
+
+    /**
+     * 查询有需要支付的订单
+     * */
+    public function getDispatchOrder(Request $request){
+        $user_info     =   $request->get('user_info');//接收中间件产生的参数
+        $now_time      =   date('Y-m-d H:i:s',time());
+        $input         =   $request->all();
+
+        /** 接收数据*/
+        $type                = $request->input('type');
+        $group_code          = $request->input('group_code');
+        $total_user_id       = $request->input('total_user_id');
+
+        /*** 虚拟数据
+        $input['type']                   = $type  = 'company';
+        $input['group_code']             = $group_code    = 'group_202109071459575059349124';
+        $input['total_user_id']           = $total_user_id  = '';
+         **/
+        $search=[
+            ['type'=>'=','name'=>'order_status','value'=>4],
+            ['type'=>'=','name'=>'pay_type','value'=>'offline'],
+            ['type'=>'=','name'=>'pay_state','value'=>'N'],
+            ['type'=>'!=','name'=>'order_type','value'=>'line'],
+            ['type'=>'!=','name'=>'order_type','value'=>'lcl'],
+        ];
+        if ($type == 'company'){
+            ['type'=>'=','name'=>'group_code','value'=>$group_code];
+        }else{
+            ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
+        }
+        $where  = get_list_where($search);
+        $info = TmsOrder::where($where)->select(['self_id','gather_shi_name','send_shi_name','group_code','order_status','pay_type','pay_state'])->get();
+
+        $msg['code'] = 200;
+        $msg['msg']  = '';
+        $msg['data'] = $info;
+        return $msg;
+    }
+
 }
 ?>
