@@ -192,6 +192,7 @@ class TakeController extends Controller{
             }elseif(!$info->pay_type && $info->pay_status == 'N'){
                 $info->pay_state = '未付款';
             }
+            $info->payStatus = $info->pay_status;
             $info->pay_status = $tms_pay_type[$info->pay_type];
             $info_clod = $info->clod;
             $info->self_id_show  = substr($info->self_id,15);
