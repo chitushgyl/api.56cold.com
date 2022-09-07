@@ -327,7 +327,7 @@ class OrderController extends Controller{
                             $v->button  = $button2;
                         }
                         if ($v->order_status  == 3 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
-                            $v->button  = $button3;
+                            $v->button  = $button4;
                         }
                         if($v->order_status == 6 && $v->discuss_flag == 'N'){
                             $v->button = $button5;
