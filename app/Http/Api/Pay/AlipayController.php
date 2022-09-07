@@ -712,7 +712,7 @@ class AlipayController extends Controller{
         $params['trade_type'] = 'APP';                      //交易类型 JSAPI | NATIVE | APP | WAP
         $params['attach'] = $user_id;                      //附加参数（用户ID）
         $result = $wechatAppPay->unifiedOrder($params);
-        // print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
+         print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
         //2.创建APP端预支付参数
         /** @var TYPE_NAME $result */
         $data = @$wechatAppPay->getAppPayParams($result['prepay_id']);
