@@ -557,7 +557,7 @@ class TakeController extends Controller{
                 ['self_id','=',$wait_info->order_id]
             ];
             $order_update['order_status'] = 3;
-            $order = TmsOrder::where($order_where)->update($order_update);
+
 
             if($wait_info->on_line_flag == 'N' && $wait_info->receiver_id){
                 $msg['code'] = 304;
@@ -575,34 +575,45 @@ class TakeController extends Controller{
             $update['on_line_flag']      ='N';
             $update['order_status']      = 3;
             $update['update_time']        =$now_time;
-            $id = TmsOrderDispatch::where($where)->update($update);
+            DB::beginTransaction();
+            try {
+                $order = TmsOrder::where($order_where)->update($order_update);
+                $id = TmsOrderDispatch::where($where)->update($update);
 
-            /** 保存应收及应付对象**/
-            if ($wait_info->pay_type == 'online'){
-                $money['shouk_total_user_id']           = $user_info->total_user_id;
-                $money['shouk_type']                    = 'USER';
-                $money['fk_group_code']                 = '1234';
-                $money['fk_type']                       = 'PLATFORM';
-                $money['ZIJ_total_user_id']             = $user_info->total_user_id;
-                $money['order_id']                      = $wait_info->order_id;
-                $money['create_time']                   = $now_time;
-                $money['update_time']                   = $now_time;
-                $money['money']                         = $wait_info->on_line_money*100;
-                $money['money_type']                    = 'freight';
-                $money['type']                          = 'out';
-                TmsOrderCost::insert($money);
-            }else{
-                $money_where = [
-                    ['order_id','=',$wait_info->order_id],
-                    ['delete_flag','=','Y'],
+                /** 保存应收及应付对象**/
+                if ($wait_info->pay_type == 'online'){
+                    $money['shouk_total_user_id']           = $user_info->total_user_id;
+                    $money['shouk_type']                    = 'USER';
+                    $money['fk_group_code']                 = '1234';
+                    $money['fk_type']                       = 'PLATFORM';
+                    $money['ZIJ_total_user_id']             = $user_info->total_user_id;
+                    $money['order_id']                      = $wait_info->order_id;
+                    $money['create_time']                   = $now_time;
+                    $money['update_time']                   = $now_time;
+                    $money['money']                         = $wait_info->on_line_money*100;
+                    $money['money_type']                    = 'freight';
+                    $money['type']                          = 'out';
+                    TmsOrderCost::insert($money);
+                }else{
+                    $money_where = [
+                        ['order_id','=',$wait_info->order_id],
+                        ['delete_flag','=','Y'],
 
-                ];
-                $money['shouk_total_user_id']           = $user_info->total_user_id;
-                $money['shouk_type']                    = 'USER';
-                TmsOrderCost::where($money_where)->update($money);
+                    ];
+                    $money['shouk_total_user_id']           = $user_info->total_user_id;
+                    $money['shouk_type']                    = 'USER';
+                    TmsOrderCost::where($money_where)->update($money);
+                }
+
+                /*** 发送短信通知用户已有司机接单**/
+                message_send();
+            }catch(\Exception $e){
+                DB::rollBack();
+                $msg['code'] = 302;
+                $msg['msg'] = "操作失败";
+                return $msg;
             }
 
-            /*** 发送短信通知用户已有司机接单**/
 
 
             if($id){

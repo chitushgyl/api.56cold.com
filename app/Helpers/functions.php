@@ -1,4 +1,5 @@
 ﻿<?php
+use App\Http\Controllers\SendController as Send;
 /**生成唯一的ID**/
 function generate_id($kk){
     list($s1, $s2) = explode(' ', microtime());
@@ -601,6 +602,39 @@ function dateTime(){
 
     return $date;
 }
+/**
+ * 发送短信
+ * */
+function message_send($tel,$start_city,$end_city,Send $send){
+        $tel='18623716061';
+        $aliyun     = config('aliyun.aliyun');      //短信配置参数
+        $templateCode   ='SMS_250970604';
+        switch ($templateCode){
+            case 'SMS_250970604':
+                $send_type      ='quxiao';
+                $smsData        = [
+                    'start_city'=>$start_city,
+                    'end_city'=>$end_city,
+                ];
+
+                break;
+            case 'SMS_251075600':
+                 $send_type      ='jiedan';
+                 $smsData        = [
+                     'start_city'=>$start_city,
+                     'end_city'=>$end_city,
+                 ];
+
+                 break;
+        }
+
+
+
+        $info=$send->send($tel,$aliyun,$templateCode,$send_type,$smsData);
+        $msg['code']    =$info['status'];
+        $msg['msg']     =$info['msg'];
+        return $msg;
+    }
 
 
 ?>

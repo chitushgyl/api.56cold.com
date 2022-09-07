@@ -487,7 +487,7 @@ class AlipayController extends Controller{
     /**
      * 加价支付宝支付
      * */
-    public function addApipay_notity(Request $request){
+    public function addAlipay_notity(Request $request){
         include_once base_path( '/vendor/alipay/aop/AopClient.php');
         $aop = new \AopClient();
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuQzIBEB5B/JBGh4mqr2uJp6NplptuW7p7ZZ+uGeC8TZtGpjWi7WIuI+pTYKM4XUM4HuwdyfuAqvePjM2ch/dw4JW/XOC/3Ww4QY2OvisiTwqziArBFze+ehgCXjiWVyMUmUf12/qkGnf4fHlKC9NqVQewhLcfPa2kpQVXokx3l0tuclDo1t5+1qi1b33dgscyQ+Xg/4fI/G41kwvfIU+t9unMqP6mbXcBec7z5EDAJNmDU5zGgRaQgupSY35BBjW8YVYFxMXL4VnNX1r5wW90ALB288e+4/WDrjTz5nu5yeRUqBEAto3xDb5evhxXHliGJMqwd7zqXQv7Q+iVIPpXQIDAQAB';
@@ -1294,6 +1294,10 @@ class AlipayController extends Controller{
         }else{
             $notify = 'https://ytapi.56cold.com/alipay/paymentWechatNotify';
         }
+        /***加价支付**/
+        if($type == 3){
+            $notify = 'https://ytapi.56cold.com/alipay/addPricenotify';
+        }
 
         $config    = config('tms.routine_config_user');//引入配置文件参数
         $appid  = $config['appid'];
@@ -2086,10 +2090,16 @@ class AlipayController extends Controller{
         TmsPayment::insert($pay);
         $order_update['pay_state'] = 'Y';
         $order_update['update_time'] = date('Y-m-d H:i:s',time());
-        $id = TmsOrder::where('self_id',$self_id)->update($order_update);
+        $id = TmsSubOrder::where('self_id',$price)->update($order_update);
+        $update['total_money'] = $order->total_money + $price;
+        $update['add_price'] = $price;
+        $update['price'] = $price;
+        $update['update_time'] = $now_time;
+        TmsOrder::where('self_id',$self_id)->update($update);
         if($order->order_type == 'vehicle'){
-            $dispatch_where['pay_status'] = 'Y';
             $dispatch_where['update_time'] = $now_time;
+            $dispatch_where['add_price'] = $price;
+            $dispatch_where['on_line_money'] = $price + $order->total_money;
             TmsOrderDispatch::where('order_id',$self_id)->update($dispatch_where);
         }
         /**修改费用数据为可用**/
@@ -2097,6 +2107,7 @@ class AlipayController extends Controller{
         $money['settle_flag']                = 'W';
         $tmsOrderCost = TmsOrderCost::where('order_id',$self_id)->select('self_id')->get();
         if ($tmsOrderCost){
+            $money['money']                      = $update['total_money'];
             $money_list = array_column($tmsOrderCost->toArray(),'self_id');
             TmsOrderCost::whereIn('self_id',$money_list)->update($money);
         }
