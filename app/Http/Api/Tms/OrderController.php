@@ -89,7 +89,7 @@ class OrderController extends Controller{
         $select = ['self_id','group_name','company_name','create_user_name','create_time','use_flag','order_type','order_status','car_type','clod','pick_flag','send_flag',
             'gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address','pay_state',
             'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
-            'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time','discuss_flag','follow_flag','line_id'];
+            'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time','discuss_flag','follow_flag','line_id','group_code','total_user_id'];
         $select2 = ['self_id','parame_name'];
         $select1 = ['self_id','carriage_id','order_dispatch_id'];
         $select3 = ['self_id','company_id','company_name','carriage_flag','total_money'];
