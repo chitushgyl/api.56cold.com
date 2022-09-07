@@ -104,6 +104,7 @@ Route::group([
     Route::any('/alipay/depositAlipay', 'Pay\AlipayController@depositAlipay');
     Route::any('/alipay/depositWechat', 'Pay\AlipayController@depositWechat');
     Route::any('/alipay/routineDeposit', 'Pay\AlipayController@routineDeposit');
+    Route::any('/alipay/addPriceBalance', 'Pay\AlipayController@addPriceBalance');
 });
 Route::any('/alipay/notify', 'Pay\AlipayController@notify');
 Route::any('/alipay/wxpaynotify', 'Pay\AlipayController@wxpaynotify');
@@ -118,7 +119,7 @@ Route::any('/alipay/qrcode_notify', 'Pay\AlipayController@qrcode_notify');
 Route::any('/alipay/depositAlipayNotify', 'Pay\AlipayController@depositAlipayNotify');
 Route::any('/alipay/depositWechatNotify', 'Pay\AlipayController@depositWechatNotify');
 Route::any('/alipay/addPricenotify', 'Pay\AlipayController@addPricenotify');
-Route::any('/alipay/addApipay_notity', 'Pay\AlipayController@addApipay_notity');
+Route::any('/alipay/addAlipay_notity', 'Pay\AlipayController@addAlipay_notity');
 
 
 /**极速版支付***/

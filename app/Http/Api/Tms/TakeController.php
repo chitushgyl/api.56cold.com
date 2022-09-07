@@ -606,7 +606,7 @@ class TakeController extends Controller{
                 }
 
                 /*** 发送短信通知用户已有司机接单**/
-                message_send();
+                $message = message_send($tel,$wait_info->gather_shi_name,$wait_info->send_shi_name);
             }catch(\Exception $e){
                 DB::rollBack();
                 $msg['code'] = 302;
