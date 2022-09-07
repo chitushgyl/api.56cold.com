@@ -503,9 +503,10 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
-            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
             $info = TmsSubOrder::where('self_id',$_POST['out_trade_no'])->select(['order_id','price','gropup_code','total_user_id','pay_state'])->first();
             $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_state'])->first();
+            file_put_contents(base_path('/vendor/alipay.txt'),$info);
+            file_put_contents(base_path('/vendor/alipay1.txt'),$order);
             if ($info->pay_state == 'Y'){
                 echo 'success';
                 return false;
@@ -712,7 +713,7 @@ class AlipayController extends Controller{
         $params['trade_type'] = 'APP';                      //交易类型 JSAPI | NATIVE | APP | WAP
         $params['attach'] = $user_id;                      //附加参数（用户ID）
         $result = $wechatAppPay->unifiedOrder($params);
-         print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
+//         print_r($result); // result中就是返回的各种信息信息，成功的情况下也包含很重要的prepay_id
         //2.创建APP端预支付参数
         /** @var TYPE_NAME $result */
         $data = @$wechatAppPay->getAppPayParams($result['prepay_id']);
