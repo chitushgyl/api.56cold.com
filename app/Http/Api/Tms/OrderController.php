@@ -4170,6 +4170,7 @@ class OrderController extends Controller{
             $data['user_type']                  = $user_type;
             $data['carpool']                    = $carpool;
             $data['kilometre']                    = $kilo;
+            $data['reduce_price']               = $reduce_price;
             /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
             $inserttt=[];
 

@@ -4467,6 +4467,7 @@ class OrderController extends CommonController{
         $reduce_price    = $request->input('reduce_price');//立减金额
         $user_type       = $request->input('user_type');
         $carpool       = $request->input('carpool');
+        $kilo       = $request->input('kilometre');
         /*** 虚拟数据
         //$input['self_id']   = $self_id='';
         $input['order_type']  = $order_type='vehicle';  //vehicle  lcl   line
@@ -4897,6 +4898,8 @@ class OrderController extends CommonController{
             $data['remark']                     = $remark;
             $data['user_type']                  = $user_type;
             $data['carpool']                    = $carpool;
+            $data['kilometre']                    = $kilo;
+            $data['reduce_price']               = $reduce_price;
             /*** 现在根据用户的这个是否提货产生出可调度的数据出来以及费用出来**/
             $inserttt=[];
 
@@ -4979,6 +4982,7 @@ class OrderController extends CommonController{
             $list['user_type']                  = $user_type;
             $list['reduce_price']               = $reduce_price;
             $list['carpool']                    = $carpool;
+            $list['kilometre']                    = $kilo;
             if ($pay_type == 'offline'){
                 $list['order_status'] = 2;
             }

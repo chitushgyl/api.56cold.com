@@ -542,22 +542,22 @@ class AlipayController extends Controller{
 //            $order_update['order_status'] = 6;
             $order_update['pay_state'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
-            $id = TmsSubOrder::where('self_id',$_POST['total_amount'])->update($order_update);
-            $update['total_money'] = $order->total_money + $_POST['total_amount'];
-            $update['add_price'] = $_POST['total_amount'];
-            $update['price'] = $_POST['total_amount'];
+            $id = TmsSubOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
+            $update['total_money'] = $order->total_money + $_POST['total_amount']*100;
+            $update['add_price'] = $_POST['total_amount']*100;
+            $update['price'] = $_POST['total_amount']*100;
             $update['update_time'] = $now_time;
             TmsOrder::where('self_id',$info->order_id)->update($update);
             if($order->order_type == 'vehicle'){
                 $dispatch_where['update_time'] = $now_time;
-                $dispatch_where['add_price'] = $_POST['total_amount'];
-                $dispatch_where['on_line_money'] = $_POST['total_amount'] + $order->total_money;
-                TmsOrderDispatch::where('order_id',$_POST['out_trade_no'])->update($dispatch_where);
+                $dispatch_where['add_price'] = $_POST['total_amount']*100;
+                $dispatch_where['on_line_money'] = $_POST['total_amount']*100 + $order->total_money;
+                TmsOrderDispatch::where('order_id',$order->order_id)->update($dispatch_where);
             }
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
-            $tmsOrderCost = TmsOrderCost::where('order_id',$_POST['out_trade_no'])->select('self_id')->get();
+            $tmsOrderCost = TmsOrderCost::where('order_id',$order->order_id)->select('self_id')->get();
             if ($tmsOrderCost){
                 $money['money']                      = $update['total_money'];
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
@@ -959,12 +959,12 @@ class AlipayController extends Controller{
                 $dispatch_where['update_time'] = $now_time;
                 $dispatch_where['add_price'] = $array_data['total_fee'];
                 $dispatch_where['on_line_money'] = $array_data['total_fee'] + $order->total_money;
-                TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->update($dispatch_where);
+                TmsOrderDispatch::where('order_id',$order->order_id)->update($dispatch_where);
             }
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
-            $tmsOrderCost = TmsOrderCost::where('order_id',$array_data['out_trade_no'])->select('self_id')->get();
+            $tmsOrderCost = TmsOrderCost::where('order_id',$order->order_id)->select('self_id')->get();
             if ($tmsOrderCost){
                 $money['money']                      = $update['total_money'];
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
@@ -2053,7 +2053,8 @@ class AlipayController extends Controller{
         $pay['pay_result'] = 'SU';//
         $pay['state'] = 'in';//支付状态
         $pay['self_id'] = generate_id('pay_');
-        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name','pay_state','order_type','total_money','price'])->first();
+        $info = TmsSubOrder::where('self_id',$self_id)->select(['order_id','price','group_code','total_user_id','pay_state'])->first();
+        $order = TmsOrder::where('self_id',$info->order_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name','pay_state','order_type','total_money','price','add_price'])->first();
 //        if ($order->order_status == 2){
 //            $msg['code'] = 301;
 //            $msg['msg']  = '该订单已支付';
@@ -2092,12 +2093,12 @@ class AlipayController extends Controller{
         TmsPayment::insert($pay);
         $order_update['pay_state'] = 'Y';
         $order_update['update_time'] = date('Y-m-d H:i:s',time());
-        $id = TmsSubOrder::where('self_id',$price)->update($order_update);
+        $id = TmsSubOrder::where('self_id',$self_id)->update($order_update);
         $update['total_money'] = $order->total_money + $price;
         $update['add_price'] = $price;
         $update['price'] = $price;
         $update['update_time'] = $now_time;
-        TmsOrder::where('self_id',$self_id)->update($update);
+        TmsOrder::where('self_id',$order->order_id)->update($update);
         if($order->order_type == 'vehicle'){
             $dispatch_where['update_time'] = $now_time;
             $dispatch_where['add_price'] = $price;
