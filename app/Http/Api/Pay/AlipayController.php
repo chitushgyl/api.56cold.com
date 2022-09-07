@@ -2111,6 +2111,13 @@ class AlipayController extends Controller{
         }
     }
 
+    /**
+     * 加价小程序支付
+     * */
+    public function toutineAddPrice(Request $request){
+
+    }
+
 
 
 }

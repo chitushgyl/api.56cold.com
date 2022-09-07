@@ -4990,12 +4990,6 @@ class OrderController extends Controller{
         $rules = [
             'self_id'=>'required',
             'price'=>'required',
-            'temperture'=>'required',
-            'start_city'=>'required',
-            'end_city'=>'required',
-            'car_type'=>'required',
-            'good_info'=>'required',
-            'pay_type'=>'required',
         ];
         $message = [
             'self_id.required'=>'请选择订单！',
