@@ -545,7 +545,7 @@ class AlipayController extends Controller{
             $id = TmsSubOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
             $update['total_money'] = $order->total_money + $_POST['total_amount']*100;
             $update['add_price'] = $_POST['total_amount']*100;
-            $update['price'] = $_POST['total_amount']*100;
+            $update['price'] = $_POST['total_amount']*100 +$order->price;
             $update['update_time'] = $now_time;
             TmsOrder::where('self_id',$info->order_id)->update($update);
             if($order->order_type == 'vehicle'){
@@ -952,7 +952,7 @@ class AlipayController extends Controller{
             $id = TmsSubOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
             $update['total_money'] = $order->total_money + $array_data['total_fee'];
             $update['add_price'] = $array_data['total_fee'];
-            $update['price'] = $array_data['total_fee'];
+            $update['price'] = $array_data['total_fee']+$order->price;
             $update['update_time'] = $now_time;
             TmsOrder::where('self_id',$info->order_id)->update($update);
             if($order->order_type == 'vehicle'){
@@ -2096,7 +2096,7 @@ class AlipayController extends Controller{
         $id = TmsSubOrder::where('self_id',$self_id)->update($order_update);
         $update['total_money'] = $order->total_money + $price;
         $update['add_price'] = $price*100;
-        $update['price'] = $price*100;
+        $update['price'] = $price*100+$order->price;
         $update['update_time'] = $now_time;
         TmsOrder::where('self_id',$order->order_id)->update($update);
         if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
