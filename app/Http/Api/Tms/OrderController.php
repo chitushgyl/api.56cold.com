@@ -5001,9 +5001,9 @@ class OrderController extends Controller{
         if($validator->passes()) {
             $select = ['self_id','total_money','price','send_money','pick_money'];
             $info = TmsOrder::where('self_id',$self_id)->select($select)->first();
-            $data['price'] = $price;
-            $data['add_price'] = $price;
-            $data['total_money'] = $price + $info->total_money;
+            $data['price'] = $price*100;
+            $data['add_price'] = $price*100;
+            $data['total_money'] = $price*100 + $info->total_money;
             TmsOrder::where('self_id',$self_id)->update($data);
 
             $sub['self_id'] = generate_id('sub_');
