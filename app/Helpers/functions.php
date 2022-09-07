@@ -605,7 +605,7 @@ function dateTime(){
 /**
  * 发送短信
  * */
-function message_send($tel,$start_city,$end_city,Send $send){
+function message_send($tel,$start_city,$end_city,$templateCode,Send $send){
         $tel='18623716061';
         $aliyun     = config('aliyun.aliyun');      //短信配置参数
         $templateCode   ='SMS_250970604';

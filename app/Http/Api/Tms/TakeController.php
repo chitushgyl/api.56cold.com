@@ -552,7 +552,11 @@ class TakeController extends Controller{
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address',
                 'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
-            $wait_info=TmsOrderDispatch::where($where)->select($select)->first();
+            $select1 = ['tel','self_id'];
+            $wait_info=TmsOrderDispatch::with(['userReg'=>function($query)use($select1) {
+                $query->where('delete_flag','Y');
+                $query->select($select1);
+            }])->where($where)->select($select)->first();
             $order_where = [
                 ['self_id','=',$wait_info->order_id]
             ];
@@ -606,7 +610,11 @@ class TakeController extends Controller{
                 }
 
                 /*** 发送短信通知用户已有司机接单**/
-                $message = message_send($tel,$wait_info->gather_shi_name,$wait_info->send_shi_name);
+                if ($wait_info->userReg){
+                    $templateCode = 'SMS_251075600';
+                    $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+                }
+
             }catch(\Exception $e){
                 DB::rollBack();
                 $msg['code'] = 302;
