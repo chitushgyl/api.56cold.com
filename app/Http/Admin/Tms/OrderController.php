@@ -441,10 +441,10 @@ class OrderController extends CommonController{
                 if ($v->order_status == 2 && $v->order_type == 'lift'){
                     $v->button  = $button1;
                 }
-                if ($v->order_status == 5 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
+                if ($v->order_status == 3 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
                     $v->button  = $button4;
                 }
-                if ($v->order_status == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
+                if ($v->order_status == 4 && $v->pay_type == 'offline' && $v->pay_state == 'N' && $v->app_flag == 1){
                     $v->button  = $button5;
                 }
                 if($v->order_status == 6 && $v->discuss_flag == 'N'){
@@ -453,9 +453,9 @@ class OrderController extends CommonController{
                 if($v->order_status == 6 && $v->discuss_flag == 'Y' && $v->follow_flag == 'N'){
                     $v->button = $button8;
                 }
-                if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
-                    $v->button  = $button5;
-                }
+//                if ($v->order_status  == 6 && $v->pay_type == 'offline' && $v->pay_state == 'N'){
+//                    $v->button  = $button5;
+//                }
 
 
             }
