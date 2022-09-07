@@ -503,6 +503,7 @@ class AlipayController extends Controller{
             $pay['pay_result'] = 'SU';//
             $pay['state'] = 'in';//支付状态
             $pay['self_id'] = generate_id('pay_');
+            file_put_contents(base_path('/vendor/alipay.txt'),$pay);
             $info = TmsSubOrder::where('self_id',$_POST['out_trade_no'])->select(['order_id','price','gropup_code','total_user_id','pay_state'])->first();
             $order = TmsOrder::where('self_id',$_POST['out_trade_no'])->select(['total_user_id','group_code','order_status','group_name','order_type','pay_state'])->first();
             if ($info->pay_state == 'Y'){
@@ -2051,7 +2052,7 @@ class AlipayController extends Controller{
         $pay['pay_result'] = 'SU';//
         $pay['state'] = 'in';//支付状态
         $pay['self_id'] = generate_id('pay_');
-        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name','pay_state','order_type'])->first();
+        $order = TmsOrder::where('self_id',$self_id)->select(['total_user_id','group_code','order_status','group_name','order_type','send_shi_name','gather_shi_name','pay_state','order_type','total_money','price'])->first();
 //        if ($order->order_status == 2){
 //            $msg['code'] = 301;
 //            $msg['msg']  = '该订单已支付';
