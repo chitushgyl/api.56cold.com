@@ -115,7 +115,7 @@ class OrderController extends CommonController{
         $select=['self_id','group_name','company_name','create_user_name','create_time','use_flag','order_type','order_status','pay_type','pay_state','app_flag','gather_address_id',
             'gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address','send_address_id','send_contacts_id', 'send_name',
             'send_tel','send_sheng','send_shi','send_qu','send_address','total_money','total_user_id','good_name','good_number', 'good_weight', 'good_volume', 'gather_shi_name',
-            'send_shi_name','send_qu_name','car_type','clod','send_time','gather_time','discuss_flag','follow_flag','line_id','group_code'];
+            'send_shi_name','send_qu_name','car_type','clod','send_time','gather_time','discuss_flag','follow_flag','line_id'];
         $select2 = ['self_id','parame_name'];
         $select3 = ['self_id','total_user_id','tel'];
         $select1 = ['self_id','carriage_id','order_dispatch_id'];
@@ -126,7 +126,7 @@ class OrderController extends CommonController{
             'line_gather_sheng','line_gather_shi','line_gather_qu','line_gather_sheng_name','line_gather_shi_name','line_gather_qu_name' , 'line_gather_address','remark',
             'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi',
             'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','clod','pick_flag','send_flag',
-            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag','receiver_id'
+            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag','receiver_id','total_user_id'
         ];
         switch ($group_info['group_id']){
             case 'all':

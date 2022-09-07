@@ -89,7 +89,7 @@ class OrderController extends Controller{
         $select = ['self_id','group_name','company_name','create_user_name','create_time','use_flag','order_type','order_status','car_type','clod','pick_flag','send_flag',
             'gather_address_id','gather_contacts_id','gather_name','gather_tel','gather_sheng','gather_shi','gather_qu','gather_qu_name','gather_address','pay_state',
             'send_address_id','send_contacts_id','send_name','send_tel','send_sheng','send_shi','send_qu','send_qu_name','send_address','total_money','pay_type',
-            'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time','discuss_flag','follow_flag','line_id','total_user_id','group_code'];
+            'good_name','good_number','good_weight','good_volume','gather_shi_name','send_shi_name','gather_time','send_time','discuss_flag','follow_flag','line_id'];
         $select2 = ['self_id','parame_name'];
         $select1 = ['self_id','carriage_id','order_dispatch_id'];
         $select3 = ['self_id','company_id','company_name','carriage_flag','total_money'];
@@ -99,7 +99,7 @@ class OrderController extends Controller{
             'line_gather_sheng','line_gather_shi','line_gather_qu','line_gather_sheng_name','line_gather_shi_name','line_gather_qu_name' , 'line_gather_address','remark',
             'line_gather_address_longitude','line_gather_address_latitude','line_send_address_id','line_send_contacts_id','line_send_name','line_send_tel', 'line_send_sheng','line_send_shi',
             'line_send_qu','line_send_sheng_name','line_send_shi_name','line_send_qu_name','line_send_address','line_send_address_longitude','line_send_address_latitude','clod','pick_flag','send_flag',
-            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag','receiver_id'
+            'pay_type','order_id','pay_status','pay_time','receiver_type','gather_name','gather_tel','send_name','send_tel','receipt_flag','receiver_id','total_user_id'
         ];
         $data['info'] = TmsOrder::with(['TmsCarType' => function($query) use($select2){
             $query->select($select2);
