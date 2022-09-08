@@ -551,12 +551,13 @@ class TakeController extends Controller{
             $select=['self_id','order_id','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address',
-                'good_info','good_number','good_weight','good_volume','total_money','on_line_money'];
+                'good_info','good_number','good_weight','good_volume','total_money','on_line_money','total_user_id'];
             $select1 = ['tel','self_id'];
             $wait_info=TmsOrderDispatch::with(['userReg'=>function($query)use($select1) {
                 $query->where('delete_flag','Y');
                 $query->select($select1);
             }])->where($where)->select($select)->first();
+
             $order_where = [
                 ['self_id','=',$wait_info->order_id]
             ];
@@ -608,12 +609,12 @@ class TakeController extends Controller{
                     $money['shouk_type']                    = 'USER';
                     TmsOrderCost::where($money_where)->update($money);
                 }
-                message_send('18623716061','上海市','北京市',’SMS_251075600);
+
                 /*** 发送短信通知用户已有司机接单**/
-//                if ($wait_info->userReg){
-//                    $templateCode = 'SMS_251075600';
-//                    $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
-//                }
+                if ($wait_info->userReg){
+                    $templateCode = 'SMS_250970604';
+                    $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+                }
                 DB::commit();
                 $msg['code'] = 200;
                 $msg['msg'] = "操作成功";

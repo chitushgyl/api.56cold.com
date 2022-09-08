@@ -79,8 +79,6 @@ class SendController extends Controller{
         $result = json_decode(json_encode($acsResponse), true);
         $resp = $result['Code'];
 
-        dd($result);
-
         //$send_type='verify';
 //        $user_id=null;
         $msg=$this->sendMsgResult($resp,$tel,$send_type,$templateCode,$smsData);

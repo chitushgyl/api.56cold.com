@@ -605,10 +605,8 @@ function dateTime(){
 /**
  * 发送短信
  * */
-function message_send($tel,$start_city,$end_city,$templateCode,Send $send){
-        $tel='18623716061';
+function message_send($tel,$start_city,$end_city,$templateCode){
         $aliyun     = config('aliyun.aliyun');      //短信配置参数
-        $templateCode   ='SMS_250970604';
         switch ($templateCode){
             case 'SMS_250970604':
                 $send_type      ='quxiao';
@@ -628,8 +626,7 @@ function message_send($tel,$start_city,$end_city,$templateCode,Send $send){
                  break;
         }
 
-
-
+        $send = new \App\Http\Controllers\SendController();
         $info=$send->send($tel,$aliyun,$templateCode,$send_type,$smsData);
         $msg['code']    =$info['status'];
         $msg['msg']     =$info['msg'];
