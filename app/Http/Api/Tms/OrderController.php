@@ -5125,5 +5125,68 @@ class OrderController extends Controller{
         return $msg;
     }
 
+    /**
+     * 未支付订单直接加价（不需要支付）
+     * */
+    public function add_price(Request $request){
+        $user_info = $request->get('user_info');//接收中间件产生的参数
+        $now_time      = date('Y-m-d H:i:s',time());
+        $input         = $request->all();
+
+        /** 接收数据*/
+        $self_id       = $request->input('self_id');
+        $price         = $request->input('price');
+
+        /*** 虚拟数据
+        $input['self_id']           = $start_city  = 'order_45456456456454';
+        $input['price']             = $end_city    =300;
+         **/
+        $rules = [
+            'self_id'=>'required',
+            'price'=>'required',
+        ];
+        $message = [
+            'self_id.required'=>'请选择订单！',
+            'price.required'=>'请填写加价金额！',
+        ];
+
+        $validator = Validator::make($input,$rules,$message);
+        if($validator->passes()) {
+              $info = TmsOrder::where('self_id',$self_id)->select(['total_money','price','add_price'])->first();
+              $order = TmsOrderDispatch::where('order_id',$self_id)->select(['total_money','on_line_money','add_price'])->first();
+            $update['total_money'] = $info->total_money + $price*100;
+            $update['add_price'] = $price*100;
+            $update['price'] = $price*100 + $info->price;
+            $update['update_time'] = $now_time;
+            TmsOrder::where('self_id',$self_id)->update($update);
+            if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
+                $dispatch_where['update_time'] = $now_time;
+                $dispatch_where['add_price'] = $price*100;
+                $dispatch_where['on_line_money'] = $price*100 + $order->on_line_money;
+                TmsOrderDispatch::where('order_id',$self_id)->update($dispatch_where);
+            }
+            /**修改费用数据为可用**/
+            $money['delete_flag']                = 'Y';
+            $money['settle_flag']                = 'W';
+            $tmsOrderCost = TmsOrderCost::where('order_id',$order->order_id)->select('self_id')->get();
+            if ($tmsOrderCost){
+                $money['money']                      = $update['total_money'];
+                $money_list = array_column($tmsOrderCost->toArray(),'self_id');
+                TmsOrderCost::whereIn('self_id',$money_list)->update($money);
+            }
+        }else{
+            //前端用户验证没有通过
+            $erro = $validator->errors()->all();
+            $msg['code'] = 300;
+            $msg['msg']  = null;
+            foreach ($erro as $k => $v) {
+                $kk = $k+1;
+                $msg['msg'].=$kk.'：'.$v.'</br>';
+            }
+            return $msg;
+        }
+
+    }
+
 }
 ?>

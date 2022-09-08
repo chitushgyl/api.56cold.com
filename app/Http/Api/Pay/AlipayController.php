@@ -955,10 +955,10 @@ class AlipayController extends Controller{
             $update['price'] = $array_data['total_fee']+$order->price;
             $update['update_time'] = $now_time;
             TmsOrder::where('self_id',$info->order_id)->update($update);
-            if($order->order_type == 'vehicle'){
+            if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
                 $dispatch_where['update_time'] = $now_time;
                 $dispatch_where['add_price'] = $array_data['total_fee'];
-                $dispatch_where['on_line_money'] = $array_data['total_fee'] + $order->total_money;
+                $dispatch_where['on_line_money'] = $update['total_money'];
                 TmsOrderDispatch::where('order_id',$order->order_id)->update($dispatch_where);
             }
             /**修改费用数据为可用**/
@@ -2094,7 +2094,7 @@ class AlipayController extends Controller{
         $order_update['pay_state'] = 'Y';
         $order_update['update_time'] = date('Y-m-d H:i:s',time());
         $id = TmsSubOrder::where('self_id',$self_id)->update($order_update);
-        $update['total_money'] = $order->total_money + $price;
+        $update['total_money'] = $order->total_money + $price*100;
         $update['add_price'] = $price*100;
         $update['price'] = $price*100+$order->price;
         $update['update_time'] = $now_time;

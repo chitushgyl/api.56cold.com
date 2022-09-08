@@ -95,7 +95,7 @@ class UserController extends Controller{
 
                     $data['total_user_id']      =$user_info->total_user_id;
                     $data['type']               ='user';
-                    $data['create_user_id']     = '1111111111';
+                    $data['create_user_id']     = $user_info->total_user_id;
                     $data['create_user_name']   = $user_info->total_user_id;
                     if ($user_identity){
                         UserIdentity::where([['total_user_id','=',$user_info->total_user_id],['type','=','user'],['delete_flag','=','Y']])->update($data);
@@ -112,7 +112,7 @@ class UserController extends Controller{
 //                    $data['self_id']            = generate_id('identity_');
                     $data['total_user_id']      =$user_info->total_user_id;
                     $data['type']               ='carriage';
-                    $data['create_user_id']     = '2222222';
+                    $data['create_user_id']     = $user_info->total_user_id;
                     $data['create_user_name']   = $user_info->total_user_id;
 
                     if ($user_identity){
