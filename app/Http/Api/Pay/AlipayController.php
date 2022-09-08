@@ -2103,6 +2103,10 @@ class AlipayController extends Controller{
             $dispatch_where['update_time'] = $now_time;
             $dispatch_where['add_price'] = $price*100;
             $dispatch_where['on_line_money'] = $update['total_money'];
+            $msg['code'] = 200;
+            $msg['msg']  = '支付成功！';
+            $msg['data']  = $dispatch_where;
+            return $msg;
             TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
         }
         /**修改费用数据为可用**/
