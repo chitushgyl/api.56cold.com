@@ -2105,7 +2105,9 @@ class AlipayController extends Controller{
             $dispatch_where['on_line_money'] = $update['total_money'];
             $msg['code'] = 200;
             $msg['msg']  = '支付成功！';
-            $msg['data']  = $dispatch_where;
+            $msg['money1']  = $dispatch_where;
+            $msg['money2']  = $order->total_money;
+            $msg['money3']  = $price*100;
             return $msg;
             TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
         }
