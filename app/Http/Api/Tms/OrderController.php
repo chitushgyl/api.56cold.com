@@ -5028,12 +5028,12 @@ class OrderController extends Controller{
             TmsSubOrder::insert($sub);
 
             /*** 修改运单价格**/
-            $select1 = ['self_id','order_id','on_line_money'];
-            $info1 = TmsOrderDispatch::where('order_id',$self_id)->first();
-
-            $data1['add_price'] = $price*100;
-            $data1['on_line_money'] = $price + $info1->on_line_money;
-            TmsOrderDispatch::where('order_id',$self_id)->update($data1);
+//            $select1 = ['self_id','order_id','on_line_money'];
+//            $info1 = TmsOrderDispatch::where('order_id',$self_id)->first();
+//
+//            $data1['add_price'] = $price*100;
+//            $data1['on_line_money'] = $price + $info1->on_line_money;
+//            TmsOrderDispatch::where('order_id',$self_id)->update($data1);
             /***修改费用**/
 
             $msg['code'] = 200;
