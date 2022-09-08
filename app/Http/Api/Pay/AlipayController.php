@@ -552,12 +552,12 @@ class AlipayController extends Controller{
                 $dispatch_where['update_time'] = $now_time;
                 $dispatch_where['add_price'] = $_POST['total_amount']*100;
                 $dispatch_where['on_line_money'] = $update['total_money'];
-                TmsOrderDispatch::where('order_id',$order->order_id)->update($dispatch_where);
+                TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
             }
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
-            $tmsOrderCost = TmsOrderCost::where('order_id',$order->order_id)->select('self_id')->get();
+            $tmsOrderCost = TmsOrderCost::where('order_id',$info>order_id)->select('self_id')->get();
             if ($tmsOrderCost){
                 $money['money']                      = $update['total_money'];
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
@@ -958,13 +958,13 @@ class AlipayController extends Controller{
             if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
                 $dispatch_where['update_time'] = $now_time;
                 $dispatch_where['add_price'] = $array_data['total_fee'];
-                $dispatch_where['on_line_money'] = $update['total_money'];
-                TmsOrderDispatch::where('order_id',$order->order_id)->update($dispatch_where);
+                $dispatch_where['on_line_money'] = $order->total_money + $array_data['total_fee'];
+                TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
             }
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
-            $tmsOrderCost = TmsOrderCost::where('order_id',$order->order_id)->select('self_id')->get();
+            $tmsOrderCost = TmsOrderCost::where('order_id',$info->order_id)->select('self_id')->get();
             if ($tmsOrderCost){
                 $money['money']                      = $update['total_money'];
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
@@ -2102,13 +2102,13 @@ class AlipayController extends Controller{
         if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
             $dispatch_where['update_time'] = $now_time;
             $dispatch_where['add_price'] = $price*100;
-            $dispatch_where['on_line_money'] = $update['total_money'];
-            TmsOrderDispatch::where('order_id',$self_id)->update($dispatch_where);
+            $dispatch_where['on_line_money'] = $order->total_money + $price*100;
+            TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
         }
         /**修改费用数据为可用**/
         $money['delete_flag']                = 'Y';
         $money['settle_flag']                = 'W';
-        $tmsOrderCost = TmsOrderCost::where('order_id',$self_id)->select('self_id')->get();
+        $tmsOrderCost = TmsOrderCost::where('order_id',$info->order_id)->select('self_id')->get();
         if ($tmsOrderCost){
             $money['money']                      = $update['total_money'];
             $money_list = array_column($tmsOrderCost->toArray(),'self_id');
