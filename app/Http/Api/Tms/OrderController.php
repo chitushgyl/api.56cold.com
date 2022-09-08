@@ -5157,8 +5157,8 @@ class OrderController extends Controller{
 
         $validator = Validator::make($input,$rules,$message);
         if($validator->passes()) {
-              $info = TmsOrder::where('self_id',$self_id)->select(['total_money','price','add_price'])->first();
-              $order = TmsOrderDispatch::where('order_id',$self_id)->select(['total_money','on_line_money','add_price'])->first();
+              $info = TmsOrder::where('self_id',$self_id)->select(['total_money','price','add_price','order_type'])->first();
+              $order = TmsOrderDispatch::where('order_id',$self_id)->select(['order_type','total_money','on_line_money','add_price'])->first();
             $update['total_money'] = $info->total_money + $price*100;
             $update['add_price'] = $price*100;
             $update['price'] = $price*100 + $info->price;
