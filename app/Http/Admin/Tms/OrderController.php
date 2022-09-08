@@ -2517,6 +2517,11 @@ class OrderController extends CommonController{
             ];
             $select = ['self_id','order_status','total_money'];
             $order = TmsOrder::where($where)->select($select)->first();
+            if ($order->order_status != 5){
+                $msg['code'] = 301;
+                $msg['msg'] = '请确认订单已送达';
+                return $msg;
+            }
             if ($order->order_status == 6){
                 $msg['code'] = 301;
                 $msg['msg'] = '订单已完成';
