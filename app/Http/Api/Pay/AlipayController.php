@@ -547,13 +547,14 @@ class AlipayController extends Controller{
             $update['add_price'] = $_POST['total_amount']*100;
             $update['price'] = $_POST['total_amount']*100 +$order->price;
             $update['update_time'] = $now_time;
-            TmsOrder::where('self_id',$info->order_id)->update($update);
+
             if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
                 $dispatch_where['update_time'] = $now_time;
                 $dispatch_where['add_price'] = $_POST['total_amount']*100;
                 $dispatch_where['on_line_money'] = $update['total_money'];
                 TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
             }
+            TmsOrder::where('self_id',$info->order_id)->update($update);
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
@@ -954,13 +955,14 @@ class AlipayController extends Controller{
             $update['add_price'] = $array_data['total_fee'];
             $update['price'] = $array_data['total_fee']+$order->price;
             $update['update_time'] = $now_time;
-            TmsOrder::where('self_id',$info->order_id)->update($update);
+
             if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
                 $dispatch_where['update_time'] = $now_time;
                 $dispatch_where['add_price'] = $array_data['total_fee'];
                 $dispatch_where['on_line_money'] = $update['total_money'];
                 TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
             }
+            TmsOrder::where('self_id',$info->order_id)->update($update);
             /**修改费用数据为可用**/
             $money['delete_flag']                = 'Y';
             $money['settle_flag']                = 'W';
@@ -2098,19 +2100,14 @@ class AlipayController extends Controller{
         $update['add_price'] = $price*100;
         $update['price'] = $price*100+$order->price;
         $update['update_time'] = $now_time;
-        TmsOrder::where('self_id',$order->order_id)->update($update);
+
         if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
             $dispatch_where['update_time'] = $now_time;
             $dispatch_where['add_price'] = $price*100;
             $dispatch_where['on_line_money'] = $update['total_money'];
-            $msg['code'] = 200;
-            $msg['msg']  = '支付成功！';
-            $msg['money1']  = $dispatch_where;
-            $msg['money2']  = $order->total_money;
-            $msg['money3']  = $price*100;
-            return $msg;
             TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
         }
+        TmsOrder::where('self_id',$order->order_id)->update($update);
         /**修改费用数据为可用**/
         $money['delete_flag']                = 'Y';
         $money['settle_flag']                = 'W';
