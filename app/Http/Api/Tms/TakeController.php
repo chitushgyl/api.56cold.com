@@ -608,12 +608,12 @@ class TakeController extends Controller{
                     $money['shouk_type']                    = 'USER';
                     TmsOrderCost::where($money_where)->update($money);
                 }
-
+                message_send('18623716061','上海市','北京市',’SMS_251075600);
                 /*** 发送短信通知用户已有司机接单**/
-                if ($wait_info->userReg){
-                    $templateCode = 'SMS_251075600';
-                    $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
-                }
+//                if ($wait_info->userReg){
+//                    $templateCode = 'SMS_251075600';
+//                    $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+//                }
                 DB::commit();
                 $msg['code'] = 200;
                 $msg['msg'] = "操作成功";
