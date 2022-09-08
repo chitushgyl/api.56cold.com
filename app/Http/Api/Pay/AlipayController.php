@@ -2100,15 +2100,17 @@ class AlipayController extends Controller{
         $update['add_price'] = $price*100;
         $update['price'] = $price*100+$order->price;
         $update['update_time'] = $now_time;
-
+        $msg['update1'] = $update;
         if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
-            $msg['code'] = 200;
-            $msg['msg']  = '支付成功！';
-            $msg['data']  = $order->order_type;
-            return $msg;
+
             $dispatch_where['update_time'] = $now_time;
             $dispatch_where['add_price'] = $price*100;
             $dispatch_where['on_line_money'] = $update['total_money'];
+            $msg['code'] = 200;
+            $msg['msg']  = '支付成功！';
+            $msg['data']  = $dispatch_where;
+            $msg['update']  = $update;
+            return $msg;
             TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
         }
         TmsOrder::where('self_id',$order->order_id)->update($update);
