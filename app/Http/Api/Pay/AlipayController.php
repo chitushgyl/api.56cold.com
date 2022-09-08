@@ -2100,7 +2100,6 @@ class AlipayController extends Controller{
         $update['add_price'] = $price*100;
         $update['price'] = $price*100+$order->price;
         $update['update_time'] = $now_time;
-        $msg['update1'] = $update;
         if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
             $dispatch_where['update_time'] = $now_time;
             $dispatch_where['add_price'] = $price*100;

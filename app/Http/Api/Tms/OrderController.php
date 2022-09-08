@@ -5006,10 +5006,10 @@ class OrderController extends Controller{
         if($validator->passes()) {
             $select = ['self_id','total_money','price','send_money','pick_money'];
             $info = TmsOrder::where('self_id',$self_id)->select($select)->first();
-            $data['price'] = $price*100;
-            $data['add_price'] = $price*100;
-            $data['total_money'] = $price*100 + $info->total_money;
-            TmsOrder::where('self_id',$self_id)->update($data);
+//            $data['price'] = $price*100;
+//            $data['add_price'] = $price*100;
+//            $data['total_money'] = $price*100 + $info->total_money;
+//            TmsOrder::where('self_id',$self_id)->update($data);
 
             $sub['self_id'] = generate_id('sub_');
             $sub['price'] = $price*100;
