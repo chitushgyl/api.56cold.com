@@ -2110,6 +2110,7 @@ class AlipayController extends Controller{
             $msg['msg']  = '支付成功！';
             $msg['data']  = $dispatch_where;
             $msg['update']  = $update;
+            $msg['order_type']  = $order->order_type;
             return $msg;
             TmsOrderDispatch::where('order_id',$info->order_id)->update($dispatch_where);
         }
