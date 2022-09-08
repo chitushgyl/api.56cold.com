@@ -614,21 +614,13 @@ class TakeController extends Controller{
                     $templateCode = 'SMS_251075600';
                     $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
                 }
-
-            }catch(\Exception $e){
-                DB::rollBack();
-                $msg['code'] = 302;
-                $msg['msg'] = "操作失败";
-                return $msg;
-            }
-
-
-
-            if($id){
+                DB::commit();
                 $msg['code'] = 200;
                 $msg['msg'] = "操作成功";
                 return $msg;
-            }else{
+
+            }catch(\Exception $e){
+                DB::rollBack();
                 $msg['code'] = 302;
                 $msg['msg'] = "操作失败";
                 return $msg;

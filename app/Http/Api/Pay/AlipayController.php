@@ -460,7 +460,7 @@ class AlipayController extends Controller{
             $order_update['pay_state'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsOrder::where('self_id',$_POST['out_trade_no'])->update($order_update);
-            if($order->order_type == 'vehicle'){
+            if($order->order_type == 'vehicle' ||$order->order_type == 'lift'){
                 $dispatch_where['pay_status'] = 'Y';
                 $dispatch_where['update_time'] = $now_time;
                 TmsOrderDispatch::where('order_id',$_POST['out_trade_no'])->update($dispatch_where);
@@ -872,7 +872,7 @@ class AlipayController extends Controller{
             $order_update['pay_state'] = 'Y';
             $order_update['update_time'] = date('Y-m-d H:i:s',time());
             $id = TmsOrder::where('self_id',$array_data['out_trade_no'])->update($order_update);
-            if($order->order_type == 'vehicle'){
+            if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
                 $dispatch_where['pay_status'] = 'Y';
                 $dispatch_where['update_time'] = $now_time;
                 TmsOrderDispatch::where('order_id',$array_data['out_trade_no'])->update($dispatch_where);
@@ -1249,7 +1249,7 @@ class AlipayController extends Controller{
         $order_update['pay_state'] = 'Y';
         $order_update['update_time'] = date('Y-m-d H:i:s',time());
         $id = TmsOrder::where('self_id',$self_id)->update($order_update);
-        if($order->order_type == 'vehicle'){
+        if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
             $dispatch_where['pay_status'] = 'Y';
             $dispatch_where['update_time'] = $now_time;
             TmsOrderDispatch::where('order_id',$self_id)->update($dispatch_where);
