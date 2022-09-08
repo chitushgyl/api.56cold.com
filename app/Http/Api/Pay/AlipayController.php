@@ -2102,6 +2102,10 @@ class AlipayController extends Controller{
         $update['update_time'] = $now_time;
 
         if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
+            $msg['code'] = 200;
+            $msg['msg']  = '支付成功！';
+            $msg['data']  = $order->order_type;
+            return $msg;
             $dispatch_where['update_time'] = $now_time;
             $dispatch_where['add_price'] = $price*100;
             $dispatch_where['on_line_money'] = $update['total_money'];
