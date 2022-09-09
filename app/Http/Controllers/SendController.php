@@ -139,6 +139,71 @@ class SendController extends Controller{
         return $msg;
     }
 
+    /**
+     * 发送通知短信
+     * */
+    public function send_message($tel,$aliyun,$templateCode,$send_type,$smsData){
+        if(empty($tel) && !$this->isphone($tel)){
+            $msg['status'] = 301;
+            $msg['message'] = "手机号格式不正确";
+            return $msg;
+        }
+        /*** 以下位置为阿里云的短信配置元素 **/
+        require_once  './app/Tools/sms/vendor/autoload.php';    //此处为你放置API的路径
+        Config::load();             //加载区域结点配置
+        $accessKeyId        = $aliyun['accessKeyId'];
+        $accessKeySecret    = $aliyun['accessKeySecret'];
+        $SignName    = $aliyun['SignName'];
+//        $templateCode = config('aliyun.aliyun.templateCode');   //短信模板ID
+
+        //短信API产品名（短信产品名固定，无需修改）
+        $product = "Dysmsapi";
+        //短信API产品域名（接口地址固定，无需修改）
+        $domain = "dysmsapi.aliyuncs.com";
+        //暂时不支持多Region（目前仅支持cn-hangzhou请勿修改）
+        $region = "cn-hangzhou";
+        // 初始化用户Profile实例
+        $profile = DefaultProfile::getProfile($region, $accessKeyId, $accessKeySecret);
+        // dump($profile);exit;
+        // 增加服务结点
+        DefaultProfile::addEndpoint("cn-hangzhou", "cn-hangzhou", $product, $domain);
+        // 初始化AcsClient用于发起请求
+        $acsClient = new DefaultAcsClient($profile);
+        // 初始化SendSmsRequest实例用于设置发送短信的参数
+        $request = new SendSmsRequest();
+        // 必填，设置短信接收号码
+        $request->setPhoneNumbers($tel);
+
+        // 必填，设置签名名称 填写和阿里云配置短信的模板签名一样
+        $request->setSignName($SignName);
+        // 必填，设置模板CODE
+        $request->setTemplateCode($templateCode);
+        /*** 阿里云的短信配置元素结束 现在是单独处理元素的地方 **/
+
+        /**这里是处理变量的地方***/
+
+        //选填-假如模板中存在变量需要替换则为必填(JSON格式),友情提示:如果JSON中需要带换行符,请参照标准的JSON协议对换行符的要求,比如短信内容中包含\r\n的情况在JSON中需要表示成\\r\\n,否则会导致JSON在服务端解析失败
+        $request->setTemplateParam(json_encode($smsData));
+
+
+        //发起访问请求
+        $acsResponse = $acsClient -> getAcsResponse($request);
+
+
+        //返回请求结果
+        $result = json_decode(json_encode($acsResponse), true);
+        $resp = $result['Code'];
+
+        if ($resp == "OK") {
+            $msg['status']=200;
+            $msg['msg']="发送成功";
+        }else{
+            $msg['status']=303;
+            $msg['msg']="阿里云发送失败";
+        }
+        return $msg;
+    }
+
 
 }
 ?>
