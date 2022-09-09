@@ -5163,7 +5163,7 @@ class OrderController extends Controller{
             $update['add_price'] = $price*100;
             $update['price'] = $price*100 + $info->price;
             $update['update_time'] = $now_time;
-            TmsOrder::where('self_id',$self_id)->update($update);
+            $id = TmsOrder::where('self_id',$self_id)->update($update);
             if($order->order_type == 'vehicle' || $order->order_type == 'lift'){
                 $dispatch_where['update_time'] = $now_time;
                 $dispatch_where['add_price'] = $price*100;
@@ -5179,6 +5179,17 @@ class OrderController extends Controller{
                 $money_list = array_column($tmsOrderCost->toArray(),'self_id');
                 TmsOrderCost::whereIn('self_id',$money_list)->update($money);
             }
+            if($id){
+                $msg['code'] = 200;
+                $msg['msg']  = '加价成功';
+                return $msg;
+            }else{
+                $msg['code'] = 303;
+                $msg['msg']  = '加价失败';
+                return $msg;
+            }
+
+
         }else{
             //前端用户验证没有通过
             $erro = $validator->errors()->all();
