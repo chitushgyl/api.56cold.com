@@ -506,6 +506,7 @@ class AlipayController extends Controller{
             $info = TmsSubOrder::where('self_id',$_POST['out_trade_no'])->select(['order_id','price','group_code','total_user_id','pay_state'])->first();
             $order = TmsOrder::where('self_id',$info->order_id)->select(['total_user_id','group_code','order_status','group_name','order_type','pay_state','add_price','total_money','price'])->first();
             file_put_contents(base_path('/vendor/alipay.txt'),$info);
+            file_put_contents(base_path('/vendor/alipay2.txt'),$_POST);
             file_put_contents(base_path('/vendor/alipay1.txt'),$order);
             if ($info->pay_state == 'Y'){
                 echo 'success';
