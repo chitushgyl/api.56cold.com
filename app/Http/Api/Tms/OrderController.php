@@ -5082,7 +5082,7 @@ class OrderController extends Controller{
             ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
         }
         $where  = get_list_where($search);
-        $info = TmsOrder::where($where)->select(['gather_shi_name','send_shi_name'])->get();
+        $info = TmsOrder::where($where)->select(['gather_shi_name','send_shi_name','group_code','total_user_id'])->get();
 
         $msg['code'] = 200;
         $msg['msg']  = '';
@@ -5122,7 +5122,7 @@ class OrderController extends Controller{
             ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
         }
         $where  = get_list_where($search);
-        $info = TmsOrder::where($where)->select(['self_id','gather_shi_name','send_shi_name','group_code','order_status','pay_type','pay_state'])->get();
+        $info = TmsOrder::where($where)->select(['self_id','gather_shi_name','send_shi_name','group_code','order_status','pay_type','pay_state','total_user_id'])->get();
 
         $msg['code'] = 200;
         $msg['msg']  = '';
