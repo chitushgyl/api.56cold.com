@@ -5077,9 +5077,9 @@ class OrderController extends Controller{
             ['type'=>'=','name'=>'order_status','value'=>7],
         ];
         if($type == 'company'){
-            ['type'=>'=','name'=>'group_code','value'=>$group_code];
+            $search[] = ['type'=>'=','name'=>'group_code','value'=>$group_code];
         }else{
-            ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
+            $search[] = ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
         }
         $where  = get_list_where($search);
         $info = TmsOrder::where($where)->select(['gather_shi_name','send_shi_name','group_code','total_user_id'])->get();
@@ -5105,9 +5105,9 @@ class OrderController extends Controller{
         $total_user_id       = $request->input('total_user_id');
 
         /*** 虚拟数据
-        $input['type']                   = $type  = 'company';
-        $input['group_code']             = $group_code    = 'group_202109071459575059349124';
-        $input['total_user_id']           = $total_user_id  = '';
+        $input['type']                   = $type  = 'user';
+        $input['group_code']             = $group_code    = 'user_202109071430261164192197';
+        $input['total_user_id']           = $total_user_id  = 'user_202109071430261164192197';
          **/
         $search=[
             ['type'=>'=','name'=>'order_status','value'=>4],
@@ -5117,9 +5117,9 @@ class OrderController extends Controller{
             ['type'=>'!=','name'=>'order_type','value'=>'lcl'],
         ];
         if ($type == 'company'){
-            ['type'=>'=','name'=>'group_code','value'=>$group_code];
+            $search[] = ['type'=>'=','name'=>'group_code','value'=>$group_code];
         }else{
-            ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
+            $search[] = ['type'=>'=','name'=>'total_user_id','value'=>$total_user_id];
         }
         $where  = get_list_where($search);
         $info = TmsOrder::where($where)->select(['self_id','gather_shi_name','send_shi_name','group_code','order_status','pay_type','pay_state','total_user_id'])->get();
