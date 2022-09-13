@@ -76,6 +76,12 @@ class UserIdentity extends Model{
         return $this->hasOne('App\Models\User\UserReg','total_user_id','total_user_id');
     }
 
+    public function userId(){
+        //参数：关联模型名称，外键，主键
+        //如果主键是id可以省略
+        return $this->hasMany('App\Models\User\UserReg','total_user_id','total_user_id');
+    }
+
     public function userCapital(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略

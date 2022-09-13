@@ -287,7 +287,7 @@ class OnlineController extends CommonController{
                 ->with(['userIdentity'=>function($query)use($select2,$select1) {
                     $query->where('delete_flag','Y');
                     $query->select($select2);
-                    $query->with(['userReg' => function($query)use($select1) {
+                    $query->with(['userId' => function($query)use($select1) {
                         $query->select($select1);
                     }]);
                 }])
@@ -323,9 +323,11 @@ class OnlineController extends CommonController{
                     $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
                 }
             }else{
+                $tel = [];
                 if ($wait_info->userIdentity){
-                    foreach($wait_info->userIdentity->userReg as $k =>$v ){
-                        $tel[] = $v->tel;
+                    $a = $wait_info->userIdentity->userId;
+                    foreach($a as $key =>$value ){
+                        $tel[] = $value->tel;
                     }
                     $templateCode = 'SMS_250970604';
                     $message = message_send(implode(',',$tel),$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
