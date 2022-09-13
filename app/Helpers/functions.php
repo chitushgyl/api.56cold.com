@@ -609,7 +609,6 @@ function message_send($tel,$start_city,$end_city,$templateCode){
         $aliyun     = config('aliyun.aliyun');      //短信配置参数
         switch ($templateCode){
             case 'SMS_250970604':
-                $send_type      ='quxiao';
                 $smsData        = [
                     'start_city'=>$start_city,
                     'end_city'=>$end_city,
@@ -617,7 +616,6 @@ function message_send($tel,$start_city,$end_city,$templateCode){
 
                 break;
             case 'SMS_251075600':
-                 $send_type      ='jiedan';
                  $smsData        = [
                      'start_city'=>$start_city,
                      'end_city'=>$end_city,
@@ -627,7 +625,7 @@ function message_send($tel,$start_city,$end_city,$templateCode){
         }
 
         $send = new \App\Http\Controllers\SendController();
-        $info=$send->send_message($tel,$aliyun,$templateCode,$send_type,$smsData);
+        $info=$send->send_message($tel,$aliyun,$templateCode,$smsData);
         $msg['code']    =$info['status'];
         $msg['msg']     =$info['msg'];
         return $msg;

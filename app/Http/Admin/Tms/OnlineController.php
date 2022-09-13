@@ -275,11 +275,24 @@ class OnlineController extends CommonController{
                 ['self_id','=',$dispatch_id],
             ];
             $select=['self_id','company_name','order_status','create_time','create_time','group_name','dispatch_flag','receiver_id','on_line_flag',
-                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id','group_code',
+                'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address','order_id','group_code','total_user_id',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address',
                 'good_info','good_number','good_weight','good_volume'];
-            $wait_info=TmsOrderDispatch::where($where)->select($select)->first(); //总的数据量
-//            dd($wait_info->order_id);
+            $select1 = ['tel','self_id','total_user_id'];
+            $select2 = ['total_user_id','group_code'];
+            $wait_info=TmsOrderDispatch::with(['userReg'=>function($query)use($select1) {
+                $query->where('delete_flag','Y');
+                $query->select($select1);
+            }])
+                ->with(['userIdentity'=>function($query)use($select2,$select1) {
+                    $query->where('delete_flag','Y');
+                    $query->select($select2);
+                    $query->with(['userReg' => function($query)use($select1) {
+                        $query->select($select1);
+                    }]);
+                }])
+                ->where($where)->select($select)->first(); //总的数据量
+
             if(empty($wait_info)){
                 $msg['code'] = 304;
                 $msg['msg'] = '您选择的订单已被承接';
@@ -302,6 +315,23 @@ class OnlineController extends CommonController{
             $update['order_status']       = 3;
             $update['update_time']        =$now_time;
             $id = TmsOrderDispatch::where($where)->update($update);
+
+            /*** 发送短信通知用户已有司机接单**/
+            if($wait_info->total_user_id){
+                if ($wait_info->userReg){
+                    $templateCode = 'SMS_250970604';
+                    $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+                }
+            }else{
+                if ($wait_info->userIdentity){
+                    foreach($wait_info->userIdentity->userReg as $k =>$v ){
+                        $tel[] = $v->tel;
+                    }
+                    $templateCode = 'SMS_250970604';
+                    $message = message_send(implode(',',$tel),$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+                }
+            }
+
 
             /*** 保存应收及应付对象**/
             if ($wait_info->pay_type == 'online'){

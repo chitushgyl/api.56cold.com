@@ -142,7 +142,7 @@ class SendController extends Controller{
     /**
      * 发送通知短信
      * */
-    public function send_message($tel,$aliyun,$templateCode,$send_type,$smsData){
+    public function send_message($tel,$aliyun,$templateCode,$smsData){
         if(empty($tel) && !$this->isphone($tel)){
             $msg['status'] = 301;
             $msg['message'] = "手机号格式不正确";
