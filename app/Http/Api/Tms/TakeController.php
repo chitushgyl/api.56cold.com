@@ -627,8 +627,11 @@ class TakeController extends Controller{
                     }
                 }else{
                     if ($wait_info->userIdentity){
-                        foreach($wait_info->userIdentity->userReg as $k =>$v ){
-                            $tel[] = $v->tel;
+                        $a = $wait_info->userIdentity;
+                        foreach($a as $key =>$value ){
+                            foreach($value->userId as $k =>$v){
+                                $tel[] = $v['tel'];
+                            }
                         }
                         $templateCode = 'SMS_250970604';
                         $message = message_send(implode(',',array_unique($tel)),$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);

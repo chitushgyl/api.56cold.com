@@ -325,9 +325,11 @@ class OnlineController extends CommonController{
             }else{
                 $tel = [];
                 if ($wait_info->userIdentity){
-                    $a = $wait_info->userIdentity->userId;
+                    $a = $wait_info->userIdentity;
                     foreach($a as $key =>$value ){
-                        $tel[] = $value->tel;
+                        foreach($value->userId as $k =>$v){
+                            $tel[] = $v['tel'];
+                        }
                     }
                     $templateCode = 'SMS_250970604';
                     $message = message_send(implode(',',array_unique($tel)),$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);

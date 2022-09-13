@@ -83,7 +83,7 @@ class TmsOrderDispatch extends Model{
     public function userIdentity(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
-        return $this->hasOne('App\Models\User\UserIdentity','group_code','group_code');
+        return $this->hasMany('App\Models\User\UserIdentity','group_code','group_code');
     }
 
     public function systemGroup(){
