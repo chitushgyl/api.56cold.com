@@ -631,7 +631,7 @@ class TakeController extends Controller{
                             $tel[] = $v->tel;
                         }
                         $templateCode = 'SMS_250970604';
-                        $message = message_send(implode(',',$tel),$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+                        $message = message_send(implode(',',array_unique($tel)),$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
                     }
                 }
                 DB::commit();
