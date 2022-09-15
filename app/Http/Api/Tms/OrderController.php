@@ -2784,7 +2784,7 @@ class OrderController extends Controller{
         $sendtype = $request->input('send_flag')??null;
         $order_type = $request->input('order_type');
 
-//        /**虚拟数据
+        /**虚拟数据
         $input['pick_flag'] = $picktype = 2;  // 'Y' 提货  'N' 自送
         $input['send_flag'] = $sendtype = 1;  // 'Y' 配送  'N' 自提
         $input['volume'] = $volume = 2;
@@ -2792,7 +2792,7 @@ class OrderController extends Controller{
         $input['car_type'] = $car_type = 'type_202102051755118039490396';
         $input['gather_address'] = $gather_address = [["area"=>"东城区","city"=> "北京市","info"=> "123123","pro"=> "北京市"],["area"=>"房山区","city"=> "北京市","info"=> "星光路12号","pro"=> "北京市"]];
         $input['send_address'] = $send_address = [['area'=>'嘉定区',"city"=> "上海市","info"=>"江桥镇","pro"=> "上海市"],['area'=>'松江区',"city"=> "上海市","info"=>"佘山","pro"=> "上海市"]];
-//         **/
+         **/
         $rules = [
             'car_type'=>'required',
             'gather_address'=>'required',
