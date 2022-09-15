@@ -373,7 +373,7 @@ class CrondtabController extends Controller {
             ['order_type','!=','line'],
             ['order_type','!=','lcl']
         ];
-        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','on_line_flag','gather_time','order_id','update_time','pay_status'];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','on_line_flag','gather_time','order_id','update_time','pay_status','gather_shi_name','send_shi_name',''];
         $select1 = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','gather_time','total_money','update_time','pay_state'];
         $order_list = TmsOrderDispatch::where($where)->select($select)->get();
         foreach ($order_list as $k => $v) {
@@ -382,6 +382,8 @@ class CrondtabController extends Controller {
                     $order = TmsOrder::where('self_id',$v->order_id)->select($select1)->first();
                     $update['order_status'] = 7;
                     $update['update_time']  = date('Y-m-d H:i:s',time());
+                    $templecode = '';
+                    $result = message_send();
                     TmsOrderDispatch::where('self_id',$v->self_id)->update($update);
                     TmsOrder::where('self_id',$v->order_id)->update($update);
                 }
