@@ -334,7 +334,7 @@ class CarController extends Controller{
             ['delete_flag','=','Y'],
             ['use_flag','=','Y'],
         ];
-        $select=['self_id','parame_name','dimensions','allweight','allvolume','img'];
+        $select=['self_id','parame_name','dimensions','allweight','allvolume','img','pickup_price','unload_price'];
         //dd($where);
         $data['info']=TmsCarType::where($where)->select($select)->get();
         if ($data['info']){
@@ -346,6 +346,8 @@ class CarController extends Controller{
                 $data['info'][$key]['allweight'] = ($value['allweight']/1000).'吨';
                 $data['info'][$key]['allvolume'] = $value['allvolume'].'方';
                 $data['info'][$key]['dimensions'] = $value['dimensions'].'米';
+                $data['info'][$key]['pickup_price'] = $value['pickup_price']/100;
+                $data['info'][$key]['unload_price'] = $value['unload_price']/100;
 
             }
         }
