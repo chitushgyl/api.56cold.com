@@ -35,6 +35,7 @@ Route::any('/crondtab/order_unline', 'Crondtab\CrondtabController@order_unline')
 Route::any('/crondtab/order_done', 'Crondtab\CrondtabController@order_done'); //定时完成订单
 Route::any('/crondtab/queryAlipay', 'Crondtab\CrondtabController@queryAlipay'); //定时完成订单
 Route::any('/crondtab/queryWechat', 'Crondtab\CrondtabController@queryWechat'); //定时完成订单
+Route::any('/crondtab/cancelPayOrder', 'Crondtab\CrondtabController@cancelPayOrder'); //定时完成订单
 
 /******支付板块模块*******/
 Route::any('/pay/wx_pay', 'Pay\PayController@wx_pay');

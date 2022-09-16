@@ -623,7 +623,7 @@ class TakeController extends Controller{
                 if($wait_info->total_user_id){
                     if ($wait_info->userReg){
                         $templateCode = 'SMS_250970604';
-                        $message = message_send($wait_info->userReg->tel,$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+                        $message = message_send($wait_info->userReg->tel,$wait_info->send_shi_name,$wait_info->gather_shi_name,$templateCode);
                     }
                 }else{
                     if ($wait_info->userIdentity){
@@ -634,7 +634,7 @@ class TakeController extends Controller{
                             }
                         }
                         $templateCode = 'SMS_250970604';
-                        $message = message_send(implode(',',array_unique($tel)),$wait_info->gather_shi_name,$wait_info->send_shi_name,$templateCode);
+                        $message = message_send(implode(',',array_unique($tel)),$wait_info->send_shi_name,$wait_info->gather_shi_name,$templateCode);
                     }
                 }
                 DB::commit();

@@ -5075,6 +5075,7 @@ class OrderController extends Controller{
         $search=[
             ['type'=>'=','name'=>'cancel_flag','value'=>'P'],
             ['type'=>'=','name'=>'order_status','value'=>7],
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
         ];
         if($type == 'company'){
             $search[] = ['type'=>'=','name'=>'group_code','value'=>$group_code];
@@ -5115,6 +5116,7 @@ class OrderController extends Controller{
             ['type'=>'=','name'=>'pay_state','value'=>'N'],
             ['type'=>'!=','name'=>'order_type','value'=>'line'],
             ['type'=>'!=','name'=>'order_type','value'=>'lcl'],
+            ['type'=>'=','name'=>'delete_flag','value'=>'Y'],
         ];
         if ($type == 'company'){
             $search[] = ['type'=>'=','name'=>'group_code','value'=>$group_code];

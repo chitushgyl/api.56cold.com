@@ -418,7 +418,7 @@ function unit_do($good_unit , $good_target_unit, $good_scale, $num) {
      * return 经纬度
      * */
 function bd_location($type,$pro,$city,$area,$info){
-//    $ak ="PaC1MWoU0dYwg1ZHB6IgKEFOhy3PIpvc";
+//    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
     $ak = '27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg';
     if($type == 1){
         $address = $pro.$city;
@@ -498,6 +498,7 @@ function direction($lat1, $lng1, $lat2, $lng2){
         return '';
     }
     $ak ="27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg";
+//    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
     $url = "http://api.map.baidu.com/direction/v2/driving?output=json&tactics=0&origin=".$lat1.",".$lng1."&destination=".$lat2.",".$lng2."&ak=".$ak;
 
     $renderOption = file_get_contents($url);
