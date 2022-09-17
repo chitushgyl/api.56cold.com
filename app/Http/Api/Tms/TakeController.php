@@ -552,7 +552,7 @@ class TakeController extends Controller{
                 'gather_sheng_name','gather_shi_name','gather_qu_name','gather_address',
                 'send_sheng_name','send_shi_name','send_qu_name','send_address',
                 'good_info','good_number','good_weight','good_volume','total_money','on_line_money','total_user_id','group_code'];
-            $select1 = ['tel','self_id'];
+            $select1 = ['tel','self_id','total_user_id'];
             $select2 = ['total_user_id','group_code'];
             $wait_info=TmsOrderDispatch::with(['userReg'=>function($query)use($select1) {
                 $query->where('delete_flag','Y');
@@ -561,7 +561,7 @@ class TakeController extends Controller{
                 ->with(['userIdentity'=>function($query)use($select2,$select1) {
                     $query->where('delete_flag','Y');
                     $query->select($select2);
-                    $query->with(['userReg' => function($query)use($select1) {
+                    $query->with(['userId' => function($query)use($select1) {
                         $query->select($select1);
                     }]);
                 }])

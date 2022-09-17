@@ -371,24 +371,55 @@ class CrondtabController extends Controller {
         $where = [
             ['order_status','=',4],
             ['order_type','!=','line'],
-            ['order_type','!=','lcl']
+            ['order_type','!=','lcl'],
+            ['pay_type','=','offline'],
+            ['pay_status','=','N']
         ];
-        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','on_line_flag','gather_time','order_id','update_time','pay_status','gather_shi_name','send_shi_name',''];
+        $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','on_line_flag','gather_time','order_id','update_time','pay_status','gather_shi_name','send_shi_name'];
         $select1 = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','gather_time','total_money','update_time','pay_state'];
-        $order_list = TmsOrderDispatch::where($where)->select($select)->get();
+        $select2 = ['tel','self_id','total_user_id'];
+        $select3 = ['total_user_id','group_code'];
+        $order_list = TmsOrderDispatch::with(['userReg'=>function($query)use($select2) {
+            $query->where('delete_flag','Y');
+            $query->select($select2);
+        }])
+            ->with(['userIdentity'=>function($query)use($select2,$select3) {
+                $query->where('delete_flag','Y');
+                $query->select($select3);
+                $query->with(['userId' => function($query)use($select2) {
+                    $query->select($select2);
+                }]);
+            }])
+            ->where($where)->select($select)->get();
+//        dd($order_list->toArray());
         foreach ($order_list as $k => $v) {
             if ($now_time - 2*3600 > strtotime($v->update_time)) {
-                if ($order_list->pay_status == 'N'){
+                if ($v->pay_status == 'N'){
                     $order = TmsOrder::where('self_id',$v->order_id)->select($select1)->first();
                     $update['order_status'] = 7;
                     $update['update_time']  = date('Y-m-d H:i:s',time());
                     $templecode = '';
-                    $result = message_send();
-                    TmsOrderDispatch::where('self_id',$v->self_id)->update($update);
-                    TmsOrder::where('self_id',$v->order_id)->update($update);
+                    /*** 发送短信通知用户已有司机接单**/
+                    if($v->total_user_id){
+                        if ($v->userReg){
+                            $templateCode = 'SMS_251075600';
+                            $message = message_send($v->userReg->tel,$v->send_shi_name,$v->gather_shi_name,$templateCode);
+                        }
+                    }else{
+                        if ($v->userIdentity){
+                            $a = $v->userIdentity;
+                            foreach($a as $key =>$value ){
+                                foreach($value->userId as $k =>$v){
+                                    $tel[] = $v['tel'];
+                                }
+                            }
+                            $templateCode = 'SMS_251075600';
+                            $message = message_send(implode(',',array_unique($tel)),$v->send_shi_name,$v->gather_shi_name,$templateCode);
+                        }
+                    }
+                    $res = TmsOrderDispatch::where('self_id',$v->self_id)->update($update);
+                    $result = TmsOrder::where('self_id',$v->order_id)->update($update);
                 }
-
-
             }
         }
     }
