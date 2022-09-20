@@ -1650,6 +1650,44 @@ class AlipayController extends Controller{
 
     }
 
+
+    public function qrcodeLogo(){
+        include_once base_path('/vendor/phpqrcode/phpqrcode.php');
+
+        $qrcode = new \QRcode();
+        //二维码内容
+        $value = 'https://api.56cold.com/update/user.apk';
+        $errorCorrectionLevel = 'H';//容错级别
+        $matrixPointSize = 5;//生成图片大小
+        //生成二维码图片
+        $qrcode->png($value,'qrcode.png',$errorCorrectionLevel, $matrixPointSize, 5,false);
+
+        $logo =  base_path('/uploads/logo/logo.png');//准备好的logo图片
+        $QR = 'qrcode.png';//已经生成的原始二维码图
+        if ($logo !== FALSE) {
+            $QR = imagecreatefromstring(file_get_contents($QR));
+            $logo = imagecreatefromstring(file_get_contents($logo));
+            $QR_width = imagesx($QR);//二维码图片宽度
+            $QR_height = imagesy($QR);//二维码图片高度
+            $logo_width = imagesx($logo);//logo图片宽度
+            $logo_height = imagesy($logo);//logo图片高度
+            $logo_qr_width = $QR_width / 5;
+            $scale = $logo_width/$logo_qr_width;
+            $logo_qr_height = $logo_height/$scale;
+            $from_width = ($QR_width - $logo_qr_width) / 2;
+            //重新组合图片并调整大小
+            imagecopyresampled($QR, $logo, $from_width, $from_width, 0, 0, $logo_qr_width,
+                $logo_qr_height, $logo_width, $logo_height);
+        }
+        //输出图片
+        $path = 'uploads/qrcode/';
+        $filename = $path.date('YmdHis').'.png';
+        imagepng($QR,$filename);
+
+        return $filename;
+
+    }
+
     /**
      * 判断微信端还是支付宝端
      * */
