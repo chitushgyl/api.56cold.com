@@ -1656,13 +1656,13 @@ class AlipayController extends Controller{
 
         $qrcode = new \QRcode();
         //二维码内容
-        $value = 'https://ytapi.56cold.com/update/user.apk';
+        $value = 'https://ytapi.56cold.com/update/driver.apk';
         $errorCorrectionLevel = 'H';//容错级别
         $matrixPointSize = 5;//生成图片大小
         //生成二维码图片
         $qrcode->png($value,'qrcode.png',$errorCorrectionLevel, $matrixPointSize, 5,false);
 
-        $logo =  base_path('/uploads/logo/user.png');//准备好的logo图片
+        $logo =  base_path('/uploads/logo/driver.png');//准备好的logo图片
         $QR = 'qrcode.png';//已经生成的原始二维码图
         if ($logo !== FALSE) {
             $QR = imagecreatefromstring(file_get_contents($QR));
