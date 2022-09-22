@@ -839,9 +839,9 @@ class DispatchController extends CommonController{
             $info->driver_price = 0;
 
             if ($info->pay_status == 'Y' && $info->pay_type == 'offline'){
-                $info->pay_state = '已付款';
+                $info->pay_state = '货到付款';
             }elseif($info->pay_type == 'online'){
-                $info->pay_state = '已付款';
+                $info->pay_state = '货到付款';
             }elseif($info->pay_type == 'offline' && $info->pay_status == 'N'){
                 $info->pay_state = '未付款';
             }elseif(!$info->pay_type && $info->pay_status == 'N'){
@@ -913,7 +913,7 @@ class DispatchController extends CommonController{
             if ($info->group_code != $info->receiver_id || $info->total_user_id != $info->receiver_id){
                 $order_details1['value'] = '¥'.$info->on_line_money;
             }
-            $order_details7['name'] = '是否付款';
+            $order_details7['name'] = '付款方式';
             $order_details7['value'] = $info->pay_state;
             $order_details7['color'] = '#FF7A1A';
             $order_details2['name'] = '里程';
