@@ -497,9 +497,11 @@ function direction($lat1, $lng1, $lat2, $lng2){
     if(empty($lat1) || empty($lng1) || empty($lat2) || empty($lng2)){
         return '';
     }
-    $ak ="27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg";
+//    $ak ="27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg";
 //    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
-    $url = "http://api.map.baidu.com/direction/v2/driving?output=json&tactics=0&origin=".$lat1.",".$lng1."&destination=".$lat2.",".$lng2."&ak=".$ak;
+      $tk = '43511f4345162ee3db18035f8a6b50a5';
+//    $url = "http://api.map.baidu.com/direction/v2/driving?output=json&tactics=0&origin=".$lat1.",".$lng1."&destination=".$lat2.",".$lng2."&ak=".$ak;
+      $url = "http://api.tianditu.gov.cn/drive?postStr={'orig':\"$lat1,$lng1\",'dest':\"$lat2,$lng2\",'style':'0'}&type=search&tk=$tk";
 
     $renderOption = file_get_contents($url);
     $result = json_decode($renderOption,true);
