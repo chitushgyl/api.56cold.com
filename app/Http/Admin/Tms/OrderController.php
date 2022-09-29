@@ -2519,7 +2519,7 @@ class OrderController extends CommonController{
             $order = TmsOrder::where($where)->select($select)->first();
             if ($order->order_status != 5){
                 $msg['code'] = 301;
-                $msg['msg'] = '请确认订单已送达';
+                $msg['msg'] = '请等待司机确认！';
                 return $msg;
             }
             if ($order->order_status == 6){

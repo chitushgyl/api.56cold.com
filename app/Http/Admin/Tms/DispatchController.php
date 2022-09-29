@@ -843,9 +843,9 @@ class DispatchController extends CommonController{
             }elseif($info->pay_type == 'online'){
                 $info->pay_state = '货到付款';
             }elseif($info->pay_type == 'offline' && $info->pay_status == 'N'){
-                $info->pay_state = '未付款';
+                $info->pay_state = '货到付款';
             }elseif(!$info->pay_type && $info->pay_status == 'N'){
-                $info->pay_state = '未付款';
+                $info->pay_state = '货到付款';
             }
             $cold = $info->clod;
             foreach ($cold as $key => $value){

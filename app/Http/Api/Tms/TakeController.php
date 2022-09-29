@@ -188,9 +188,9 @@ class TakeController extends Controller{
             }elseif($info->pay_type == 'online'){
                 $info->pay_state = '货到付款';
             }elseif($info->pay_type == 'offline' && $info->pay_status == 'N'){
-                $info->pay_state = '未付款';
+                $info->pay_state = '货到付款';
             }elseif(!$info->pay_type && $info->pay_status == 'N'){
-                $info->pay_state = '未付款';
+                $info->pay_state = '货到付款';
             }
             $info->payStatus = $info->pay_status;
             $info->pay_status = $tms_pay_type[$info->pay_type];
