@@ -2983,6 +2983,7 @@ class OrderController extends Controller{
                 $start_action1= bd_location($type,'',$startcity_str[$i]['city'],$startcity_str[$i]['area'],$startcity_str[$i]['info']);
                 // 获取百度返回的结果
                 $list = direction($start_action['lat'], $start_action['lng'], $start_action1['lat'], $start_action1['lng']);
+                dd($list);
                 $finally = $list['distance']/1000;
                 $km1 = $this->mileage_interval(2,(int)$finally);
                 $km += $km1;

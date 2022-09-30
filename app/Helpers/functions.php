@@ -418,13 +418,15 @@ function unit_do($good_unit , $good_target_unit, $good_scale, $num) {
      * return 经纬度
      * */
 function bd_location($type,$pro,$city,$area,$info){
-//    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
-    $ak = '27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg';
+    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
+//    $ak = '27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg';
+    $tk = '';
     if($type == 1){
         $address = $pro.$city;
     }else{
         $address = $pro.$city.$area.$info;
     }
+//    $url = 'http://api.tianditu.gov.cn/geocoder?ds={"keyWord":'."延庆区北京市延庆区延庆镇莲花池村前街50夕阳红养老院"."}&tk=".$tk;
     $url ="http://api.map.baidu.com/geocoding/v3/?callback=showLocation&output=json&address=".$address."&ak=".$ak;
     $showLocation = file_get_contents($url);
     $res = preg_match("/.*\((.*)\)/",$showLocation,$result);
@@ -498,13 +500,15 @@ function direction($lat1, $lng1, $lat2, $lng2){
         return '';
     }
 //    $ak ="27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg";
-//    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
-      $tk = '43511f4345162ee3db18035f8a6b50a5';
-//    $url = "http://api.map.baidu.com/direction/v2/driving?output=json&tactics=0&origin=".$lat1.",".$lng1."&destination=".$lat2.",".$lng2."&ak=".$ak;
-      $url = "http://api.tianditu.gov.cn/drive?postStr={'orig':\"$lat1,$lng1\",'dest':\"$lat2,$lng2\",'style':'0'}&type=search&tk=$tk";
-
+    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
+//      $tk = '43511f4345162ee3db18035f8a6b50a5';
+    $url = "http://api.map.baidu.com/direction/v2/driving?output=json&tactics=0&origin=".$lat1.",".$lng1."&destination=".$lat2.",".$lng2."&ak=".$ak;
+//      $url = "http://api.tianditu.gov.cn/drive?postStr={'orig':\"$lat1,$lng1\",'dest':\"$lat2,$lng2\",'style':'0'}&type=search&tk=$tk";
+//    dd($url);
     $renderOption = file_get_contents($url);
+//    dd($renderOption);
     $result = json_decode($renderOption,true);
+
 
     if ($result['status'] == '0') {
         $res['distance'] = $result['result']['routes'][0]['distance'];
