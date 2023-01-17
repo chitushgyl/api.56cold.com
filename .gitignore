@@ -1,7 +1,7 @@
 /storage
 /storage/*.key
 /vendor
-.env
+../yijin/.env
 .editorconfig
 .phpunit.result.cache
 Homestead.json

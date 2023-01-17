@@ -418,8 +418,8 @@ function unit_do($good_unit , $good_target_unit, $good_scale, $num) {
      * return 经纬度
      * */
 function bd_location($type,$pro,$city,$area,$info){
-    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
-//    $ak = '27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg';
+//    $ak ="rHo8wEGkKqtQCjESneT18rA9GpUQv25r";
+    $ak = '27uKVv8Q5jQpeZb6Vxaei7RvZhjNa3Gg';
     $tk = '';
     if($type == 1){
         $address = $pro.$city;

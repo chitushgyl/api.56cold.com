@@ -171,7 +171,7 @@ class WarehousequeryController extends CommonController{
             ];
             $Areaselect=['warehouse_id','self_id','area'];
             $Signselect=['warehouse_id','self_id','area_id','use_flag','area','row','column','tier'];
-            $wmsLibrarySigeSelect=['warehouse_sign_id','self_id','now_num'];
+            $wmsLibrarySigeSelect=['warehouse_sign_id','self_id','now_num','good_name','good_english_name','good_unit','spec','grounding_status'];
 
             $data['area_info']=WmsWarehouseArea::with(['wmsWarehouseSign' => function($query)use($Signselect,$wmsLibrarySigeSelect){
                 $query->where('delete_flag','=','Y');

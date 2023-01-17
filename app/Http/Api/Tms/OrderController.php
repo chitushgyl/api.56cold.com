@@ -2698,8 +2698,8 @@ class OrderController extends Controller{
         $send_address = $request->input('send_address');
 
         /**虚拟数据
-        $input['gather_address']      = $gather_address      = [["area"=>"东城区","city"=> "北京市","info"=> "123123","pro"=> "北京市"]];
-        $input['send_address']        = $send_address        = [['area'=>'城关区',"city"=> "拉萨市","info"=>"1234区","pro"=> "西藏"]];
+        $input['gather_address']      = $gather_address      = [["area"=>"东城区","city"=> "北京市","info"=> "123123","pro"=> "北京市"],["area"=>"房山区","city"=> "北京市","info"=> "星光路12号","pro"=> "北京市"]];
+        $input['send_address']        = $send_address        = [['area'=>'嘉定区',"city"=> "上海市","info"=>"金园一路","pro"=> "上海市"],['area'=>'闵行区',"city"=> "上海市","info"=>"虹桥火车站","pro"=> "上海市"]];
         $input['car_type']            = $car_type           = 'type_202102051755118039490396';
         * **/
         $rules = [
@@ -2983,7 +2983,6 @@ class OrderController extends Controller{
                 $start_action1= bd_location($type,'',$startcity_str[$i]['city'],$startcity_str[$i]['area'],$startcity_str[$i]['info']);
                 // 获取百度返回的结果
                 $list = direction($start_action['lat'], $start_action['lng'], $start_action1['lat'], $start_action1['lng']);
-                dd($list);
                 $finally = $list['distance']/1000;
                 $km1 = $this->mileage_interval(2,(int)$finally);
                 $km += $km1;
