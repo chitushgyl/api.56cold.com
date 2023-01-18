@@ -202,7 +202,7 @@ class WarehousequeryController extends CommonController{
                               $data['warehouse_info']->maintain++;
 
                           }else{
-                             if(!empty($vv->wmsLibrarySige)){
+                             if(count($vv->wmsLibrarySige)>0){
                                  $vv->status = 'Y';
                                  $v->count++;
                                  $v->use_count++;
