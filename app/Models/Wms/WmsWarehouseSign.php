@@ -54,7 +54,7 @@ class WmsWarehouseSign extends Model{
     public function wmsLibrarySige(){
         //参数：关联模型名称，外键，主键
         //如果主键是id可以省略
-        return $this->hasOne('App\Models\Wms\WmsLibrarySige','warehouse_sign_id','self_id');
+        return $this->hasMany('App\Models\Wms\WmsLibrarySige','warehouse_sign_id','self_id');
     }
 
 
