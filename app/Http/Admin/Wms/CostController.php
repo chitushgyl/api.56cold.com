@@ -320,10 +320,10 @@ class CostController  extends CommonController{
                 $info->wmsCost->out_price=$info->wmsCost->out_price/100;
                 $info->wmsCost->storage_price=$info->wmsCost->storage_price/100;
                 $info->wmsCost->total_price=$info->wmsCost->total_price/100;
-                $info->preentry_type_show=$wms_cost_type_show[$info->wmsCost->preentry_type];
-                $info->out_type_show=$wms_cost_type_show[$info->wmsCost->out_type];
-                $info->storage_type_show=$wms_cost_type_show[$info->wmsCost->storage_type];
-                $info->total_type_show=$wms_cost_type_show[$info->wmsCost->total_type];
+                $info->preentry_type_show=$wms_cost_type_show[$info->wmsCost->preentry_type]??null;
+                $info->out_type_show=$wms_cost_type_show[$info->wmsCost->out_type]??null;
+                $info->storage_type_show=$wms_cost_type_show[$info->wmsCost->storage_type]??null;
+                $info->total_type_show=$wms_cost_type_show[$info->wmsCost->total_type]??null;
 
             }
 
