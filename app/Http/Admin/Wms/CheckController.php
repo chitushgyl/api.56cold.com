@@ -221,6 +221,7 @@ class CheckController extends CommonController{
                 $where=[
                     ['delete_flag','=','Y'],
                     ['warehouse_id','=',$warehouse_id],
+                    ['grounding_status','=','Y'],
                     ['now_num','>',0],
                 ];
 
@@ -229,6 +230,11 @@ class CheckController extends CommonController{
                     'row','column','tier','now_num','good_unit','good_target_unit','good_scale','create_time'];
 
                 $info=WmsLibrarySige::where($where)->orderBy('create_time', 'desc')->select($select)->get();
+                if (!$info){
+                    $msg['code']=301;
+                    $msg['msg']="没有数据可以导出";
+                    return $msg;
+                }
 				//dd($info);
 				if($info){
 					foreach ($info as $k=>$v){
@@ -297,7 +303,7 @@ class CheckController extends CommonController{
                     $data['create_user_name']   =$user_info->name;
                     $data['create_time']        =$data['update_time']=$now_time;
                     $data['count']              = $info->count();
-                    dd($info);
+
                     $data['group_code']         = $info[0]->group_code;
                     $data['group_name']         = $info[0]->group_name;
                     $data['company_id']         = $info[0]->company_id;
