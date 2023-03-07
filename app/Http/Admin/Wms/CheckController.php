@@ -297,7 +297,7 @@ class CheckController extends CommonController{
                     $data['create_user_name']   =$user_info->name;
                     $data['create_time']        =$data['update_time']=$now_time;
                     $data['count']              = $info->count();
-                    dd($info);
+                    
                     $data['group_code']         = $info[0]->group_code;
                     $data['group_name']         = $info[0]->group_name;
                     $data['company_id']         = $info[0]->company_id;
