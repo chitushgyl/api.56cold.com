@@ -226,7 +226,7 @@ class CompanyController extends CommonController{
 		//dump($name_where);
         $group = SystemGroup::where($name_where)->count();
 		//dump($group);
-		
+
         if ($group>0){
             $msg['code'] = 308;
             $msg['msg'] = '公司名称不能重复！';
@@ -888,7 +888,7 @@ class CompanyController extends CommonController{
             ];
         }
 
-        $select=['self_id','group_name','group_code'];
+        $select=['self_id','group_name','group_code','business_type'];
         switch ($group_info['group_id']){
             case 'all':
                 $data['items']=SystemGroup::where($where)->orderBy('create_time', 'desc')
