@@ -687,7 +687,12 @@ class GoodController extends CommonController{
                     }else{
                         $list['good_zhuanhua']=null;
                     }
-                    $list['period']=$v->period_value.$period[$v->period];
+                    if($v->period){
+                        $list['period']=$v->period_value.$period[$v->period];
+                    }else{
+                        $list['period']=null;
+                    }
+
 
                     if($v->use_flag == 'Y'){
                         $list['use_flag']='使用中';

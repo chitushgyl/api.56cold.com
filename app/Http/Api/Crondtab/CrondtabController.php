@@ -162,6 +162,7 @@ class CrondtabController extends Controller {
         $where = [
             ['order_status','=',1],
             ['pay_type','=','online'],
+            ['pay_state','=','N'],
             ['create_time','>','2021-09-26 12:00:00']
         ];
         $select = ['self_id','order_status','total_money','pay_type','group_code','group_name','total_user_id','order_type','create_time'];
