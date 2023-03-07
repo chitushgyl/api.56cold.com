@@ -236,7 +236,7 @@ class CheckController extends CommonController{
                     $msg['msg']="没有数据可以导出";
                     return $msg;
                 }
-				//dd($info);
+
 				if($info){
 					foreach ($info as $k=>$v){
 						$list=[];
