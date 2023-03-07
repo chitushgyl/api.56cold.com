@@ -230,7 +230,8 @@ class CheckController extends CommonController{
                     'row','column','tier','now_num','good_unit','good_target_unit','good_scale','create_time'];
 
                 $info=WmsLibrarySige::where($where)->orderBy('create_time', 'desc')->select($select)->get();
-                if (empty($info)){
+
+                if (empty(get_object_vars($info))){
                     $msg['code']=301;
                     $msg['msg']="没有数据可以导出";
                     return $msg;
